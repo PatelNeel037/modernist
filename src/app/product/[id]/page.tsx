@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { notFound, useRouter } from 'next/navigation';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 import ProductCard from '@/components/ProductCard';
 import { useToast } from '@/context/ToastContext';
 import { Star, Truck, RefreshCw, ShieldCheck, Heart, ShoppingBag, Zap } from 'lucide-react';
@@ -24,6 +25,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const { addToCart } = useCart();
     const { showToast } = useToast();
+    const { user } = useAuth(); // Auth context
 
     // We'll initialize state with defaults if product exists, otherwise null
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -77,7 +79,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             quantity: quantity
         });
 
-        // Stay on page
+        // No redirect, just added
     };
 
     const handleBuyNow = () => {
@@ -95,6 +97,21 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             quantity: quantity
         };
 
+        // Check Login Status (sync check preferred for immediate feedback)
+        const isLogged = localStorage.getItem('user_data');
+
+        if (!isLogged && !user) {
+            showToast('Please login to complete your purchase.', 'error');
+            // Save intent
+            sessionStorage.setItem('modernist_buy_now_item', JSON.stringify(item));
+
+            setTimeout(() => {
+                router.push('/login');
+            }, 1000);
+            return;
+        }
+
+        // If logged in
         sessionStorage.setItem('modernist_buy_now_item', JSON.stringify(item));
         router.push('/checkout?mode=buy_now');
     };
@@ -108,7 +125,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 <div className="container mx-auto px-6 text-sm text-gray-500">
                     <Link href="/" className="hover:text-gray-900">Home</Link>
                     <span className="mx-2">/</span>
-                    <Link href="/shop/men" className="hover:text-gray-900">Shop</Link>
+                    <Link href="/shop" className="hover:text-gray-900">Shop</Link>
                     <span className="mx-2">/</span>
                     <span className="text-gray-900 font-medium">{product.name}</span>
                 </div>
@@ -119,11 +136,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
                     {/* Image Section */}
                     <div className="space-y-4">
-                        <div className="aspect-[4/5] bg-gray-100 rounded-lg overflow-hidden">
+                        <div className="aspect-[4/5] bg-gray-100 rounded-lg overflow-hidden relative group">
                             <img
                                 src={mainImage}
                                 alt={product.name}
-                                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                             />
                         </div>
                         <div className="flex space-x-4 overflow-x-auto pb-2">
@@ -223,30 +240,30 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         <div className="space-y-4 border-t border-gray-100 pt-6">
                             <div className="flex items-start gap-3">
                                 <Truck className="text-gray-400 w-5 h-5 mt-1" />
-                                <div>
-                                    <h5 className="font-medium text-gray-900 text-sm">Free Shipping & Returns</h5>
-                                    <p className="text-gray-500 text-sm mt-1">Free standard shipping on orders over $100.</p>
+                                <div className="text-sm">
+                                    <h5 className="font-medium text-gray-900">Free Shipping & Returns</h5>
+                                    <p className="text-gray-500 mt-1">Free standard shipping on orders over $100.</p>
                                 </div>
                             </div>
                             <div className="flex items-start gap-3">
                                 <RefreshCw className="text-gray-400 w-5 h-5 mt-1" />
-                                <div>
-                                    <h5 className="font-medium text-gray-900 text-sm">Easy Returns</h5>
-                                    <p className="text-gray-500 text-sm mt-1">30-day return policy for a full refund.</p>
+                                <div className="text-sm">
+                                    <h5 className="font-medium text-gray-900">Easy Returns</h5>
+                                    <p className="text-gray-500 mt-1">30-day return policy for a full refund.</p>
                                 </div>
                             </div>
                             <div className="flex items-start gap-3">
                                 <ShieldCheck className="text-gray-400 w-5 h-5 mt-1" />
-                                <div>
-                                    <h5 className="font-medium text-gray-900 text-sm">Secure Payment</h5>
-                                    <p className="text-gray-500 text-sm mt-1">All payments are processed securely.</p>
+                                <div className="text-sm">
+                                    <h5 className="font-medium text-gray-900">Secure Payment</h5>
+                                    <p className="text-gray-500 mt-1">All payments are processed securely.</p>
                                 </div>
                             </div>
                         </div>
 
                         <div className="mt-8">
                             <h4 className="font-medium text-gray-900 mb-2">Material & Care</h4>
-                            <p className="text-gray-600 text-sm">{product.material}</p>
+                            <p className="text-gray-600 text-sm leading-relaxed">{product.material}</p>
                         </div>
                     </div>
                 </div>

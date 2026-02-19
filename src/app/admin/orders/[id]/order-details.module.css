@@ -1,0 +1,275 @@
+/* Admin Order Details CSS Module */
+.orderDetailsContent {
+    flex: 1;
+    padding: 2rem;
+}
+
+.headerSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.headerTitle {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.breadcrumb {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+.breadcrumb a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+/* Detail Cards */
+.detailsGrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+    .detailsGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+}
+
+.cardHeader {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cardHeader h3 {
+    font-size: 1.1rem;
+    color: #2c3e50;
+    margin: 0;
+    font-weight: 600;
+}
+
+/* Order Info Grid */
+.infoRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.infoLabel {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    margin-bottom: 0.25rem;
+}
+
+.infoValue {
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
+/* Product Table */
+.itemsTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.itemsTable th,
+.itemsTable td {
+    text-align: left;
+    padding: 1rem 0.5rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.itemsTable th {
+    font-size: 0.85rem;
+    color: #95a5a6;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.prodWrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.prodImg {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+    background: #f5f5f5;
+}
+
+.prodName {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.prodMeta {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.totalRow td {
+    font-weight: 700;
+    padding-top: 1rem;
+    font-size: 1.1rem;
+    color: #2c3e50;
+}
+
+/* Status Badge */
+.statusBadge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    text-transform: capitalize;
+    display: inline-block;
+    font-weight: 500;
+}
+
+.statusPending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.statusProcessing {
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+.statusShipped {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.statusDelivered {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.statusCancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Actions */
+.actionBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+    gap: 8px;
+}
+
+.printBtn {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    width: auto;
+    margin: 0;
+}
+
+.printBtn:hover {
+    background-color: #2980b9;
+}
+
+.btnProcess {
+    background-color: #3498db;
+    color: white;
+}
+
+.btnProcess:hover {
+    background-color: #2980b9;
+}
+
+.btnShip {
+    background-color: #8e44ad;
+    color: white;
+}
+
+.btnShip:hover {
+    background-color: #71368a;
+}
+
+.btnDeliver {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.btnDeliver:hover {
+    background-color: #27ae60;
+}
+
+.btnCancel {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btnCancel:hover {
+    background-color: #c0392b;
+}
+
+.disabledBtn {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.timelineList {
+    list-style: none;
+    padding-left: 10px;
+    margin: 0;
+}
+
+.timelineItem {
+    margin-bottom: 15px;
+    border-left: 2px solid #ddd;
+    padding-left: 20px;
+    position: relative;
+    padding-bottom: 5px;
+}
+
+.timelineDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    position: absolute;
+    left: -6px;
+    top: 5px;
+    background: #bdc3c7;
+    /* default dot color */
+}

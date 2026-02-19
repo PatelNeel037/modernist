@@ -1,0 +1,128 @@
+/* Admin Customers CSS Module */
+.customersContent {
+    flex: 1;
+    padding: 2rem;
+}
+
+.headerSection {
+    margin-bottom: 2rem;
+}
+
+.headerTitle {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+/* Controls */
+.controlsContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.searchBox {
+    flex: 1;
+    max-width: 400px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.searchBox input {
+    width: 100%;
+    padding: 10px 15px 10px 40px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.searchBox input:focus {
+    border-color: #3498db;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 12px;
+    color: #999;
+    pointer-events: none;
+}
+
+.filterSelect {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    min-width: 150px;
+    outline: none;
+    background-color: white;
+}
+
+/* Table */
+.tableCard {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+}
+
+.adminTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.adminTable th,
+.adminTable td {
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.adminTable th {
+    font-weight: 600;
+    color: #7f8c8d;
+    background-color: #fcfcfc;
+}
+
+.userAvatar {
+    width: 35px;
+    height: 35px;
+    background: #e3f2fd;
+    color: #3498db;
+    border-radius: 50%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Badges */
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.activeBadge {
+    background: #d4edda;
+    color: #155724;
+}
+
+.inactiveBadge {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.blockedBadge {
+    background: #f8d7da;
+    color: #721c24;
+}

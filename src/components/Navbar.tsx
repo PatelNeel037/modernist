@@ -91,7 +91,8 @@ export default function Navbar() {
     return (
         <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-4' : 'bg-transparent py-6'}`}>
             <div className="container mx-auto px-6 flex justify-between items-center">
-                {/* ... (Logo and Desktop Menu remain same) */}
+
+                {/* Logo */}
                 <Link href="/" className={`text-2xl font-playfair font-bold tracking-wider ${isScrolled ? 'text-gray-900' : 'text-gray-900'}`}>
                     MODERNIST
                 </Link>
@@ -160,8 +161,8 @@ export default function Navbar() {
                     <div className="relative" ref={userRef}>
                         {user ? (
                             <>
-                                <button onClick={() => setIsUserOpen(!isUserOpen)} className="focus:outline-none">
-                                    <User className="w-5 h-5 hover:text-gray-600 transition-colors text-gray-900" />
+                                <button onClick={() => setIsUserOpen(!isUserOpen)} className="focus:outline-none" title={`Signed in as ${user.name}`}>
+                                    <User className="w-5 h-5 hover:text-gray-600 transition-colors text-gray-900 fill-current" />
                                 </button>
                                 {isUserOpen && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white shadow-xl rounded-md overflow-hidden border border-gray-100 z-50 animate-in fade-in zoom-in-95 duration-200">
@@ -182,7 +183,7 @@ export default function Navbar() {
                                 )}
                             </>
                         ) : (
-                            <Link href="/login"><User className="w-5 h-5 hover:text-gray-600 transition-colors" /></Link>
+                            <Link href="/login" title="Login / Sign Up"><User className="w-5 h-5 hover:text-gray-600 transition-colors" /></Link>
                         )}
                     </div>
 
@@ -213,20 +214,22 @@ export default function Navbar() {
 
             {/* Mobile Menu Overlay */}
             {isOpen && (
-                <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-6 flex flex-col space-y-4">
+                <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-6 flex flex-col space-y-4 h-screen">
                     <Link href="/" className="text-sm font-medium hover:text-gray-600" onClick={() => setIsOpen(false)}>HOME</Link>
                     <Link href="/shop/men" className="text-sm font-medium hover:text-gray-600" onClick={() => setIsOpen(false)}>MEN</Link>
                     <Link href="/shop/women" className="text-sm font-medium hover:text-gray-600" onClick={() => setIsOpen(false)}>WOMEN</Link>
-                    <Link href="#new-arrivals" className="text-sm font-medium hover:text-gray-600" onClick={() => setIsOpen(false)}>NEW ARRIVALS</Link>
-                    <Link href="#about" className="text-sm font-medium hover:text-gray-600" onClick={() => setIsOpen(false)}>ABOUT</Link>
-                    <div className="flex space-x-4 pt-4 border-t">
+                    <Link href="/#new-arrivals" className="text-sm font-medium hover:text-gray-600" onClick={() => setIsOpen(false)}>NEW ARRIVALS</Link>
+                    <Link href="/#about" className="text-sm font-medium hover:text-gray-600" onClick={() => setIsOpen(false)}>ABOUT</Link>
+                    <div className="flex space-x-6 pt-6 border-t mt-4">
                         {user ? (
-                            <Link href="/profile" onClick={() => setIsOpen(false)}><User className="w-5 h-5 text-gray-900" /></Link>
+                            <button onClick={() => { setIsOpen(false); router.push('/profile'); }} className="flex items-center">
+                                <User className="w-6 h-6 text-gray-900 fill-current mr-2" />
+                            </button>
                         ) : (
-                            <Link href="/login" onClick={() => setIsOpen(false)}><User className="w-5 h-5" /></Link>
+                            <Link href="/login" onClick={() => setIsOpen(false)}><User className="w-6 h-6" /></Link>
                         )}
-                        <Link href="/wishlist"><Heart className="w-5 h-5" /></Link>
-                        <Link href="/cart"><ShoppingBag className="w-5 h-5" /></Link>
+                        <Link href="/wishlist"><Heart className="w-6 h-6" /></Link>
+                        <Link href="/cart"><ShoppingBag className="w-6 h-6" /></Link>
                     </div>
                 </div>
             )}

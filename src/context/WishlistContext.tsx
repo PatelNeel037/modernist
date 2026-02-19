@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from './ToastContext';
+import { useAuth } from './AuthContext';
+import { DB } from '@/services/db';
 
 // Define the shape of a wishlist item. We'll store basic info to avoid complex lookups.
 interface WishlistItem {
@@ -24,41 +26,43 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 export function WishlistProvider({ children }: { children: ReactNode }) {
     const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
     const { showToast } = useToast();
+    const { user } = useAuth();
 
-    // Load from localStorage on mount (client-side only)
+    // Load wishlist on mount or user change
     useEffect(() => {
-        const storedWishlist = localStorage.getItem('wishlist');
-        if (storedWishlist) {
-            try {
-                // eslint-disable-next-line react-hooks/set-state-in-effect
-                setWishlist(JSON.parse(storedWishlist));
-            } catch (error) {
-                console.error("Failed to parse wishlist:", error);
-            }
-        }
-    }, []);
+        setWishlist(DB.getWishlist());
+    }, [user]);
 
-    // Save to localStorage whenever wishlist changes
+    // Save to DB whenever wishlist changes
     useEffect(() => {
-        localStorage.setItem('wishlist', JSON.stringify(wishlist));
-    }, [wishlist]);
+        // Simple save, assuming DB handles key logic based on current user
+        DB.saveWishlist(wishlist);
+    }, [wishlist, user]);
+
+    // Sync across tabs
+    useEffect(() => {
+        const handleStorage = () => {
+            setWishlist(DB.getWishlist());
+        };
+        window.addEventListener('storage', handleStorage);
+        return () => window.removeEventListener('storage', handleStorage);
+    }, [user]);
 
     const addToWishlist = (item: WishlistItem) => {
-        setWishlist((prev) => {
-            if (prev.some((i) => i.id === item.id)) {
-                showToast("Item already in wishlist", 'info');
-                return prev;
-            }
-            showToast("Added to wishlist", 'success');
-            return [...prev, item];
-        });
+        const isAlreadyInWishlist = wishlist.some((i) => i.id === item.id);
+
+        if (isAlreadyInWishlist) {
+            showToast("Item already in wishlist", 'info');
+            return;
+        }
+
+        setWishlist((prev) => [...prev, item]);
+        showToast("Added to wishlist", 'success');
     };
 
     const removeFromWishlist = (id: number) => {
-        setWishlist((prev) => {
-            showToast("Removed from wishlist", 'info');
-            return prev.filter((item) => item.id !== id);
-        });
+        setWishlist((prev) => prev.filter((item) => item.id !== id));
+        showToast("Removed from wishlist", 'info');
     };
 
     const isInWishlist = (id: number) => {

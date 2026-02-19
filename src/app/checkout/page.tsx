@@ -68,8 +68,8 @@ function CheckoutContent() {
         e.preventDefault();
         setIsLoading(true);
 
-        // Simulate API Processing
-        setTimeout(() => {
+        // Simulate API Processing Delay (Optional)
+        setTimeout(async () => {
             // Save address if new and user is logged in
             if (user && selectedAddressIndex === 'new') {
                 const newAddress = {
@@ -84,31 +84,50 @@ function CheckoutContent() {
                 addAddress(newAddress);
             }
 
-            // Create Order Logic (Mock)
-            const newOrder = {
-                id: `ORD-${Math.floor(Math.random() * 1000000)}`,
-                date: new Date().toISOString(),
-                status: 'Processing',
+            // Create Order Payload for API
+            const orderPayload = {
                 items: checkoutItems,
-                total: total,
-                shipping: selectedAddressIndex === 'new' ? formData : user?.addresses?.[selectedAddressIndex as number]
+                totalAmount: checkoutItems.reduce((acc, item: any) => acc + (item.price * item.quantity), 0),
+                shippingAddress: selectedAddressIndex === 'new' ? formData : user?.addresses?.[selectedAddressIndex as number],
+                guestInfo: !user ? {
+                    name: formData.firstName + ' ' + formData.lastName,
+                    email: formData.email
+                } : null,
+                userId: user ? user.id : null
             };
 
-            // Save to Mock DB (Orders)
-            // In a real app, this would be an API call.
-            // We'll store it in localStorage under 'modernist_orders'
+            // Call Backend API
             try {
-                const existingOrders = JSON.parse(localStorage.getItem('modernist_orders') || '[]');
-                // Associate with user email if logged in, otherwise guest?
-                // For simplicity, we just store all orders or filter by user in Orders page if we had user ID.
-                // Let's add email to order.
-                const orderWithUser = { ...newOrder, userEmail: user?.email || formData.email };
-                localStorage.setItem('modernist_orders', JSON.stringify([orderWithUser, ...existingOrders]));
+                const response = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderPayload)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Also save to localStorage for User "My Orders" page compatibility (Legacy support)
+                    const localOrder = {
+                        id: data.orderId || `ORD-${Date.now()}`,
+                        date: new Date().toISOString(),
+                        status: 'Pending',
+                        items: checkoutItems,
+                        total: orderPayload.totalAmount,
+                        shipping: orderPayload.shippingAddress,
+                        userEmail: user?.email || formData.email
+                    };
+
+                    const existingOrders = JSON.parse(localStorage.getItem('modernist_orders') || '[]');
+                    localStorage.setItem('modernist_orders', JSON.stringify([localOrder, ...existingOrders]));
+                } else {
+                    console.error("API Order Failed");
+                }
             } catch (e) {
-                console.error("Failed to save order", e);
+                console.error("Failed to save order to API", e);
             }
 
-            console.log("Order Placed:", newOrder);
+            console.log("Order Placed:", orderPayload);
 
             if (mode === 'buy_now') {
                 sessionStorage.removeItem('modernist_buy_now_item');

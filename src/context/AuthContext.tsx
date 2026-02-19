@@ -1,32 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-// --- Mock DB Layer (Simulating the user's DB object requirements) ---
-const DB = {
-    getUsers: () => {
-        if (typeof window === 'undefined') return [];
-        const users = localStorage.getItem('modernist_users');
-        return users ? JSON.parse(users) : [];
-    },
-    saveUser: (user: any) => {
-        const users = DB.getUsers();
-        users.push(user);
-        localStorage.setItem('modernist_users', JSON.stringify(users));
-    },
-    getCurrentUser: () => {
-        if (typeof window === 'undefined') return null;
-        const user = localStorage.getItem('modernist_current_user');
-        return user ? JSON.parse(user) : null;
-    },
-    setCurrentUser: (user: any) => {
-        if (user) {
-            localStorage.setItem('modernist_current_user', JSON.stringify(user));
-        } else {
-            localStorage.removeItem('modernist_current_user');
-        }
-    }
-};
+import { DB } from '@/services/db';
 
 interface Address {
     id: string;
@@ -40,9 +15,22 @@ interface Address {
 }
 
 interface User {
+    id?: string | number;
     name: string;
     email: string;
+    role?: string;
     addresses?: Address[];
+    isVerified?: boolean;
+    isActive?: boolean;
+    twoFactorEnabled?: boolean;
+    notifications?: {
+        orderUpdates: boolean;
+        promotions: boolean;
+        newArrivals: boolean;
+        email: boolean;
+        sms: boolean;
+    };
+    theme?: 'light' | 'dark';
 }
 
 interface AuthContextType {
@@ -51,91 +39,131 @@ interface AuthContextType {
     register: (name: string, email: string, password: string) => Promise<{ success: boolean; message: string }>;
     logout: () => void;
     addAddress: (address: Address) => void;
+    updateAddress: (address: Address) => void;
+    deleteAddress: (id: string) => void;
+    updateUser: (updates: Partial<User>) => void;
+    changePassword: (current: string, newPass: string) => Promise<{ success: boolean; message?: string }>;
     isAuthenticated: boolean;
+    isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Init: Check for logged in user
+    // ... (Init effect remains same)
     useEffect(() => {
         const currentUser = DB.getCurrentUser();
         if (currentUser) {
             setUser(currentUser);
         }
+        setIsLoading(false);
     }, []);
+    // ...
 
+    // ... (login/register remains same)
     const login = async (email: string, password: string) => {
-        // Mock DB Login
-        return new Promise<{ success: boolean; message: string }>((resolve) => {
-            setTimeout(() => {
-                const users = DB.getUsers();
-                const foundUser = users.find((u: any) => u.email === email && u.password === password);
-
-                if (foundUser) {
-                    const sessionUser = { name: foundUser.name, email: foundUser.email };
-                    DB.setCurrentUser(sessionUser);
-                    setUser(sessionUser);
-                    resolve({ success: true, message: 'Login successful!' });
-                } else {
-                    resolve({ success: false, message: 'Invalid email or password.' });
-                }
-            }, 500); // Simulate network delay
-        });
-    };
-
-    const register = async (name: string, email: string, password: string) => {
-        // Mock DB Register
-        return new Promise<{ success: boolean; message: string }>((resolve) => {
-            setTimeout(() => {
-                const users = DB.getUsers();
-                if (users.find((u: any) => u.email === email)) {
-                    resolve({ success: false, message: 'Email already registered.' });
-                    return;
-                }
-
-                const newUser = { name, email, password }; // ID would be generated here in real app
-                DB.saveUser(newUser);
-
-                // Auto login after register? The snippet doesn't explicitly say, but usually yes. 
-                // However, snippet `Auth.register` just says "Account created".
-                // We'll require login unless user wants auto-login.
-                // Let's auto-login for better UX.
-                const sessionUser = { name, email };
-                DB.setCurrentUser(sessionUser);
-                setUser(sessionUser);
-
-                resolve({ success: true, message: 'Account created successfully!' });
-            }, 500);
-        });
-    };
-
-    const addAddress = (address: Address) => {
-        if (!user) return;
-
-        const updatedUser = { ...user, addresses: [...(user.addresses || []), address] };
-        setUser(updatedUser);
-        DB.setCurrentUser(updatedUser);
-
-        // Update in "Database"
-        const users = DB.getUsers();
-        const userIndex = users.findIndex((u: any) => u.email === user.email);
-        if (userIndex !== -1) {
-            users[userIndex] = { ...users[userIndex], addresses: updatedUser.addresses };
-            localStorage.setItem('modernist_users', JSON.stringify(users));
+        const result = await DB.login(email, password);
+        if (result.success) {
+            const currentUser = DB.getCurrentUser();
+            setUser(currentUser);
+            localStorage.setItem('modernist_token', 'mock-token-' + Date.now());
+            return { success: true, message: 'Login successful!' };
+        } else {
+            return { success: false, message: result.message || 'Login failed' };
         }
     };
 
+    const register = async (name: string, email: string, password: string) => {
+        const result = await DB.register(name, email, password);
+        if (result.success) {
+            if (result.requireVerification) {
+                return { success: true, message: result.message || 'Please verify your email.' };
+            }
+            const currentUser = DB.getCurrentUser();
+            setUser(currentUser);
+            return { success: true, message: 'Account created successfully!' };
+        } else {
+            return { success: false, message: result.message || 'Registration failed' };
+        }
+    };
+
+    const updateUser = (updates: Partial<User>) => {
+        if (!user) return;
+        const updatedUser = { ...user, ...updates };
+        setUser(updatedUser);
+        DB.updateCurrentUser(updatedUser);
+        DB.updateProfile(updatedUser);
+    };
+
+    // ... (Address methods remain same, just ensure they are included in Provider value)
+    const addAddress = (address: Address) => {
+        if (!user) return;
+
+        let currentAddresses = user.addresses || [];
+        let newAddress = { ...address };
+
+        if (currentAddresses.length === 0) {
+            newAddress.isDefault = true;
+        }
+
+        if (newAddress.isDefault) {
+            currentAddresses = currentAddresses.map(a => ({ ...a, isDefault: false }));
+        }
+
+        const updatedUser = { ...user, addresses: [...currentAddresses, newAddress] };
+        setUser(updatedUser);
+        DB.updateCurrentUser(updatedUser);
+        DB.updateProfile(updatedUser);
+    };
+
+    const updateAddress = (updatedAddress: Address) => {
+        if (!user || !user.addresses) return;
+
+        let updatedAddresses = user.addresses.map(addr => {
+            if (addr.id === updatedAddress.id) return updatedAddress;
+            if (updatedAddress.isDefault) return { ...addr, isDefault: false };
+            return addr;
+        });
+
+        if (updatedAddresses.length > 0 && !updatedAddresses.some(a => a.isDefault)) {
+            updatedAddresses[0] = { ...updatedAddresses[0], isDefault: true };
+        }
+
+        const updatedUser = { ...user, addresses: updatedAddresses };
+        setUser(updatedUser);
+        DB.updateCurrentUser(updatedUser);
+        DB.updateProfile(updatedUser);
+    };
+
+    const deleteAddress = (addressId: string) => {
+        if (!user || !user.addresses) return;
+        let updatedAddresses = user.addresses.filter(addr => addr.id !== addressId);
+
+        if (updatedAddresses.length > 0 && !updatedAddresses.some(a => a.isDefault)) {
+            updatedAddresses[0] = { ...updatedAddresses[0], isDefault: true };
+        }
+
+        const updatedUser = { ...user, addresses: updatedAddresses };
+        setUser(updatedUser);
+        DB.updateCurrentUser(updatedUser);
+        DB.updateProfile(updatedUser);
+    };
+
+    const changePassword = async (current: string, newPass: string) => {
+        if (!user) return { success: false, message: 'Not logged in' };
+        return await DB.changePassword(user.email, current, newPass);
+    };
+
     const logout = () => {
-        DB.setCurrentUser(null);
+        DB.logout();
         setUser(null);
-        // window.location.href = '/login'; // Optional: Redirect or just clear state
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, addAddress, isAuthenticated: !!user }}>
+        <AuthContext.Provider value={{ user, login, register, logout, addAddress, updateAddress, deleteAddress, updateUser, changePassword, isAuthenticated: !!user, isLoading }}>
             {children}
         </AuthContext.Provider>
     );

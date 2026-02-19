@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from './ToastContext';
+import { useAuth } from './AuthContext';
+import { DB } from '@/services/db';
 
 export interface CartItem {
     id: number;
@@ -27,37 +29,35 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
     const [cart, setCart] = useState<CartItem[]>([]);
     const { showToast } = useToast();
+    const { user } = useAuth(); // Dependency on Auth to switch carts
 
-    // Load from localStorage on mount and listen for storage changes
+    // Load cart when user changes or on mount
     useEffect(() => {
-        const storedCart = localStorage.getItem('cart');
-        if (storedCart) {
-            try {
-                // eslint-disable-next-line react-hooks/set-state-in-effect
-                setCart(JSON.parse(storedCart));
-            } catch (error) {
-                console.error("Failed to parse cart:", error);
-            }
-        }
+        setCart(DB.getCart());
+    }, [user]);
 
-        const handleStorage = (event: StorageEvent) => {
-            if (event.key === 'cart') {
-                try {
-                    setCart(JSON.parse(event.newValue || '[]'));
-                } catch (e) { }
-            }
+    // Listen for storage events (e.g. from other tabs or DB adapter dispatch)
+    useEffect(() => {
+        const handleStorage = () => {
+            // Reload cart logic handled by checking DB again
+            const freshCart = DB.getCart();
+            // Optional: deep compare to avoid unnecessary re-renders
+            setCart(freshCart);
         };
         window.addEventListener('storage', handleStorage);
         return () => window.removeEventListener('storage', handleStorage);
-    }, []);
+    }, [user]); // Re-bind if user context changes (affects DB.getCart internal logic)
 
-    // Save to localStorage whenever cart changes
+    // Save to DB (localStorage) whenever cart changes
     useEffect(() => {
-        // We only write if the cart state changes. 
-        // Note: writing to localStorage does NOT trigger 'storage' event in the same window,
-        // so this won't cause an infinite loop with the listener above.
-        localStorage.setItem('cart', JSON.stringify(cart));
-    }, [cart]);
+        // Prevent writing if the state matches DB (avoids loops)
+        const currentDB = JSON.stringify(DB.getCart());
+        const currentState = JSON.stringify(cart);
+
+        if (currentDB !== currentState) {
+            DB.saveCart(cart);
+        }
+    }, [cart]); // Removed 'user' dependency to avoid overwriting DB on context switch with stale cart state
 
     const addToCart = (newItem: CartItem) => {
         setCart((prevCart) => {
@@ -82,11 +82,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     };
 
     const removeFromCart = (id: number, size?: string) => {
-        setCart((prevCart) => {
-            const item = prevCart.find(i => i.id === id && i.size === size);
-            if (item) showToast(`Removed ${item.name} from cart`, 'info');
-            return prevCart.filter((item) => !(item.id === id && item.size === size));
-        });
+        const itemToRemove = cart.find(i => i.id === id && i.size === size);
+        if (itemToRemove) {
+            showToast(`Removed ${itemToRemove.name} from cart`, 'info');
+        }
+        setCart((prevCart) => prevCart.filter((item) => !(item.id === id && item.size === size)));
     };
 
     const updateQuantity = (id: number, size: string | undefined, quantity: number) => {

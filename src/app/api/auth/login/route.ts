@@ -1,37 +1,56 @@
 import { NextResponse } from 'next/server';
-import { MockUserStore } from '@/lib/mock-store';
+import { connectDB } from '@/lib/db';
+import User from '@/models/User';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-const MOCK_TOKEN = "jwt_token_user_login";
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_for_development_only';
 
 export async function POST(request: Request) {
     try {
+        await connectDB();
         const body = await request.json();
         const { email, password } = body;
 
-        // Find user in memory store
-        const user = MockUserStore.validateCredentials(email, password);
+        const user = await User.findOne({ email });
 
         if (user) {
-            // Check Blocked Status
             if (user.isBlocked) {
                 return NextResponse.json({ success: false, message: 'Your account has been suspended. Please contact support.' }, { status: 403 });
             }
 
-            // Success
-            // Don't return password in response
-            const { password: _, ...safeUser } = user;
+            const isMatch = await bcrypt.compare(password, user.password);
 
-            return NextResponse.json({
+            if (!isMatch) {
+                return NextResponse.json({ success: false, message: 'Invalid email or password.' }, { status: 401 });
+            }
+
+            const token = jwt.sign({ id: user._id, role: user.role, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+
+            const { password: _, ...safeUser } = user.toObject();
+            safeUser.id = safeUser._id.toString();
+
+            const response = NextResponse.json({
                 success: true,
-                token: MOCK_TOKEN,
+                token,
                 user: safeUser,
                 message: 'Login successful'
             });
+
+            response.cookies.set("token", token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "strict",
+                path: "/",
+            });
+
+            return response;
         }
 
         return NextResponse.json({ success: false, message: 'Invalid email or password.' }, { status: 401 });
 
     } catch (error) {
+        console.error("Login error:", error);
         return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
     }
 }

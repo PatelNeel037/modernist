@@ -1,17 +1,24 @@
 import { NextResponse } from 'next/server';
-import { MockProductStore } from '@/lib/mock-store';
+import { connectDB } from '@/lib/db';
+import Product from '@/models/Product';
+import { verifyAdmin } from '@/lib/auth';
 
 export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
     try {
+        await connectDB();
         const params = await props.params;
-        const id = parseInt(params.id);
-        const product = MockProductStore.getById(id);
+        const id = params.id;
 
-        if (!product || product.status === 'deleted') { // Hide deleted products
+        const product = await Product.findById(id);
+
+        if (!product || product.status === 'deleted') {
             return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
         }
 
-        return NextResponse.json(product);
+        const safeProduct = product.toObject();
+        safeProduct.id = safeProduct._id.toString();
+
+        return NextResponse.json(safeProduct);
     } catch (e) {
         console.error("GET Product Error:", e);
         return NextResponse.json({ success: false, message: 'Fetch failed' }, { status: 500 });
@@ -20,18 +27,23 @@ export async function GET(request: Request, props: { params: Promise<{ id: strin
 
 export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
     try {
+        await verifyAdmin();
+        await connectDB();
         const params = await props.params;
-        const id = parseInt(params.id);
+        const id = params.id;
         const body = await request.json();
 
         // Check product existence
-        const updated = MockProductStore.update(id, body);
+        const updated = await Product.findByIdAndUpdate(id, body, { new: true });
 
         if (!updated) {
             return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
         }
 
-        return NextResponse.json({ success: true, product: updated });
+        const safeProduct = updated.toObject();
+        safeProduct.id = safeProduct._id.toString();
+
+        return NextResponse.json({ success: true, product: safeProduct });
     } catch (e) {
         console.error("PUT Product Error:", e);
         return NextResponse.json({ success: false, message: 'Update failed' }, { status: 500 });
@@ -40,9 +52,13 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
 
 export async function DELETE(request: Request, props: { params: Promise<{ id: string }> }) {
     try {
+        await verifyAdmin();
+        await connectDB();
         const params = await props.params;
-        const id = parseInt(params.id);
-        const deleted = MockProductStore.delete(id);
+        const id = params.id;
+
+        // Soft delete
+        const deleted = await Product.findByIdAndUpdate(id, { status: 'deleted' });
 
         if (!deleted) {
             return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });

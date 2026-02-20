@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { MockOrderStore } from '@/lib/mock-store';
+import { connectDB } from '@/lib/db';
+import Order from '@/models/Order';
+import { verifyAuth } from '@/lib/auth';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -10,21 +12,36 @@ export async function GET(request: Request) {
         return NextResponse.json({ message: 'User ID or Email is required' }, { status: 400 });
     }
 
-    try {
-        let orders = MockOrderStore.getAll();
+    if (userId) {
+        try {
+            const decodedToken = await verifyAuth();
+            if (decodedToken.id !== userId && decodedToken.role !== 'admin') {
+                return NextResponse.json({ message: 'Unauthorized access to user orders' }, { status: 403 });
+            }
+        } catch (e) {
+            return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+        }
+    }
 
+    try {
+        await connectDB();
+
+        let query: any = {};
         if (userId) {
-            // Convert to string for comparison as userId might be number in store
-            orders = orders.filter((o: any) => String(o.userId) === String(userId));
+            query.userId = userId;
         } else if (email) {
-            // Fallback for older orders without userId
-            orders = orders.filter((o: any) => o.userEmail === email);
+            query.userEmail = email;
         }
 
-        // Sort by date desc
-        orders.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        const orders = await Order.find(query).sort({ createdAt: -1 });
 
-        return NextResponse.json(orders);
+        const formattedOrders = orders.map(o => {
+            const obj = o.toObject();
+            obj.id = obj._id.toString();
+            return obj;
+        });
+
+        return NextResponse.json(formattedOrders);
     } catch (e) {
         return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
     }

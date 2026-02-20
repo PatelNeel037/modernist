@@ -1,21 +1,29 @@
 import { NextResponse } from 'next/server';
-import { MockUserStore, MockOrderStore } from '@/lib/mock-store';
+import { connectDB } from '@/lib/db';
+import User from '@/models/User';
+import Order from '@/models/Order';
+import { verifyAdmin } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        const users = MockUserStore.getAll();
-        const orders = MockOrderStore.getAll();
+        await verifyAdmin();
+        await connectDB();
+        const users = await User.find().lean();
+        const orders = await Order.find().lean();
 
         // Enrich users with stats
-        const enrichedUsers = users.map((user: any) => {
-            const userOrders = orders.filter((o: any) => o.userEmail === user.email || o.userId === user.id);
+        const enrichedUsers = users.map((u: any) => {
+            const userOrders = orders.filter((o: any) => o.userEmail === u.email || String(o.userId) === String(u._id));
             const totalSpent = userOrders.reduce((sum: number, o: any) => sum + (Number(o.totalAmount) || 0), 0);
 
             return {
-                ...user,
-                status: user.isBlocked ? 'blocked' : (user.status || 'active'),
-                isActive: !user.isBlocked,
-                joined: user.id, // Timestamp is ID in mock
+                ...u,
+                id: u._id.toString(),
+                status: u.isBlocked ? 'blocked' : (u.status || 'active'),
+                isActive: !u.isBlocked,
+                joined: u.createdAt,
                 totalOrders: userOrders.length,
                 totalSpent: totalSpent
             };

@@ -1,38 +1,58 @@
 import { NextResponse } from 'next/server';
-import { MockUserStore } from '@/lib/mock-store';
+import { connectDB } from '@/lib/db';
+import User from '@/models/User';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-const MOCK_TOKEN = "jwt_token_user_signup";
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_for_development_only';
 
 export async function POST(request: Request) {
     try {
+        await connectDB();
         const body = await request.json();
         const { name, email, password } = body;
 
-        // Validation
         if (!email || !password || !name) {
             return NextResponse.json({ success: false, message: 'All fields are required' }, { status: 400 });
         }
 
-        // Check if user exists
-        const existing = MockUserStore.findByEmail(email);
+        const existing = await User.findOne({ email });
         if (existing) {
             return NextResponse.json({ success: false, message: 'Email already registered.' }, { status: 409 });
         }
 
-        // Create new user
-        const newUser = MockUserStore.create({ name, email, password, role: 'user' });
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Safe user object (no password)
-        const { password: _, ...safeUser } = newUser;
+        const newUser = await User.create({
+            name,
+            email,
+            password: hashedPassword,
+            role: 'user',
+        });
 
-        return NextResponse.json({
+        const token = jwt.sign({ id: newUser._id, role: newUser.role, email: newUser.email }, JWT_SECRET, { expiresIn: '7d' });
+
+        const { password: _, ...safeUser } = newUser.toObject();
+        safeUser.id = safeUser._id.toString();
+
+        const response = NextResponse.json({
             success: true,
-            token: MOCK_TOKEN,
+            token,
             user: safeUser,
             message: 'Account created successfully!'
         });
 
+        response.cookies.set("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            path: "/",
+        });
+
+        return response;
+
     } catch (error) {
+        console.error("Signup error:", error);
         return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
     }
 }

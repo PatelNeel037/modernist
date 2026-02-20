@@ -302,8 +302,9 @@ export const DB = {
     fetchProducts: async function () {
         try {
             const response = await fetch(`${API_URL}/products`);
+            if (!response.ok) return [];
             const data = await response.json();
-            return data;
+            return Array.isArray(data) ? data : [];
         } catch (e) {
             console.warn("Failed to fetch products (Is backend running?)", e);
             return [];

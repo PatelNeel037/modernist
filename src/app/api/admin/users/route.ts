@@ -13,6 +13,8 @@ export async function GET() {
 
             return {
                 ...user,
+                status: user.isBlocked ? 'blocked' : (user.status || 'active'),
+                isActive: !user.isBlocked,
                 joined: user.id, // Timestamp is ID in mock
                 totalOrders: userOrders.length,
                 totalSpent: totalSpent

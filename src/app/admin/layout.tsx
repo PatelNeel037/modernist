@@ -11,13 +11,14 @@ import {
     LogOut,
     Menu
 } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+import { DB } from '@/services/db'; // Direct DB access for Admin
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-    const { user, isAuthenticated, logout } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
     const [isSidebarOpen, setSidebarOpen] = useState(true);
+    const [adminUser, setAdminUser] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
 
     const isLoginPage = pathname === '/admin/login';
 
@@ -25,7 +26,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
     useEffect(() => {
-        // If on login page, don't enforce auth immediately or redirect to /login
+        // Build-time / server-side check
+        if (typeof window === 'undefined') return;
+
+        const user = DB.getAdminUser();
+        setAdminUser(user);
+        setLoading(false);
+
+        // If on login page, don't enforce auth immediately
         if (isLoginPage) {
             // But if we ARE logged in as admin, go to dashboard
             if (user && user.role === 'admin') {
@@ -35,24 +43,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }
 
         // Protect other admin routes
-        if (!isAuthenticated) return; // Wait for auth to load
-
-        if (user && user.role !== 'admin') {
-            router.push('/');
-        } else if (!user) {
-            router.push('/admin/login'); // Redirect to admin login
+        if (!user || user.role !== 'admin') {
+            router.push('/admin/login');
         }
-    }, [user, isAuthenticated, router, isLoginPage, pathname]);
+    }, [pathname, isLoginPage, router]);
 
     // Initial Loading State Logic
-    // If NOT on login page AND (no user OR not admin), show loading
-    if (!isLoginPage && (!user || user.role !== 'admin')) {
+    if (loading) {
         return <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-500">Loading Admin Panel...</div>;
     }
 
     // If it IS login page, just render children (the login form)
     if (isLoginPage) {
         return <>{children}</>;
+    }
+
+    // Wait until we have a verified admin user before showing layout
+    if (!adminUser || adminUser.role !== 'admin') {
+        return null; // Will redirect in useEffect
     }
 
     const menuItems = [
@@ -69,12 +77,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <button onClick={toggleSidebar}>
                     <Menu className="w-6 h-6 text-gray-700" />
                 </button>
-                <span className="ml-4 font-bold text-gray-700">MODERNIST ADMIN</span>
+                <div className="ml-4 flex items-center gap-2">
+                    <span className="font-bold text-gray-700">MODERNIST ADMIN</span>
+                </div>
             </div>
 
             {/* Sidebar */}
             <aside className={`${styles.sidebar} ${!isSidebarOpen ? '-translate-x-full md:translate-x-0' : 'translate-x-0'}`}>
                 <div className={styles.logo}>MODERNIST ADMIN</div>
+                <div className="px-6 py-2 mb-4">
+                    <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Logged in as</div>
+                    <div className="text-sm font-medium text-white truncate">{adminUser.name}</div>
+                </div>
                 <nav className={styles.menu}>
                     <ul>
                         {menuItems.map((item) => {
@@ -94,7 +108,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         })}
                     </ul>
                 </nav>
-                <div onClick={() => { logout(); router.push('/admin/login'); }} className={`${styles.menuLink} ${styles.logout} cursor-pointer`}>
+                <div onClick={() => { DB.adminLogout(); }} className={`${styles.menuLink} ${styles.logout} cursor-pointer`}>
                     <LogOut size={18} />
                     <span>Logout</span>
                 </div>

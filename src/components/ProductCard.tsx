@@ -73,7 +73,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
 
                 {/* Add to Cart - Bottom overlay */}
                 <div className="absolute inset-x-0 bottom-0 bg-white/95 backdrop-blur-md py-3 flex justify-center items-center translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20 border-t border-gray-100">
-                    <button onClick={handleAddToCart} className="text-sm font-semibold text-gray-900 hover:text-blue-600 flex items-center gap-2">
+                    <button onClick={handleAddToCart} className="text-sm font-semibold text-content-heading hover:text-brand-primary flex items-center gap-2 transition-colors">
                         <i className="fas fa-plus"></i> Add to Cart
                     </button>
                 </div>
@@ -81,16 +81,16 @@ export default function ProductCard({ product }: { product: ProductProps }) {
 
                 {/* Sale Badge */}
                 {product.sale && (
-                    <span className="absolute top-4 left-4 bg-red-500 text-white text-[10px] uppercase font-bold px-2 py-1 rounded tracking-wide">Sale</span>
+                    <span className="absolute top-4 left-4 bg-brand-primary text-white text-[10px] uppercase font-bold px-2 py-1 rounded tracking-wide">Sale</span>
                 )}
             </div>
 
             {/* Info */}
             <div className="p-4 text-center">
                 <Link href={`/product/${product.id}`}>
-                    <h3 className="font-medium text-gray-900 text-lg mb-1 hover:text-gray-600 transition-colors">{product.name}</h3>
+                    <h3 className="font-medium text-content-heading text-lg mb-1 hover:text-brand-primary transition-colors">{product.name}</h3>
                 </Link>
-                <p className="text-gray-500 font-light">${product.price}</p>
+                <p className="text-brand-primary font-medium">${product.price}</p>
             </div>
         </div>
     );

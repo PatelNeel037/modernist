@@ -46,7 +46,14 @@ function readDB(): Schema {
     ensureDB();
     try {
         const data = fs.readFileSync(DB_FILE, 'utf-8');
-        return JSON.parse(data);
+        const parsed = JSON.parse(data);
+        if (!parsed || !Array.isArray(parsed.users) || !Array.isArray(parsed.orders)) {
+            // If schema is invalid, re-initialize or return empty
+            // Better to re-initialize if empty/corrupted? 
+            // For now just return empty safe object to avoid crashes
+            return { users: [], orders: [], products: [] };
+        }
+        return parsed;
     } catch (e) {
         console.error("DB Read Error", e);
         return { users: [], orders: [], products: [] };
@@ -104,6 +111,17 @@ export const MockUserStore = {
             return true;
         }
         return false;
+    },
+
+    toggleBlockStatus: (email: string, isBlocked: boolean) => {
+        const db = readDB();
+        const userIndex = db.users.findIndex(u => u.email === email);
+        if (userIndex !== -1) {
+            db.users[userIndex].isBlocked = isBlocked;
+            writeDB(db);
+            return true;
+        }
+        return false;
     }
 };
 
@@ -131,15 +149,15 @@ export const MockOrderStore = {
         return newOrder;
     },
 
-    updateStatus: (id: string, status: string) => {
+    update: (id: string, updates: any) => {
         const db = readDB();
         const orderIndex = db.orders.findIndex(o => o.id === id);
         if (orderIndex !== -1) {
-            db.orders[orderIndex].status = status;
+            db.orders[orderIndex] = { ...db.orders[orderIndex], ...updates };
             writeDB(db);
-            return true;
+            return db.orders[orderIndex];
         }
-        return false;
+        return null;
     },
 
     getStats: () => {

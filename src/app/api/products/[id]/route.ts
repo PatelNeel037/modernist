@@ -1,6 +1,23 @@
 import { NextResponse } from 'next/server';
 import { MockProductStore } from '@/lib/mock-store';
 
+export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
+    try {
+        const params = await props.params;
+        const id = parseInt(params.id);
+        const product = MockProductStore.getById(id);
+
+        if (!product || product.status === 'deleted') { // Hide deleted products
+            return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });
+        }
+
+        return NextResponse.json(product);
+    } catch (e) {
+        console.error("GET Product Error:", e);
+        return NextResponse.json({ success: false, message: 'Fetch failed' }, { status: 500 });
+    }
+}
+
 export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
     try {
         const params = await props.params;

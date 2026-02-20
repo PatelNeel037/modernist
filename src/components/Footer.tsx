@@ -4,7 +4,7 @@ export default function Footer() {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="bg-black text-white pt-16 pb-8">
+        <footer className="bg-brand-dark text-white pt-16 pb-8">
             <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 text-center md:text-left">
 
                 {/* Brand Column */}
@@ -16,13 +16,13 @@ export default function Footer() {
                         Redefining everyday fashion with timeless essentials.
                     </p>
                     <div className="flex justify-center md:justify-start space-x-4">
-                        <a href="#" className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all duration-300">
+                        <a href="#" className="w-10 h-10 rounded-full bg-brand-primary flex items-center justify-center text-white hover:bg-white hover:text-brand-dark transition-all duration-300">
                             <i className="fab fa-instagram text-lg"></i>
                         </a>
-                        <a href="#" className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all duration-300">
+                        <a href="#" className="w-10 h-10 rounded-full bg-brand-primary flex items-center justify-center text-white hover:bg-white hover:text-brand-dark transition-all duration-300">
                             <i className="fab fa-facebook-f text-lg"></i>
                         </a>
-                        <a href="#" className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all duration-300">
+                        <a href="#" className="w-10 h-10 rounded-full bg-brand-primary flex items-center justify-center text-white hover:bg-white hover:text-brand-dark transition-all duration-300">
                             <i className="fab fa-twitter text-lg"></i>
                         </a>
                     </div>

@@ -1,10 +1,19 @@
 import { NextResponse } from 'next/server';
-import { MockOrderStore } from '@/lib/mock-store';
+import { MockOrderStore, MockUserStore } from '@/lib/mock-store';
 
 export async function POST(request: Request) {
     try {
         const body = await request.json();
         const { userId, items, totalAmount, shippingAddress, guestInfo } = body;
+
+        // Check Blocked Status
+        if (userId) {
+            const allUsers = MockUserStore.getAll();
+            const user = allUsers.find((u: any) => u.id.toString() === userId.toString());
+            if (user && user.isBlocked) {
+                return NextResponse.json({ success: false, message: 'Account is blocked' }, { status: 403 });
+            }
+        }
 
         // Validation
         if (!items || items.length === 0) {
@@ -25,6 +34,10 @@ export async function POST(request: Request) {
 
     } catch (error) {
         console.error("Order API Error:", error);
-        return NextResponse.json({ success: false, message: 'Failed to process order' }, { status: 500 });
+        return NextResponse.json({
+            success: false,
+            message: 'Failed to process order',
+            error: String(error)
+        }, { status: 500 });
     }
 }

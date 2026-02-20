@@ -11,45 +11,74 @@ import { useAuth } from '@/context/AuthContext';
 import ProductCard from '@/components/ProductCard';
 import { useToast } from '@/context/ToastContext';
 import { Star, Truck, RefreshCw, ShieldCheck, Heart, ShoppingBag, Zap } from 'lucide-react';
+import { DB } from '@/services/db';
 import { allProducts } from '@/data/products';
-
-const getProduct = (id: string) => {
-    return allProducts.find(p => p.id === parseInt(id));
-};
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const productId = resolvedParams.id;
-    const product = getProduct(productId);
     const router = useRouter();
+
+    // State
+    const [product, setProduct] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [selectedSize, setSelectedSize] = useState<string | null>(null);
+    const [mainImage, setMainImage] = useState('');
+    const [quantity, setQuantity] = useState(1);
+    const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+
+    // Hooks
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const { addToCart } = useCart();
     const { showToast } = useToast();
-    const { user } = useAuth(); // Auth context
+    const { user } = useAuth();
 
-    // We'll initialize state with defaults if product exists, otherwise null
-    const [selectedSize, setSelectedSize] = useState<string | null>(null);
-    const [mainImage, setMainImage] = useState(product ? product.images[0] : '');
-    const [quantity, setQuantity] = useState(1);
+    // Fetch Product
+    useEffect(() => {
+        const load = async () => {
+            const data = await DB.fetchProduct(productId);
+            if (!data) {
+                setLoading(false);
+                return;
+            }
+            setProduct(data);
+            setMainImage(data.images[0]); // Initialize image here when loaded
+            setLoading(false);
+        };
+        load();
+    }, [productId]);
 
-    // If product changes (unlikely in this page unless navigation happens), update image
+    // Update image if product changes (not strictly needed if set in fetch, but safe to keep)
     useEffect(() => {
         if (product) {
             setMainImage(product.images[0]);
         }
     }, [product]);
 
+    // Fetch Related Products
+    useEffect(() => {
+        if (!product) return;
+        const loadRelated = async () => {
+            const all = await DB.fetchProducts();
+            const related = all.filter((p: any) => p.category === product.category && p.id !== product.id).slice(0, 4);
+            setRelatedProducts(related);
+        };
+        loadRelated();
+    }, [product]);
+
+    if (loading) {
+        return <div className="min-h-screen flex items-center justify-center">Loading product...</div>;
+    }
+
     if (!product) {
         notFound();
         return null; // TS satisfaction
     }
 
-    // Get related products (same category, excluding current one)
-    const relatedProducts = allProducts
-        .filter(p => p.category === product.category && p.id !== product.id)
-        .slice(0, 4);
-
+    // Derived state must be calculated after the null check
     const isIn = isInWishlist(product.id);
+
+
 
     const toggleWishlist = () => {
         if (isIn) {
@@ -144,7 +173,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                             />
                         </div>
                         <div className="flex space-x-4 overflow-x-auto pb-2">
-                            {product.images.map((img, idx) => (
+                            {product.images.map((img: string, idx: number) => (
                                 <button
                                     key={idx}
                                     onClick={() => setMainImage(img)}
@@ -183,7 +212,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                 <Link href="/size-guide" className="text-sm text-gray-500 underline hover:text-gray-900">Size Guide</Link>
                             </div>
                             <div className="flex flex-wrap gap-3">
-                                {product.sizes.map(size => (
+                                {product.sizes.map((size: string) => (
                                     <button
                                         key={size}
                                         onClick={() => setSelectedSize(size)}

@@ -9,161 +9,16 @@
       "createdAt": "2023-01-01T00:00:00.000Z"
     },
     {
-      "name": "patel",
-      "email": "patelronit644@gmail.com",
-      "password": "123456",
+      "name": "jack",
+      "email": "patel@gmail.com",
+      "password": "123",
       "role": "user",
-      "id": 1771438221993,
-      "createdAt": "2026-02-18T18:10:21.993Z",
-      "addresses": [
-        {
-          "id": "1771445292730",
-          "name": "Patel Neel",
-          "street": "Sree swaminarayan main temple",
-          "city": "Anand",
-          "state": "Gujarat",
-          "zip": "388121",
-          "phone": "09428877125",
-          "isDefault": true,
-          "type": "Home"
-        }
-      ]
+      "id": 1771526351840,
+      "createdAt": "2026-02-19T18:39:11.840Z",
+      "isBlocked": true
     }
   ],
-  "orders": [
-    {
-      "userId": 1771438221993,
-      "userEmail": null,
-      "guestInfo": null,
-      "items": [
-        {
-          "id": 4,
-          "name": "Essential Linen Tunic",
-          "price": 89,
-          "image": "https://images.unsplash.com/photo-1554568218-0f1715e72254?q=80&w=1887&auto=format&fit=crop",
-          "quantity": 1,
-          "size": "M"
-        }
-      ],
-      "totalAmount": 89,
-      "shippingAddress": {
-        "id": "1771438628756",
-        "name": "patel Neel",
-        "street": "Sree swaminarayan main temple",
-        "city": "Anand",
-        "state": "Gujarat",
-        "zip": "388121",
-        "phone": "09428877125"
-      },
-      "status": "Pending",
-      "id": "ORD-1771439029156",
-      "createdAt": "2026-02-18T18:23:49.156Z"
-    },
-    {
-      "userId": 1771438221993,
-      "userEmail": null,
-      "guestInfo": null,
-      "items": [
-        {
-          "id": 15,
-          "name": "Modern Slim Suit",
-          "price": 199,
-          "image": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1780&auto=format&fit=crop",
-          "quantity": 1,
-          "size": "M"
-        }
-      ],
-      "totalAmount": 199,
-      "shippingAddress": {
-        "id": "1771438628756",
-        "name": "patel Neel",
-        "street": "Sree swaminarayan main temple",
-        "city": "Anand",
-        "state": "Gujarat",
-        "zip": "388121",
-        "phone": "09428877125"
-      },
-      "status": "Pending",
-      "id": "ORD-1771439287922",
-      "createdAt": "2026-02-18T18:28:07.922Z",
-      "user": {
-        "name": "patel",
-        "email": "patelronit644@gmail.com"
-      }
-    },
-    {
-      "userId": 1771438221993,
-      "userEmail": null,
-      "guestInfo": null,
-      "items": [
-        {
-          "id": 2,
-          "name": "Classic Beige Shirt",
-          "price": 75,
-          "image": "images/shirt_front.png",
-          "quantity": 1,
-          "size": "M"
-        }
-      ],
-      "totalAmount": 75,
-      "shippingAddress": {
-        "id": "1771438628756",
-        "name": "patel Neel",
-        "street": "Sree swaminarayan main temple",
-        "city": "Anand",
-        "state": "Gujarat",
-        "zip": "388121",
-        "phone": "09428877125"
-      },
-      "status": "Delivered",
-      "id": "ORD-1771440370241",
-      "createdAt": "2026-02-18T18:46:10.241Z",
-      "user": {
-        "name": "patel",
-        "email": "patelronit644@gmail.com"
-      }
-    },
-    {
-      "userId": 1771438221993,
-      "userEmail": null,
-      "guestInfo": null,
-      "items": [
-        {
-          "id": 4,
-          "name": "Essential Linen Tunic",
-          "price": 89,
-          "image": "https://images.unsplash.com/photo-1554568218-0f1715e72254?q=80&w=1887&auto=format&fit=crop",
-          "quantity": 1,
-          "size": "M"
-        },
-        {
-          "id": 15,
-          "name": "Modern Slim Suit",
-          "price": 199,
-          "image": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1780&auto=format&fit=crop",
-          "quantity": 1,
-          "size": "M"
-        }
-      ],
-      "totalAmount": 288,
-      "shippingAddress": {
-        "id": "1771438628756",
-        "name": "patel Neel",
-        "street": "Sree swaminarayan main temple",
-        "city": "Anand",
-        "state": "Gujarat",
-        "zip": "388121",
-        "phone": "09428877125"
-      },
-      "status": "Delivered",
-      "id": "ORD-1771440691348",
-      "createdAt": "2026-02-18T18:51:31.348Z",
-      "user": {
-        "name": "patel",
-        "email": "patelronit644@gmail.com"
-      }
-    }
-  ],
+  "orders": [],
   "products": [
     {
       "id": 2,
@@ -187,14 +42,15 @@
       "rating": 4.5,
       "reviews": 24,
       "status": "new",
-      "stock": 37
+      "stock": 54
     },
     {
       "id": 4,
-      "name": "abc",
-      "price": 8,
+      "name": "Essential Linen Tunic",
+      "price": 89,
       "images": [
-        "https://images.unsplash.com/photo-1554568218-0f1715e72254?q=80&w=1887&auto=format&fit=crop"
+        "https://images.unsplash.com/photo-1554568218-0f1715e72254?q=80&w=1887&auto=format&fit=crop",
+        "images/shirt_back.png"
       ],
       "category": "Women",
       "type": "Shirt",
@@ -209,12 +65,8 @@
       "rating": 4.8,
       "reviews": 56,
       "sale": true,
-      "status": "active",
-      "stock": 25,
-      "discountPrice": null,
-      "image": "https://images.unsplash.com/photo-1554568218-0f1715e72254?q=80&w=1887&auto=format&fit=crop",
-      "fit": "",
-      "tags": []
+      "status": "featured",
+      "stock": 49
     },
     {
       "id": 5,
@@ -235,7 +87,7 @@
       ],
       "rating": 4.7,
       "reviews": 32,
-      "stock": 49,
+      "stock": 25,
       "status": "active"
     },
     {
@@ -258,7 +110,7 @@
       ],
       "rating": 4.6,
       "reviews": 88,
-      "stock": 37,
+      "stock": 38,
       "status": "active"
     },
     {
@@ -281,7 +133,7 @@
       ],
       "rating": 4.5,
       "reviews": 42,
-      "stock": 52,
+      "stock": 28,
       "status": "active"
     },
     {
@@ -304,7 +156,7 @@
       "rating": 5,
       "reviews": 15,
       "status": "featured",
-      "stock": 24
+      "stock": 26
     },
     {
       "id": 16,
@@ -325,7 +177,7 @@
       ],
       "rating": 4.4,
       "reviews": 28,
-      "stock": 38,
+      "stock": 41,
       "status": "active"
     },
     {
@@ -348,7 +200,7 @@
       "rating": 4.9,
       "reviews": 120,
       "status": "bestseller",
-      "stock": 44
+      "stock": 36
     },
     {
       "id": 12,
@@ -368,7 +220,7 @@
       ],
       "rating": 4.7,
       "reviews": 45,
-      "stock": 13,
+      "stock": 14,
       "status": "active"
     },
     {
@@ -390,7 +242,7 @@
       ],
       "rating": 4.8,
       "reviews": 65,
-      "stock": 53,
+      "stock": 14,
       "status": "active"
     },
     {
@@ -412,7 +264,7 @@
       ],
       "rating": 4.6,
       "reviews": 38,
-      "stock": 7,
+      "stock": 24,
       "status": "active"
     }
   ]

@@ -12,6 +12,11 @@ export async function POST(request: Request) {
         const user = MockUserStore.validateCredentials(email, password);
 
         if (user) {
+            // Check Blocked Status
+            if (user.isBlocked) {
+                return NextResponse.json({ success: false, message: 'Your account has been suspended. Please contact support.' }, { status: 403 });
+            }
+
             // Success
             // Don't return password in response
             const { password: _, ...safeUser } = user;

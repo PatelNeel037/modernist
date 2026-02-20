@@ -16,41 +16,49 @@ export default function CategorySection() {
             href: '/shop?category=Women'
         },
         {
-            title: 'Kids',
-            img: 'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?q=80&w=1972&auto=format&fit=crop',
-            href: '/shop?category=Kids'
+            title: 'New Arrivals',
+            img: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1972&auto=format&fit=crop',
+            href: '/shop?category=New Arrivals'
         }
     ];
 
     return (
-        <section id="categories" className="py-20 px-6 container mx-auto">
-            <div className="flex justify-between items-center mb-10">
-                <h2 className="text-3xl font-playfair font-bold text-gray-900 border-l-4 border-gray-900 pl-4">Shop by Category</h2>
-                <div className="flex space-x-2">
-                    <button className="p-2 border border-gray-200 rounded-full hover:bg-gray-100"><ArrowLeft size={20} /></button>
-                    <button className="p-2 border border-gray-200 rounded-full hover:bg-gray-100"><ArrowRight size={20} /></button>
+        <section id="categories" className="py-24 px-6 container mx-auto bg-white">
+            <div className="flex justify-between items-end mb-12">
+                <div>
+                    <span className="text-brand-primary font-bold uppercase tracking-widest text-xs mb-2 block">Collections</span>
+                    <h2 className="text-4xl font-playfair font-bold text-content-heading">Shop by Category</h2>
+                </div>
+                <div className="hidden md:flex space-x-3">
+                    <button className="w-12 h-12 flex items-center justify-center border border-gray-200 text-content-heading rounded-full hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all duration-300 shadow-sm hover:shadow-md"><ArrowLeft size={20} /></button>
+                    <button className="w-12 h-12 flex items-center justify-center border border-gray-200 text-content-heading rounded-full hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all duration-300 shadow-sm hover:shadow-md"><ArrowRight size={20} /></button>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {categories.map((cat, idx) => (
-                    <Link href={cat.href} key={idx} className="group relative block overflow-hidden shadow-lg hover:shadow-xl transition-shadow rounded-lg">
-                        <div className="aspect-[3/4] overflow-hidden bg-gray-200 relative">
-                            <img src={cat.img} alt={cat.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    <Link href={cat.href} key={idx} className="group relative block h-[500px] overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500">
+                        {/* Image */}
+                        <div className="absolute inset-0">
+                            <img
+                                src={cat.img}
+                                alt={cat.title}
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 onError={(e) => {
-                                    // Placeholder if image fails
                                     e.currentTarget.src = `https://placehold.co/600x800/EEE/31343C?text=${cat.title}`;
                                 }}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 transition-opacity group-hover:opacity-75"></div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-90"></div>
                         </div>
 
-                        <div className="absolute bottom-6 left-6 text-white transform transition-transform group-hover:translate-x-2">
-                            <span className="uppercase tracking-widest text-xs font-semibold mb-2 block text-gray-200">New Collection</span>
-                            <h3 className="text-3xl font-playfair font-bold">{cat.title}</h3>
-                            <span className="inline-flex items-center mt-3 text-sm font-medium border-b border-transparent group-hover:border-white transition-all pb-0.5">
-                                Explore <ArrowRight size={16} className="ml-2" />
-                            </span>
+                        {/* Content */}
+                        <div className="absolute inset-x-0 bottom-0 p-8 text-white transform transition-transform duration-500 translate-y-2 group-hover:translate-y-0">
+                            <div className="w-12 h-[1px] bg-white/50 mb-4 group-hover:w-20 transition-all duration-500"></div>
+                            <h3 className="text-4xl font-playfair font-bold mb-3 !text-white drop-shadow-md">{cat.title}</h3>
+                            <div className="flex items-center text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 transform translate-y-4 group-hover:translate-y-0 text-white">
+                                <span className="uppercase tracking-widest border-b border-transparent group-hover:border-white pb-1 transition-all">Explore Collection</span>
+                                <ArrowRight size={16} className="ml-3 transition-transform group-hover:translate-x-1" />
+                            </div>
                         </div>
                     </Link>
                 ))}

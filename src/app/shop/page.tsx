@@ -4,15 +4,27 @@ import { useState, useMemo, useEffect, Suspense } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useSearchParams } from 'next/navigation';
-import { allProducts } from '@/data/products';
+import { DB } from '@/services/db';
 import ProductCard from '@/components/ProductCard';
 import { Filter, X, ChevronDown } from 'lucide-react';
 
-const products = allProducts;
-
 function ShopContent() {
     const searchParams = useSearchParams();
+    const [products, setProducts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState('All');
+
+    // ... existing ...
+
+    useEffect(() => {
+        const loadProducts = async () => {
+            setLoading(true);
+            const data = await DB.fetchProducts();
+            setProducts(data);
+            setLoading(false);
+        };
+        loadProducts();
+    }, []);
     const [activeType, setActiveType] = useState('All');
 
     // New Filters
@@ -38,7 +50,7 @@ function ShopContent() {
             }
         });
         return Array.from(types).sort();
-    }, [activeCategory]);
+    }, [products, activeCategory]);
 
     const availableMaterials = useMemo(() => {
         const mats = new Set<string>();
@@ -48,7 +60,7 @@ function ShopContent() {
             }
         });
         return Array.from(mats).sort();
-    }, [activeCategory]);
+    }, [products, activeCategory]);
 
     // Filter Logic
     const filteredProducts = useMemo(() => {
@@ -91,7 +103,7 @@ function ShopContent() {
         }
 
         return result;
-    }, [activeCategory, activeType, priceFilters, materialFilters, sortOption]);
+    }, [products, activeCategory, activeType, priceFilters, materialFilters, sortOption]);
 
     const togglePrice = (range: string) => {
         setPriceFilters(prev => prev.includes(range) ? prev.filter(p => p !== range) : [...prev, range]);
@@ -236,7 +248,9 @@ function ShopContent() {
 
                     {/* Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredProducts.length > 0 ? (
+                        {loading ? (
+                            <div className="col-span-full text-center py-20">Loading products...</div>
+                        ) : filteredProducts.length > 0 ? (
                             filteredProducts.map(product => (
                                 <ProductCard
                                     key={product.id}

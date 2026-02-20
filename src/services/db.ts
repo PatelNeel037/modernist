@@ -11,7 +11,55 @@ export const DB = {
     KEYS: {
         TOKEN: 'modernist_auth_token',
         USER: 'modernist_user_info',
+        ADMIN_TOKEN: 'modernist_admin_token',
+        ADMIN_USER: 'modernist_admin_user',
         GUEST_CART: 'modernist_cart_guest' // Keep guest cart local for now
+    },
+
+    // --- Admin Management ---
+
+    getAdminUser: function (): any {
+        if (typeof window === 'undefined') return null;
+        const userStr = localStorage.getItem(this.KEYS.ADMIN_USER);
+        try {
+            return userStr ? JSON.parse(userStr) : null;
+        } catch (e) {
+            return null;
+        }
+    },
+
+    adminLogin: async function (email: string, password: string): Promise<{ success: boolean; message?: string }> {
+        // Reusing the same API endpoint, but storing in different keys
+        try {
+            const response = await fetch(`${API_URL}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                if (data.user.role !== 'admin') {
+                    return { success: false, message: 'Access Denied: Not an admin.' };
+                }
+                // Save Admin Token & User Info
+                localStorage.setItem(this.KEYS.ADMIN_TOKEN, data.token);
+                localStorage.setItem(this.KEYS.ADMIN_USER, JSON.stringify(data.user));
+                return { success: true };
+            } else {
+                return { success: false, message: data.message };
+            }
+        } catch (error) {
+            console.warn("Admin Login Error:", error);
+            return { success: false, message: 'Network Error' };
+        }
+    },
+
+    adminLogout: function () {
+        if (typeof window === 'undefined') return;
+        localStorage.removeItem(this.KEYS.ADMIN_TOKEN);
+        localStorage.removeItem(this.KEYS.ADMIN_USER);
+        window.location.href = '/admin/login'; // Force reload/redirect
     },
 
     // --- User Management ---
@@ -98,6 +146,12 @@ export const DB = {
         const userId = this.getCurrentUserId();
         const key = userId ? `modernist_wishlist_${userId}` : 'modernist_wishlist_guest';
         localStorage.setItem(key, JSON.stringify(wishlist));
+
+        // Dispatch event for UI updates
+        window.dispatchEvent(new StorageEvent('storage', {
+            key: key,
+            newValue: JSON.stringify(wishlist)
+        }));
     },
 
     // --- API Calls (Auth) ---
@@ -253,6 +307,17 @@ export const DB = {
         } catch (e) {
             console.warn("Failed to fetch products (Is backend running?)", e);
             return [];
+        }
+    },
+
+    fetchProduct: async function (id: string | number) {
+        try {
+            const response = await fetch(`${API_URL}/products/${id}`);
+            if (!response.ok) return null;
+            return await response.json();
+        } catch (e) {
+            console.warn("Failed to fetch product", e);
+            return null;
         }
     },
 

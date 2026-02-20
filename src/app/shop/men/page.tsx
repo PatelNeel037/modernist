@@ -1,31 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { Filter, ChevronDown } from 'lucide-react';
+import { DB } from '@/services/db';
 
-const subCategories = ['All', 'Shirts', 'Pants', 'Jackets', 'Suits', 'Accessories'];
-
-const mockMenProducts = [
-    { id: 1, name: 'Slim Fit Cotton Shirt', price: '45.00', image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=1888&auto=format&fit=crop', category: 'Shirts', sale: false },
-    { id: 2, name: 'Classic Chino Pants', price: '55.00', image: 'https://images.unsplash.com/photo-1473966968600-870d11f2eb08?q=80&w=2071&auto=format&fit=crop', category: 'Pants', sale: false },
-    { id: 3, name: 'Denim Jacket', price: '89.00', image: 'https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?q=80&w=1888&auto=format&fit=crop', category: 'Jackets', sale: true },
-    { id: 4, name: 'Wool Blend Suit', price: '299.00', image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=1780&auto=format&fit=crop', category: 'Suits', sale: false },
-    { id: 5, name: 'Casual Linen Shirt', price: '49.00', image: 'https://images.unsplash.com/photo-1589310243389-96a5483213a8?q=80&w=1889&auto=format&fit=crop', category: 'Shirts', sale: false },
-    { id: 6, name: 'Leather Belt', price: '35.00', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=1887&auto=format&fit=crop', category: 'Accessories', sale: false },
-    { id: 7, name: 'Bomber Jacket', price: '75.00', image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1936&auto=format&fit=crop', category: 'Jackets', sale: true },
-    { id: 8, name: 'Tailored Trousers', price: '65.00', image: 'https://images.unsplash.com/photo-1506629082955-511b1aa009e5?q=80&w=1887&auto=format&fit=crop', category: 'Pants', sale: false },
-];
+const subCategories = ['All', 'Shirt', 'Pants', 'Jacket', 'Suit', 'Accessories'];
 
 export default function MenPage() {
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+    const [products, setProducts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const load = async () => {
+            setLoading(true);
+            const data = await DB.fetchProducts();
+            // Filter by main category 'Men'
+            const menData = data.filter((p: any) => p.category === 'Men' && p.status !== 'deleted' && p.status !== 'hidden');
+            setProducts(menData);
+            setLoading(false);
+        };
+        load();
+    }, []);
 
     const filteredProducts = selectedCategory === 'All'
-        ? mockMenProducts
-        : mockMenProducts.filter(p => p.category === selectedCategory);
+        ? products
+        : products.filter(p => p.type === selectedCategory || p.category === selectedCategory);
 
     return (
         <main className="min-h-screen bg-white">
@@ -94,8 +98,8 @@ export default function MenPage() {
                                         key={cat}
                                         onClick={() => setSelectedCategory(cat)}
                                         className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${selectedCategory === cat
-                                                ? 'bg-gray-900 text-white border-gray-900'
-                                                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+                                            ? 'bg-gray-900 text-white border-gray-900'
+                                            : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
                                             }`}
                                     >
                                         {cat}
@@ -143,10 +147,16 @@ export default function MenPage() {
                         )}
 
                         {/* Products Grid */}
-                        {filteredProducts.length > 0 ? (
+                        {loading ? (
+                            <div className="text-center py-20 text-gray-500">Loading products...</div>
+                        ) : filteredProducts.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {filteredProducts.map(product => (
-                                    <ProductCard key={product.id} product={product} />
+                                    <ProductCard key={product.id} product={{
+                                        ...product,
+                                        image: product.images ? product.images[0] : '',
+                                        price: typeof product.price === 'number' ? product.price.toFixed(2) : product.price
+                                    }} />
                                 ))}
                             </div>
                         ) : (

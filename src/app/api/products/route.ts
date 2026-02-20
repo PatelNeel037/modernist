@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { initialProducts } from '@/data/products'; // Not used directly, using store
 import { MockProductStore } from '@/lib/mock-store';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);

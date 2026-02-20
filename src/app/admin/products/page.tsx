@@ -318,6 +318,11 @@ export default function AdminProductsPage() {
                             </div>
 
                             <div className={styles.formGroup}>
+                                <label>Material & Care</label>
+                                <textarea name="material" value={formData.material} onChange={handleChange} className={styles.formControl} rows={2} placeholder="e.g. 100% Cotton. Machine wash cold." />
+                            </div>
+
+                            <div className={styles.formGroup}>
                                 <label>Available Sizes</label>
                                 <div className={styles.checkboxGroup}>
                                     {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map(size => (

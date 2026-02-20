@@ -4,6 +4,23 @@
   --font-playfair: var(--font-playfair);
   --font-roboto: var(--font-roboto);
 
+  --color-brand-primary: #664C36;
+  /* Earthy Brown - Accent/Buttons */
+  --color-brand-secondary: #FFD3AC;
+  /* Peach - Special Sections/Newsletter */
+  --color-brand-dark: #331C08;
+  /* Dark Brown - Hover/Navbar/Luxury Text */
+
+  --color-content-heading: #331C08;
+  /* Dark Brown */
+  --color-content-body: #5C4A3D;
+  /* Muted Brown/Grey */
+
+  --color-bg-soft: #F9F7F5;
+  /* Very light beige/white mix. #CCBEB1 is too dark for main bg if user wants "Keep main background white". I will use a very light tint for soft bg. */
+  --color-bg-accent: #CCBEB1;
+  /* The requested soft section color */
+
   --animate-fade-in-up: fade-in-up 0.8s ease-out forwards;
 
   @keyframes fade-in-up {
@@ -16,6 +33,26 @@
       opacity: 1;
       transform: translateY(0);
     }
+  }
+}
+
+@layer base {
+  body {
+    background-color: #ffffff;
+    color: var(--color-content-heading);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--color-content-heading);
+  }
+
+  p {
+    color: var(--color-content-body);
   }
 }
 

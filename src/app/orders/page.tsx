@@ -50,6 +50,9 @@ interface Order {
     userEmail: string;
     paymentMethod?: string; // e.g. 'Stripe'
     transactionId?: string; // Mock
+    trackingId?: string;
+    carrier?: string;
+    refundStatus?: string;
 }
 
 export default function OrdersPage() {
@@ -240,7 +243,10 @@ export default function OrdersPage() {
 
                                                 {/* Track Order Button */}
                                                 {order.status === 'Shipped' && (
-                                                    <button className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded hover:bg-gray-50 transition flex items-center gap-2">
+                                                    <button
+                                                        onClick={() => toggleExpand(order.id)}
+                                                        className="px-4 py-2 border border-blue-200 text-blue-700 bg-blue-50 text-sm font-medium rounded hover:bg-blue-100 transition flex items-center gap-2"
+                                                    >
                                                         <Truck size={14} /> Track Order
                                                     </button>
                                                 )}
@@ -253,6 +259,22 @@ export default function OrdersPage() {
                                                     {expandedOrder === order.id ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                                                 </button>
                                             </div>
+                                        </div>
+
+                                        {/* Quick Item Preview (Horizontal Scroll) */}
+                                        <div className="flex gap-3 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+                                            {order.items.map((item, idx) => (
+                                                <Link key={`${item.id}-${idx}`} href={`/product/${item.id}`} className="min-w-[60px] w-[60px] h-[80px] bg-gray-100 rounded border border-gray-200 overflow-hidden hover:opacity-80 transition-opacity relative group">
+                                                    <img
+                                                        src={item.image}
+                                                        alt={item.name}
+                                                        className="w-full h-full object-cover"
+                                                        onError={(e: any) => e.target.src = 'https://placehold.co/60x80?text=No+Img'}
+                                                    />
+                                                    {/* Tooltip on hover */}
+                                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                                                </Link>
+                                            ))}
                                         </div>
 
                                         {/* Progress Bar (Only calculate if not cancelled) */}
@@ -307,26 +329,49 @@ export default function OrdersPage() {
                                                     </div>
                                                 </div>
 
-                                                {/* Payment Info */}
+                                                {/* Payment & Status Info */}
                                                 <div>
                                                     <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                                                        <CreditCard size={16} className="text-gray-500" /> Payment Info
+                                                        <CreditCard size={16} className="text-gray-500" /> Payment & Status
                                                     </h4>
-                                                    <div className="text-sm text-gray-600 bg-white p-4 rounded border border-gray-200">
-                                                        <p className="flex justify-between mb-1">
+                                                    <div className="text-sm text-gray-600 bg-white p-4 rounded border border-gray-200 space-y-2">
+                                                        <div className="flex justify-between">
                                                             <span>Method:</span>
                                                             <span className="font-medium text-gray-900">Card (Stripe)</span>
-                                                        </p>
-                                                        <p className="flex justify-between mb-1">
-                                                            <span>Status:</span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <span>Payment:</span>
                                                             <span className="font-medium text-green-600 flex items-center gap-1">
                                                                 <CheckCircle size={12} /> Paid
                                                             </span>
-                                                        </p>
-                                                        <p className="flex justify-between">
-                                                            <span>Txn ID:</span>
-                                                            <span className="font-mono text-xs">tx_mock12345</span>
-                                                        </p>
+                                                        </div>
+
+                                                        {/* Tracking Info */}
+                                                        {(order.status === 'Shipped' || order.status === 'Delivered') && order.trackingId && (
+                                                            <div className="pt-2 mt-2 border-t border-gray-100">
+                                                                <p className="font-semibold text-gray-900 mb-1 flex items-center gap-1">
+                                                                    <Truck size={12} /> Shipment Details
+                                                                </p>
+                                                                <p className="flex justify-between">
+                                                                    <span>Courier:</span>
+                                                                    <span className="font-medium">{order.carrier || 'Standard'}</span>
+                                                                </p>
+                                                                <p className="flex justify-between">
+                                                                    <span>Tracking:</span>
+                                                                    <span className="font-mono text-xs bg-gray-100 px-1 rounded">{order.trackingId}</span>
+                                                                </p>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Refund Info */}
+                                                        {order.refundStatus && (
+                                                            <div className="pt-2 mt-2 border-t border-gray-100">
+                                                                <p className="font-semibold text-red-600 mb-1 flex items-center gap-1">
+                                                                    <RefreshCw size={12} /> Refund Status
+                                                                </p>
+                                                                <p className="font-medium text-gray-900">{order.refundStatus}</p>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
 
@@ -363,18 +408,22 @@ export default function OrdersPage() {
                                                 <div className="space-y-4">
                                                     {order.items.map((item, idx) => (
                                                         <div key={`${order.id}-${idx}`} className="flex gap-4 md:gap-6 items-start bg-white p-4 rounded border border-gray-200">
-                                                            <div className="w-20 h-24 bg-gray-100 rounded overflow-hidden shrink-0">
+                                                            <Link href={`/product/${item.id}`} className="w-20 h-24 bg-gray-100 rounded overflow-hidden shrink-0 hover:opacity-80 transition-opacity">
                                                                 <img
                                                                     src={item.image}
                                                                     alt={item.name}
                                                                     className="w-full h-full object-cover"
                                                                     onError={(e: any) => e.target.src = 'https://placehold.co/100x120?text=No+Img'}
                                                                 />
-                                                            </div>
+                                                            </Link>
                                                             <div className="flex-1">
                                                                 <div className="flex justify-between items-start">
                                                                     <div>
-                                                                        <h5 className="font-medium text-gray-900">{item.name}</h5>
+                                                                        <h5 className="font-medium text-gray-900">
+                                                                            <Link href={`/product/${item.id}`} className="hover:underline">
+                                                                                {item.name}
+                                                                            </Link>
+                                                                        </h5>
                                                                         <p className="text-sm text-gray-500 mt-1">Size: {item.size || 'M'} | Qty: {item.quantity}</p>
                                                                     </div>
                                                                     <p className="font-medium text-gray-900">${Number(item.price).toFixed(2)}</p>

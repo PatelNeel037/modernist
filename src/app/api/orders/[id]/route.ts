@@ -31,22 +31,26 @@ export async function GET(request: Request, props: { params: Promise<{ id: strin
 export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
     try {
         const body = await request.json();
-        const { status } = body;
+        const { status, trackingId, carrier, refundStatus } = body;
         const params = await props.params;
         const id = params.id;
 
-        console.log(`[API] Updating Order ${id} to status: ${status}`);
+        console.log(`[API] Updating Order ${id}:`, { status, trackingId, carrier, refundStatus });
 
-        const success = MockOrderStore.updateStatus(id, status);
+        const updatedOrder = MockOrderStore.update(id, {
+            ...(status && { status }),
+            ...(trackingId && { trackingId }),
+            ...(carrier && { carrier }),
+            ...(refundStatus && { refundStatus })
+        });
 
-        if (!success) {
+        if (!updatedOrder) {
             console.log(`[API] Update failed: Order ${id} not found.`);
-            return NextResponse.json({ message: 'Order not found or update failed' }, { status: 404 });
+            return NextResponse.json({ message: 'Order not found' }, { status: 404 });
         }
 
-        // Return updated order
-        const updatedOrder = MockOrderStore.getById(id);
         return NextResponse.json(updatedOrder);
+
     } catch (e) {
         console.error("[API] PUT Order Error:", e);
         return NextResponse.json({ message: 'Update failed' }, { status: 500 });

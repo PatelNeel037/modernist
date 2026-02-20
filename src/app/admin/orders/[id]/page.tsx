@@ -24,6 +24,9 @@ export default function OrderDetailsPage() {
     const [order, setOrder] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [statusInput, setStatusInput] = useState('');
+    const [carrier, setCarrier] = useState('');
+    const [trackingId, setTrackingId] = useState('');
+    const [refundStatus, setRefundStatus] = useState('');
 
     const orderId = params.id as string;
 
@@ -33,7 +36,10 @@ export default function OrderDetailsPage() {
             if (res.ok) {
                 const data = await res.json();
                 setOrder(data);
-                setStatusInput(data.status); // Initialize dropdown
+                setStatusInput(data.status);
+                setCarrier(data.carrier || '');
+                setTrackingId(data.trackingId || '');
+                setRefundStatus(data.refundStatus || '');
             } else {
                 alert('Order not found');
                 router.push('/admin/orders');
@@ -49,22 +55,37 @@ export default function OrderDetailsPage() {
         loadOrder();
     }, [orderId]);
 
-    const handleStatusUpdate = async () => {
-        if (!statusInput) return;
-        if (statusInput === order.status) return; // No change
+    const handleStatusUpdate = async (overrides: any = {}) => {
+        // Prepare payload with overrides taking precedence
+        const payload = {
+            status: overrides.status || statusInput,
+            trackingId: overrides.trackingId !== undefined ? overrides.trackingId : trackingId,
+            carrier: overrides.carrier !== undefined ? overrides.carrier : carrier,
+            refundStatus: overrides.refundStatus !== undefined ? overrides.refundStatus : refundStatus
+        };
+
+        // Remove empty strings if needed, or keep them to clear fields? 
+        // MockStore expects them as part of updates object.
 
         try {
             const res = await fetch(`/api/orders/${orderId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: statusInput })
+                body: JSON.stringify(payload)
             });
 
             if (res.ok) {
                 // Refresh data
                 const updated = await res.json();
-                setOrder(prev => ({ ...prev, status: updated.status || statusInput }));
-                alert('Order status updated successfully');
+                setOrder(updated);
+
+                // Sync state with updated data to ensure UI consistency
+                if (updated.status) setStatusInput(updated.status);
+                if (updated.trackingId !== undefined) setTrackingId(updated.trackingId || '');
+                if (updated.carrier !== undefined) setCarrier(updated.carrier || '');
+                if (updated.refundStatus !== undefined) setRefundStatus(updated.refundStatus || '');
+
+                alert('Order updated successfully');
             } else {
                 alert('Update failed');
             }
@@ -207,13 +228,58 @@ export default function OrderDetailsPage() {
                                     <option value="Cancelled">Cancelled</option>
                                 </select>
                             </div>
-                            <button
-                                className="bg-blue-600 text-white px-6 py-2 rounded font-medium hover:bg-blue-700 transition disabled:opacity-50 h-[42px]"
-                                onClick={handleStatusUpdate}
-                                disabled={statusInput === order.status}
-                            >
-                                Update Status
-                            </button>
+                            <div className="flex-1">
+                                {statusInput === 'Shipped' && (
+                                    <div className="flex gap-2 mb-2 animate-in fade-in slide-in-from-top-1">
+                                        <input
+                                            type="text"
+                                            placeholder="Carrier (e.g. FedEx)"
+                                            className="flex-1 p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                            value={carrier}
+                                            onChange={(e) => setCarrier(e.target.value)}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Tracking ID"
+                                            className="flex-1 p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                            value={trackingId}
+                                            onChange={(e) => setTrackingId(e.target.value)}
+                                        />
+                                    </div>
+                                )}
+                                <div className="flex gap-2">
+                                    <button
+                                        className="bg-blue-600 text-white px-6 py-2 rounded font-medium hover:bg-blue-700 transition disabled:opacity-50 flex-1"
+                                        onClick={handleStatusUpdate}
+                                        disabled={statusInput === order.status && !trackingId && !carrier && !refundStatus}
+                                    >
+                                        Update Status
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Refund Status Control */}
+                        <div className="p-4 border-t border-gray-100">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Refund Status</label>
+                            <div className="flex gap-2">
+                                <select
+                                    className="flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                                    value={refundStatus}
+                                    onChange={(e) => setRefundStatus(e.target.value)}
+                                >
+                                    <option value="">None</option>
+                                    <option value="Refund Initiated">Refund Initiated</option>
+                                    <option value="Refund Processing">Refund Processing</option>
+                                    <option value="Refunded">Refunded</option>
+                                </select>
+                                <button
+                                    className="bg-gray-100 text-gray-700 px-4 py-2 rounded font-medium hover:bg-gray-200 text-sm"
+                                    onClick={handleStatusUpdate}
+                                >
+                                    Set Refund Status
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -299,7 +365,7 @@ export default function OrderDetailsPage() {
                                 <Mail size={16} /> Send Email to Customer
                             </button>
                             <button className="w-full flex items-center justify-center gap-2 border border-red-200 text-red-600 rounded p-2 hover:bg-red-50 text-sm font-medium transition"
-                                onClick={() => { if (confirm('Are you sure you want to cancel this order?')) setStatusInput('Cancelled'); handleStatusUpdate(); }}
+                                onClick={() => { if (confirm('Are you sure you want to cancel this order?')) handleStatusUpdate({ status: 'Cancelled' }); }}
                             >
                                 <XCircle size={16} /> Cancel Order
                             </button>

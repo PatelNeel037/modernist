@@ -1,31 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { Filter, ChevronDown } from 'lucide-react';
+import { DB } from '@/services/db';
 
-const subCategories = ['All', 'Boys', 'Girls', 'T-Shirts', 'Jeans', 'Outerwear', 'Shoes'];
-
-const mockKidsProducts = [
-    { id: 201, name: 'Cotton Graphic Tee', price: '25.00', image: 'https://images.unsplash.com/photo-1519241047957-be31d7379a5d?q=80&w=2070&auto=format&fit=crop', category: 'T-Shirts', sale: false },
-    { id: 202, name: 'Denim Overalls', price: '45.00', image: 'https://images.unsplash.com/photo-1519457431-44ccd64a579b?q=80&w=1887&auto=format&fit=crop', category: 'Jeans', sale: false },
-    { id: 203, name: 'Floral Party Dress', price: '55.00', image: 'https://images.unsplash.com/photo-1621452773781-0f992fd0f5d0?q=80&w=1887&auto=format&fit=crop', category: 'Girls', sale: false },
-    { id: 204, name: 'Comfort Sweatshirt', price: '35.00', image: 'https://images.unsplash.com/photo-1602826875956-628dc5637213?q=80&w=1887&auto=format&fit=crop', category: 'Boys', sale: true },
-    { id: 205, name: 'Puffer Jacket', price: '65.00', image: 'https://images.unsplash.com/photo-1611428813653-568e65842c5b?q=80&w=1951&auto=format&fit=crop', category: 'Outerwear', sale: false },
-    { id: 206, name: 'Casual Sneakers', price: '40.00', image: 'https://images.unsplash.com/photo-1514989940723-e8875ea6f03f?q=80&w=1994&auto=format&fit=crop', category: 'Shoes', sale: false },
-    { id: 207, name: 'Polka Dot Leggings', price: '20.00', image: 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?q=80&w=1887&auto=format&fit=crop', category: 'Girls', sale: true },
-    { id: 208, name: 'Striped Polo Shirt', price: '30.00', image: 'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?q=80&w=1972&auto=format&fit=crop', category: 'Boys', sale: false },
-];
+const subCategories = ['All', 'Boy', 'Girl', 'T-Shirt', 'Jeans', 'Outerwear', 'Shoes', 'Pants'];
 
 export default function KidsPage() {
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+    const [products, setProducts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const load = async () => {
+            setLoading(true);
+            const data = await DB.fetchProducts();
+            // Filter by main category 'Kids'
+            const kidsData = data.filter((p: any) => p.category === 'Kids' && p.status !== 'deleted' && p.status !== 'hidden');
+            setProducts(kidsData);
+            setLoading(false);
+        };
+        load();
+    }, []);
 
     const filteredProducts = selectedCategory === 'All'
-        ? mockKidsProducts
-        : mockKidsProducts.filter(p => p.category === selectedCategory);
+        ? products
+        : products.filter(p => p.type === selectedCategory || p.category === selectedCategory || (p.tags && p.tags.includes(selectedCategory)));
 
     return (
         <main className="min-h-screen bg-white">
@@ -91,8 +95,8 @@ export default function KidsPage() {
                                         key={cat}
                                         onClick={() => setSelectedCategory(cat)}
                                         className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${selectedCategory === cat
-                                                ? 'bg-gray-900 text-white border-gray-900'
-                                                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+                                            ? 'bg-gray-900 text-white border-gray-900'
+                                            : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
                                             }`}
                                     >
                                         {cat}
@@ -140,10 +144,16 @@ export default function KidsPage() {
                         )}
 
                         {/* Products Grid */}
-                        {filteredProducts.length > 0 ? (
+                        {loading ? (
+                            <div className="text-center py-20 text-gray-500">Loading products...</div>
+                        ) : filteredProducts.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {filteredProducts.map(product => (
-                                    <ProductCard key={product.id} product={product} />
+                                    <ProductCard key={product.id} product={{
+                                        ...product,
+                                        image: product.images ? product.images[0] : '',
+                                        price: typeof product.price === 'number' ? product.price.toFixed(2) : product.price
+                                    }} />
                                 ))}
                             </div>
                         ) : (

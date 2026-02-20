@@ -1,31 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { Filter, ChevronDown } from 'lucide-react';
+import { DB } from '@/services/db';
 
-const subCategories = ['All', 'Dresses', 'Tops', 'Pants', 'Skirts', 'Outerwear', 'Accessories'];
-
-const mockWomenProducts = [
-    { id: 101, name: 'Floral Summer Dress', price: '65.00', image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=1946&auto=format&fit=crop', category: 'Dresses', sale: false },
-    { id: 102, name: 'Classic White Blouse', price: '45.00', image: 'https://images.unsplash.com/photo-1564257631407-4deb1f99d992?q=80&w=1974&auto=format&fit=crop', category: 'Tops', sale: false },
-    { id: 103, name: 'High-Waist Jeans', price: '59.00', image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=1887&auto=format&fit=crop', category: 'Pants', sale: true },
-    { id: 104, name: 'Pleated Midi Skirt', price: '49.00', image: 'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?q=80&w=1964&auto=format&fit=crop', category: 'Skirts', sale: false },
-    { id: 105, name: 'Beige Trench Coat', price: '129.00', image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=1936&auto=format&fit=crop', category: 'Outerwear', sale: false }, // Placeholder image, replace if better available
-    { id: 106, name: 'Silk Scarf', price: '25.00', image: 'https://images.unsplash.com/photo-1584030373081-f37b7bb4fa8e?q=80&w=1891&auto=format&fit=crop', category: 'Accessories', sale: false },
-    { id: 107, name: 'Linen Jumpsuit', price: '79.00', image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=1887&auto=format&fit=crop', category: 'Dresses', sale: true },
-    { id: 108, name: 'Leather Handbag', price: '150.00', image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=1935&auto=format&fit=crop', category: 'Accessories', sale: false },
-];
+const subCategories = ['All', 'Dress', 'Shirt', 'Top', 'Pants', 'Skirt', 'Outerwear', 'Accessories'];
 
 export default function WomenPage() {
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+    const [products, setProducts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const load = async () => {
+            setLoading(true);
+            const data = await DB.fetchProducts();
+            // Filter by main category 'Women'
+            const womenData = data.filter((p: any) => p.category === 'Women' && p.status !== 'deleted' && p.status !== 'hidden');
+            setProducts(womenData);
+            setLoading(false);
+        };
+        load();
+    }, []);
 
     const filteredProducts = selectedCategory === 'All'
-        ? mockWomenProducts
-        : mockWomenProducts.filter(p => p.category === selectedCategory);
+        ? products
+        : products.filter(p => p.type === selectedCategory || p.category === selectedCategory);
 
     return (
         <main className="min-h-screen bg-white">
@@ -94,8 +98,8 @@ export default function WomenPage() {
                                         key={cat}
                                         onClick={() => setSelectedCategory(cat)}
                                         className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${selectedCategory === cat
-                                                ? 'bg-gray-900 text-white border-gray-900'
-                                                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+                                            ? 'bg-gray-900 text-white border-gray-900'
+                                            : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
                                             }`}
                                     >
                                         {cat}
@@ -143,10 +147,16 @@ export default function WomenPage() {
                         )}
 
                         {/* Products Grid */}
-                        {filteredProducts.length > 0 ? (
+                        {loading ? (
+                            <div className="text-center py-20 text-gray-500">Loading products...</div>
+                        ) : filteredProducts.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {filteredProducts.map(product => (
-                                    <ProductCard key={product.id} product={product} />
+                                    <ProductCard key={product.id} product={{
+                                        ...product,
+                                        image: product.images ? product.images[0] : '',
+                                        price: typeof product.price === 'number' ? product.price.toFixed(2) : product.price
+                                    }} />
                                 ))}
                             </div>
                         ) : (

@@ -40,8 +40,9 @@ export async function GET(request: Request, { params }: { params: any }) {
         const responseData = {
             user: {
                 ...safeUser,
-                status: safeUser.status || 'Active', // Default if missing
-                isVerified: safeUser.isVerified ?? true // Default if missing
+                status: (safeUser.status === 'deleted') ? 'deleted' : (safeUser.isBlocked ? 'blocked' : 'active'),
+                isActive: !safeUser.isBlocked,
+                isVerified: safeUser.isVerified ?? true
             },
             orders: userOrders,
             stats: {
@@ -76,22 +77,24 @@ export async function PUT(request: Request, { params }: { params: any }) {
             return NextResponse.json({ message: 'User not found' }, { status: 404 });
         }
 
-        // Apply updates
-        // Supported actions: Block, Unblock, Verify, Add Notes
+        const { action, notes } = body;
+        let success = false;
 
-        const updates: any = {};
-        if (body.action === 'block') updates.isActive = false; // Using isActive to map to 'Blocked' status UI
-        if (body.action === 'unblock') updates.isActive = true;
+        if (action === 'block') {
+            success = MockUserStore.toggleBlockStatus(user.email, true);
+        } else if (action === 'unblock') {
+            success = MockUserStore.toggleBlockStatus(user.email, false);
+        } else if (notes !== undefined) {
+            MockUserStore.update(user.email, { adminNotes: notes });
+            success = true;
+        }
 
-        // Admin Notes
-        if (body.notes !== undefined) updates.adminNotes = body.notes;
+        if (success) {
+            const updatedUser = MockUserStore.findByEmail(user.email);
+            return NextResponse.json({ success: true, user: updatedUser });
+        }
 
-        // Verify
-        if (body.action === 'verify') updates.isVerified = true;
-
-        const updatedUser = MockUserStore.update(user.email, updates);
-
-        return NextResponse.json({ success: true, user: updatedUser });
+        return NextResponse.json({ success: false, message: 'Update failed' });
 
     } catch (e) {
         return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
@@ -115,7 +118,7 @@ export async function DELETE(request: Request, { params }: { params: any }) {
         const user = allUsers.find((u: any) => u.id.toString() === userId);
 
         if (user) {
-            MockUserStore.update(user.email, { status: 'deleted', isActive: false });
+            MockUserStore.update(user.email, { status: 'deleted', isBlocked: true, isActive: false });
             return NextResponse.json({ success: true });
         }
         return NextResponse.json({ message: 'User not found' }, { status: 404 });

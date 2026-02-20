@@ -15,6 +15,11 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, message: 'Password must be at least 6 characters' }, { status: 400 });
         }
 
+        const user = MockUserStore.findByEmail(email);
+        if (user && user.isBlocked) {
+            return NextResponse.json({ success: false, message: 'Account is blocked' }, { status: 403 });
+        }
+
         const success = MockUserStore.changePassword(email, currentPassword, newPassword);
 
         if (success) {

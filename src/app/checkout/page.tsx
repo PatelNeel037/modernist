@@ -121,7 +121,11 @@ function CheckoutContent() {
                     const existingOrders = JSON.parse(localStorage.getItem('modernist_orders') || '[]');
                     localStorage.setItem('modernist_orders', JSON.stringify([localOrder, ...existingOrders]));
                 } else {
-                    console.error("API Order Failed");
+                    const errorData = await response.json();
+                    console.error("API Order Failed", errorData);
+                    alert(`Order Failed: ${errorData.message || 'Unknown Error'} \nDetails: ${errorData.error}`);
+                    setIsLoading(false); // Stop loading so they can retry
+                    return; // Don't proceed to clear cart
                 }
             } catch (e) {
                 console.error("Failed to save order to API", e);

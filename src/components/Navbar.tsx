@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Search, ShoppingBag, Menu, X, User, Heart, ChevronRight, LogOut, Package, IdCard } from 'lucide-react';
 
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/AuthContext';
 import { allProducts, Product } from '@/data/products';
+import { DB } from '@/services/db';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -17,14 +18,54 @@ export default function Navbar() {
     const { wishlist } = useWishlist();
     const { user, logout } = useAuth();
     const router = useRouter();
+    const pathname = usePathname();
+
+    const isActive = (path: string) => pathname === path;
+
+    // Helper to render Links with underline animation
+    const NavLink = ({ href, children }: { href: string, children: React.ReactNode }) => (
+        <Link href={href} className={`relative group text-sm font-medium transition-colors ${isActive(href) ? 'text-brand-primary' : 'text-gray-300 hover:text-white'}`}>
+            {children}
+            <span className={`absolute left-0 -bottom-1 h-[2px] bg-brand-primary transition-all duration-300 ${isActive(href) ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
+        </Link>
+    );
 
     // Search State
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState<Product[]>([]);
+    const [searchResults, setSearchResults] = useState<any[]>([]); // Use any to allow different price types or update Product interface
+    const [products, setProducts] = useState<any[]>([]); // Dynamic product list
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
 
-    // User Dropdown State
+    // Fetch products for search
+    useEffect(() => {
+        const loadProducts = async () => {
+            const data = await DB.fetchProducts();
+            setProducts(data);
+        };
+        loadProducts();
+    }, []);
+
+    // ... (refs)
+
+    // ... (skip other effects)
+
+    const handleSearch = (query: string) => {
+        setSearchQuery(query);
+        if (!query.trim()) {
+            setSearchResults(products.slice(0, 4)); // Trending suggestions from dynamic list
+            return;
+        }
+
+        const lowerQuery = query.toLowerCase();
+        const filtered = products.filter(p =>
+            p.name.toLowerCase().includes(lowerQuery) ||
+            p.category.toLowerCase().includes(lowerQuery) ||
+            (p.description && p.description.toLowerCase().includes(lowerQuery))
+        ).slice(0, 8);
+
+        setSearchResults(filtered);
+    };
     const [isUserOpen, setIsUserOpen] = useState(false);
     const userRef = useRef<HTMLDivElement>(null);
 
@@ -65,22 +106,7 @@ export default function Navbar() {
         }
     }, [isOpen]);
 
-    const handleSearch = (query: string) => {
-        setSearchQuery(query);
-        if (!query.trim()) {
-            setSearchResults(allProducts.slice(0, 4)); // Trending suggestions
-            return;
-        }
-
-        const lowerQuery = query.toLowerCase();
-        const filtered = allProducts.filter(p =>
-            p.name.toLowerCase().includes(lowerQuery) ||
-            p.category.toLowerCase().includes(lowerQuery) ||
-            p.description.toLowerCase().includes(lowerQuery)
-        ).slice(0, 8); // Limit to 8 results
-
-        setSearchResults(filtered);
-    };
+    // ... (removed duplicate handleSearch)
 
     const handleProductClick = (id: number) => {
         router.push(`/product/${id}`);
@@ -89,28 +115,28 @@ export default function Navbar() {
     };
 
     return (
-        <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-4' : 'bg-transparent py-6'}`}>
+        <nav className="fixed w-full z-50 transition-all duration-300 bg-brand-dark shadow-md py-4">
             <div className="container mx-auto px-6 flex justify-between items-center">
 
                 {/* Logo */}
-                <Link href="/" className={`text-2xl font-playfair font-bold tracking-wider ${isScrolled ? 'text-gray-900' : 'text-gray-900'}`}>
+                <Link href="/" className="text-2xl font-playfair font-bold tracking-wider text-white">
                     MODERNIST
                 </Link>
 
                 <div className="hidden md:flex items-center space-x-8">
-                    <Link href="/" className="text-sm font-medium hover:text-gray-600 transition-colors">HOME</Link>
-                    <Link href="/shop/men" className="text-sm font-medium hover:text-gray-600 transition-colors">MEN</Link>
-                    <Link href="/shop/women" className="text-sm font-medium hover:text-gray-600 transition-colors">WOMEN</Link>
-                    <Link href="/#new-arrivals" className="text-sm font-medium hover:text-gray-600 transition-colors">NEW ARRIVALS</Link>
-                    <Link href="/#about" className="text-sm font-medium hover:text-gray-600 transition-colors">ABOUT</Link>
+                    <NavLink href="/">HOME</NavLink>
+                    <NavLink href="/shop/men">MEN</NavLink>
+                    <NavLink href="/shop/women">WOMEN</NavLink>
+                    <NavLink href="/#new-arrivals">NEW ARRIVALS</NavLink>
+                    <NavLink href="/#about">ABOUT</NavLink>
                 </div>
 
                 {/* Icons */}
                 <div className="hidden md:flex items-center space-x-6">
                     {/* Search Component */}
                     <div className="relative" ref={searchRef}>
-                        <div className="flex items-center" onClick={() => { setIsSearchOpen(true); if (!searchQuery) setSearchResults(allProducts.slice(0, 4)); }}>
-                            <Search className="w-5 h-5 cursor-pointer hover:text-gray-600 transition-colors" />
+                        <div className="flex items-center" onClick={() => { setIsSearchOpen(true); if (!searchQuery) setSearchResults(products.slice(0, 4)); }}>
+                            <Search className="w-5 h-5 cursor-pointer hover:text-brand-primary transition-colors text-white" />
                         </div>
 
                         {isSearchOpen && (
@@ -120,7 +146,7 @@ export default function Navbar() {
                                         autoFocus
                                         type="text"
                                         placeholder="Search products..."
-                                        className="w-full px-3 py-2 text-sm bg-gray-50 rounded border-transparent focus:bg-white focus:ring-0 focus:border-gray-200 transition-colors outline-none"
+                                        className="w-full px-3 py-2 text-sm bg-gray-50 rounded border-transparent focus:bg-white focus:ring-0 focus:border-gray-200 transition-colors outline-none text-black"
                                         value={searchQuery}
                                         onChange={(e) => handleSearch(e.target.value)}
                                     />
@@ -145,7 +171,7 @@ export default function Navbar() {
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <h4 className="text-sm font-medium text-gray-900 truncate">{item.name}</h4>
-                                                        <p className="text-xs text-gray-500">${item.price.toFixed(2)}</p>
+                                                        <p className="text-xs text-brand-primary font-bold">${typeof item.price === 'number' ? item.price.toFixed(2) : item.price}</p>
                                                     </div>
                                                     <ChevronRight className="w-4 h-4 text-gray-300" />
                                                 </div>
@@ -162,7 +188,7 @@ export default function Navbar() {
                         {user ? (
                             <>
                                 <button onClick={() => setIsUserOpen(!isUserOpen)} className="focus:outline-none" title={`Signed in as ${user.name}`}>
-                                    <User className="w-5 h-5 hover:text-gray-600 transition-colors text-gray-900 fill-current" />
+                                    <User className="w-5 h-5 hover:text-brand-primary transition-colors text-white fill-current" />
                                 </button>
                                 {isUserOpen && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white shadow-xl rounded-md overflow-hidden border border-gray-100 z-50 animate-in fade-in zoom-in-95 duration-200">
@@ -183,23 +209,23 @@ export default function Navbar() {
                                 )}
                             </>
                         ) : (
-                            <Link href="/login" title="Login / Sign Up"><User className="w-5 h-5 hover:text-gray-600 transition-colors" /></Link>
+                            <Link href="/login" title="Login / Sign Up"><User className="w-5 h-5 text-white hover:text-brand-primary transition-colors" /></Link>
                         )}
                     </div>
 
-                    <Link href="/wishlist" className="relative group">
-                        <Heart className="w-5 h-5 hover:text-gray-600 transition-colors" />
+                    <Link href="/wishlist" className="relative group text-white">
+                        <Heart className="w-5 h-5 hover:text-brand-primary transition-colors" />
                         {wishlistCount > 0 && (
-                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                            <span className="absolute -top-2 -right-2 bg-brand-primary text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
                                 {wishlistCount}
                             </span>
                         )}
                     </Link>
 
-                    <Link href="/cart" className="relative group">
-                        <ShoppingBag className="w-5 h-5 hover:text-gray-600 transition-colors" />
+                    <Link href="/cart" className="relative group text-white">
+                        <ShoppingBag className="w-5 h-5 hover:text-brand-primary transition-colors" />
                         {cartCount > 0 && (
-                            <span className="absolute -top-2 -right-2 bg-black text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+                            <span className="absolute -top-2 -right-2 bg-brand-primary text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
                                 {cartCount}
                             </span>
                         )}
@@ -207,7 +233,7 @@ export default function Navbar() {
                 </div>
 
                 {/* Mobile Menu Button */}
-                <button className="md:hidden focus:outline-none" onClick={() => setIsOpen(!isOpen)}>
+                <button className="md:hidden focus:outline-none text-white" onClick={() => setIsOpen(!isOpen)}>
                     {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                 </button>
             </div>
@@ -215,15 +241,15 @@ export default function Navbar() {
             {/* Mobile Menu Overlay */}
             {isOpen && (
                 <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-6 flex flex-col space-y-4 h-screen">
-                    <Link href="/" className="text-sm font-medium hover:text-gray-600" onClick={() => setIsOpen(false)}>HOME</Link>
-                    <Link href="/shop/men" className="text-sm font-medium hover:text-gray-600" onClick={() => setIsOpen(false)}>MEN</Link>
-                    <Link href="/shop/women" className="text-sm font-medium hover:text-gray-600" onClick={() => setIsOpen(false)}>WOMEN</Link>
-                    <Link href="/#new-arrivals" className="text-sm font-medium hover:text-gray-600" onClick={() => setIsOpen(false)}>NEW ARRIVALS</Link>
-                    <Link href="/#about" className="text-sm font-medium hover:text-gray-600" onClick={() => setIsOpen(false)}>ABOUT</Link>
+                    <Link href="/" className={`text-sm font-medium ${isActive('/') ? 'text-brand-primary' : 'hover:text-brand-primary'}`} onClick={() => setIsOpen(false)}>HOME</Link>
+                    <Link href="/shop/men" className={`text-sm font-medium ${isActive('/shop/men') ? 'text-brand-primary' : 'hover:text-brand-primary'}`} onClick={() => setIsOpen(false)}>MEN</Link>
+                    <Link href="/shop/women" className={`text-sm font-medium ${isActive('/shop/women') ? 'text-brand-primary' : 'hover:text-brand-primary'}`} onClick={() => setIsOpen(false)}>WOMEN</Link>
+                    <Link href="/#new-arrivals" className="text-sm font-medium hover:text-brand-primary" onClick={() => setIsOpen(false)}>NEW ARRIVALS</Link>
+                    <Link href="/#about" className="text-sm font-medium hover:text-brand-primary" onClick={() => setIsOpen(false)}>ABOUT</Link>
                     <div className="flex space-x-6 pt-6 border-t mt-4">
                         {user ? (
                             <button onClick={() => { setIsOpen(false); router.push('/profile'); }} className="flex items-center">
-                                <User className="w-6 h-6 text-gray-900 fill-current mr-2" />
+                                <User className="w-6 h-6 text-content-heading fill-current mr-2" />
                             </button>
                         ) : (
                             <Link href="/login" onClick={() => setIsOpen(false)}><User className="w-6 h-6" /></Link>

@@ -10,6 +10,11 @@ export async function PUT(request: Request) {
             return NextResponse.json({ success: false, message: 'User email required' }, { status: 400 });
         }
 
+        const user = MockUserStore.findByEmail(email);
+        if (user && user.isBlocked) {
+            return NextResponse.json({ success: false, message: 'Account is blocked' }, { status: 403 });
+        }
+
         const updatedUser = MockUserStore.update(email, body);
 
         if (updatedUser) {

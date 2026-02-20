@@ -31,18 +31,18 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     // Load wishlist on mount or user change
     useEffect(() => {
         setWishlist(DB.getWishlist());
-    }, [user]);
-
-    // Save to DB whenever wishlist changes
-    useEffect(() => {
-        // Simple save, assuming DB handles key logic based on current user
-        DB.saveWishlist(wishlist);
-    }, [wishlist, user]);
+    }, [user]); // user dependency ensures we reload when switching users
 
     // Sync across tabs
     useEffect(() => {
-        const handleStorage = () => {
-            setWishlist(DB.getWishlist());
+        const handleStorage = (e: StorageEvent) => {
+            // Only update if the key matches current user's wishlist
+            const userId = user ? user.id : null;
+            const key = userId ? `modernist_wishlist_${userId}` : 'modernist_wishlist_guest';
+
+            if (e.key === key) {
+                setWishlist(DB.getWishlist());
+            }
         };
         window.addEventListener('storage', handleStorage);
         return () => window.removeEventListener('storage', handleStorage);
@@ -56,12 +56,16 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
             return;
         }
 
-        setWishlist((prev) => [...prev, item]);
+        const newWishlist = [...wishlist, item];
+        setWishlist(newWishlist);
+        DB.saveWishlist(newWishlist);
         showToast("Added to wishlist", 'success');
     };
 
     const removeFromWishlist = (id: number) => {
-        setWishlist((prev) => prev.filter((item) => item.id !== id));
+        const newWishlist = wishlist.filter((item) => item.id !== id);
+        setWishlist(newWishlist);
+        DB.saveWishlist(newWishlist);
         showToast("Removed from wishlist", 'info');
     };
 

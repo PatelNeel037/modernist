@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
 import styles from './admin-login.module.css';
 import { DB } from '@/services/db';
 
@@ -11,7 +10,6 @@ export default function AdminLoginPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const { login, logout } = useAuth();
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -20,22 +18,12 @@ export default function AdminLoginPage() {
         setLoading(true);
 
         try {
-            // Attempt login
-            const result = await login(email, password);
+            // Attempt login with isolated Admin Auth
+            const result = await DB.adminLogin(email, password);
 
             if (result.success) {
-                // Check role explicitly
-                const currentUser = DB.getCurrentUser();
-
-                if (currentUser && currentUser.role === 'admin') {
-                    // Success
-                    router.push('/admin');
-                } else {
-                    // Login successful but NOT admin
-                    logout(); // Logout immediately
-                    setError('Access Denied: You do not have admin privileges.');
-                    setLoading(false);
-                }
+                // Success
+                router.push('/admin');
             } else {
                 setError(result.message || 'Invalid email or password.');
                 setLoading(false);

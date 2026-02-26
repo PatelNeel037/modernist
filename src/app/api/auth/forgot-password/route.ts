@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import User from '@/models/User';
 import jwt from 'jsonwebtoken';
+import { sendPasswordResetEmail } from '@/lib/email';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_for_development_only';
 
@@ -33,10 +34,11 @@ export async function POST(request: Request) {
             { expiresIn: '15m' }
         );
 
+        sendPasswordResetEmail(user.email, resetToken).catch(console.error);
+
         return NextResponse.json({
             success: true,
-            message: 'If you have an account, a reset link has been sent to your email.',
-            resetToken_dev_only: resetToken // Only returning to help developer integration
+            message: 'If you have an account, a reset link has been sent to your email.'
         });
 
     } catch (error) {

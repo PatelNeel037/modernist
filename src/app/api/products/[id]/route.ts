@@ -33,6 +33,10 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
         const id = params.id;
         const body = await request.json();
 
+        if (body.image) {
+            body.images = [body.image];
+        }
+
         // Check product existence
         const updated = await Product.findByIdAndUpdate(id, body, { new: true });
 

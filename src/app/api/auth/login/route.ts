@@ -25,7 +25,7 @@ export async function POST(request: Request) {
                 return NextResponse.json({ success: false, message: 'Invalid email or password.' }, { status: 401 });
             }
 
-            const token = jwt.sign({ id: user._id, role: user.role, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+            const token = jwt.sign({ id: user._id, role: user.role, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' });
 
             const { password: _, ...safeUser } = user.toObject();
             safeUser.id = safeUser._id.toString();

@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { sendWelcomeEmail } from '@/lib/email';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_for_development_only';
 
@@ -30,10 +31,13 @@ export async function POST(request: Request) {
             role: 'user',
         });
 
-        const token = jwt.sign({ id: newUser._id, role: newUser.role, email: newUser.email }, JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ id: newUser._id, role: newUser.role, email: newUser.email, name: newUser.name }, JWT_SECRET, { expiresIn: '7d' });
 
         const { password: _, ...safeUser } = newUser.toObject();
         safeUser.id = safeUser._id.toString();
+
+        // Send Welcome Email asynchronously
+        sendWelcomeEmail(safeUser.email, safeUser.name).catch(console.error);
 
         const response = NextResponse.json({
             success: true,

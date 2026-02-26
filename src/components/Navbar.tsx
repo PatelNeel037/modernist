@@ -10,11 +10,12 @@ import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/AuthContext';
 import { allProducts, Product } from '@/data/products';
 import { DB } from '@/services/db';
+import CartDrawer from './CartDrawer';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
-    const { getCartCount } = useCart();
+    const { getCartCount, openCart } = useCart();
     const { wishlist } = useWishlist();
     const { user, logout } = useAuth();
     const router = useRouter();
@@ -222,14 +223,14 @@ export default function Navbar() {
                         )}
                     </Link>
 
-                    <Link href="/cart" className="relative group text-white">
+                    <button onClick={openCart} className="relative text-white group cursor-pointer" aria-label="Open cart">
                         <ShoppingBag className="w-5 h-5 hover:text-brand-primary transition-colors" />
                         {cartCount > 0 && (
                             <span className="absolute -top-2 -right-2 bg-brand-primary text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
                                 {cartCount}
                             </span>
                         )}
-                    </Link>
+                    </button>
                 </div>
 
                 {/* Mobile Menu Button */}
@@ -255,10 +256,11 @@ export default function Navbar() {
                             <Link href="/login" onClick={() => setIsOpen(false)}><User className="w-6 h-6" /></Link>
                         )}
                         <Link href="/wishlist"><Heart className="w-6 h-6" /></Link>
-                        <Link href="/cart"><ShoppingBag className="w-6 h-6" /></Link>
+                        <button onClick={() => { setIsOpen(false); openCart(); }}><ShoppingBag className="w-6 h-6" /></button>
                     </div>
                 </div>
             )}
+            <CartDrawer />
         </nav>
     );
 }

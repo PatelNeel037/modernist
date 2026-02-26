@@ -30,6 +30,7 @@ function ShopContent() {
     // New Filters
     const [priceFilters, setPriceFilters] = useState<string[]>([]);
     const [materialFilters, setMaterialFilters] = useState<string[]>([]);
+    const [sizeFilters, setSizeFilters] = useState<string[]>([]);
     const [sortOption, setSortOption] = useState('featured');
     const [showMobileFilters, setShowMobileFilters] = useState(false);
 
@@ -62,6 +63,25 @@ function ShopContent() {
         return Array.from(mats).sort();
     }, [products, activeCategory]);
 
+    const availableSizes = useMemo(() => {
+        const szs = new Set<string>();
+        products.forEach(p => {
+            if (activeCategory === 'All' || p.category === activeCategory) {
+                if (Array.isArray(p.sizes)) p.sizes.forEach((s: string) => szs.add(s));
+            }
+        });
+        const order = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+        // Sort unknown sizes alphabetically at the end
+        return Array.from(szs).sort((a, b) => {
+            let iA = order.indexOf(a);
+            let iB = order.indexOf(b);
+            if (iA === -1 && iB === -1) return a.localeCompare(b);
+            if (iA === -1) return 1;
+            if (iB === -1) return -1;
+            return iA - iB;
+        });
+    }, [products, activeCategory]);
+
     // Filter Logic
     const filteredProducts = useMemo(() => {
         let result = products.filter(product => {
@@ -90,6 +110,13 @@ function ShopContent() {
                 if (!matchesMat) return false;
             }
 
+            // Size
+            if (sizeFilters.length > 0) {
+                if (!product.sizes || !Array.isArray(product.sizes)) return false;
+                const matchesSize = product.sizes.some((s: string) => sizeFilters.includes(s));
+                if (!matchesSize) return false;
+            }
+
             return true;
         });
 
@@ -103,7 +130,7 @@ function ShopContent() {
         }
 
         return result;
-    }, [products, activeCategory, activeType, priceFilters, materialFilters, sortOption]);
+    }, [products, activeCategory, activeType, priceFilters, materialFilters, sizeFilters, sortOption]);
 
     const togglePrice = (range: string) => {
         setPriceFilters(prev => prev.includes(range) ? prev.filter(p => p !== range) : [...prev, range]);
@@ -113,11 +140,16 @@ function ShopContent() {
         setMaterialFilters(prev => prev.includes(mat) ? prev.filter(m => m !== mat) : [...prev, mat]);
     };
 
+    const toggleSize = (sz: string) => {
+        setSizeFilters(prev => prev.includes(sz) ? prev.filter(s => s !== sz) : [...prev, sz]);
+    };
+
     const clearAll = () => {
         setActiveCategory('All');
         setActiveType('All');
         setPriceFilters([]);
         setMaterialFilters([]);
+        setSizeFilters([]);
         setSortOption('featured');
     };
 
@@ -195,6 +227,27 @@ function ShopContent() {
                                         />
                                         <span className="text-sm text-gray-600 capitalize">{mat}</span>
                                     </label>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Size */}
+                    {availableSizes.length > 0 && (
+                        <div>
+                            <h3 className="font-bold mb-4 text-gray-900 border-b pb-2">Size</h3>
+                            <div className="grid grid-cols-3 gap-2">
+                                {availableSizes.map(sz => (
+                                    <button
+                                        key={sz}
+                                        onClick={() => toggleSize(sz)}
+                                        className={`py-1.5 text-xs font-medium border rounded transition-colors ${sizeFilters.includes(sz)
+                                                ? 'bg-black text-white border-black'
+                                                : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                                            }`}
+                                    >
+                                        {sz}
+                                    </button>
                                 ))}
                             </div>
                         </div>

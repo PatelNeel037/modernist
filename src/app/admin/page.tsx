@@ -24,7 +24,12 @@ export default function AdminDashboard() {
 
                 const ordersRes = await fetch('/api/orders/all');
                 const ordersData = await ordersRes.json();
-                setRecentOrders(ordersData.slice(0, 5)); // Top 5
+                if (Array.isArray(ordersData)) {
+                    setRecentOrders(ordersData.slice(0, 5)); // Top 5
+                } else {
+                    console.error("API Error fetching orders:", ordersData);
+                    setRecentOrders([]);
+                }
             } catch (err) {
                 console.error("Failed to load dashboard data", err);
             }
@@ -72,7 +77,7 @@ export default function AdminDashboard() {
                         </div>
                     </div>
                     <div className={styles.statValue}>
-                        {Object.values(stats.orders).reduce((a: any, b: any) => a + b, 0)}
+                        {Number(Object.values(stats.orders).reduce((a: any, b: any) => a + Number(b), 0))}
                     </div>
                     <div className={styles.statChange}>
                         <span className="text-blue-500 font-medium">{stats.orders.Pending || 0} Pending</span>
@@ -197,7 +202,20 @@ export default function AdminDashboard() {
                         <h3>Top Selling</h3>
                         <TrendingUp className="text-yellow-500" size={20} />
                     </div>
-                    <div className="text-center text-gray-400 text-sm py-4">No sales data yet</div>
+                    {stats.topSelling && stats.topSelling.length > 0 ? (
+                        <table className={styles.table}>
+                            <tbody>
+                                {stats.topSelling.map((p: any, i: number) => (
+                                    <tr key={i}>
+                                        <td className="font-medium">{p.name}</td>
+                                        <td className="text-right text-gray-500">{p.count} sold</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <div className="text-center text-gray-400 text-sm py-4">No sales data yet</div>
+                    )}
                 </div>
             </div>
         </>

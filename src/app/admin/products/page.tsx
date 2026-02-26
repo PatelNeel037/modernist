@@ -105,6 +105,31 @@ export default function AdminProductsPage() {
     };
 
     // --- Form Handlers ---
+    const handleImageUpload = async (e: any) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const res = await fetch('/api/admin/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await res.json();
+            if (res.ok && data.success) {
+                setFormData(prev => ({ ...prev, image: data.url }));
+            } else {
+                alert('Image upload failed: ' + data.message);
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Upload error');
+        }
+    };
+
     const handleChange = (e: any) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -308,8 +333,12 @@ export default function AdminProductsPage() {
                             </div>
 
                             <div className={styles.formGroup}>
-                                <label>Image URL</label>
+                                <label>Image URL or Upload</label>
+                                <input type="file" onChange={handleImageUpload} className={styles.formControl} accept="image/*" style={{ marginBottom: '10px' }} />
                                 <input name="image" value={formData.image} onChange={handleChange} className={styles.formControl} placeholder="https://..." />
+                                {formData.image && (
+                                    <img src={formData.image} alt="Preview" style={{ marginTop: '10px', maxHeight: '100px', borderRadius: '8px' }} />
+                                )}
                             </div>
 
                             <div className={styles.formGroup}>

@@ -101,10 +101,12 @@ export default function OrdersPage() {
         if (!confirm("Are you sure you want to cancel this order?")) return;
 
         try {
+            // Include userId or email so backend can authenticate as ownership
+            const userId = user?.id || user?.email;
             const res = await fetch(`/api/orders/${orderId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: 'Cancelled' })
+                body: JSON.stringify({ status: 'Cancelled', userId: userId })
             });
 
             if (res.ok) {
@@ -114,7 +116,8 @@ export default function OrdersPage() {
                 ));
                 alert("Order cancelled successfully.");
             } else {
-                alert("Failed to cancel order.");
+                const errorData = await res.json();
+                alert(`Failed to cancel order: ${errorData.message || 'Unknown error'}`);
             }
         } catch (e) {
             console.error(e);
@@ -225,7 +228,7 @@ export default function OrdersPage() {
                                                     {/* Status Badge Small */}
                                                     <p className="text-gray-500 mb-1">Status</p>
                                                     <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold 
-                                                        ${order.status === 'Delivered' ? 'bg-green-100 text-green-800' :
+                                                            ${order.status === 'Delivered' ? 'bg-green-100 text-green-800' :
                                                             order.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
                                                                 'bg-blue-50 text-blue-800'}`}>
                                                         {order.status}

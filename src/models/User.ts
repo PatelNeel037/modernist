@@ -6,6 +6,15 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     role: { type: String, default: "user", enum: ["user", "admin"] },
     isBlocked: { type: Boolean, default: false },
+    addresses: [{
+        id: String,
+        name: String,
+        street: String,
+        city: String,
+        state: String,
+        zip: String,
+        phone: String
+    }],
 }, { timestamps: true });
 
 export default mongoose.models.User || mongoose.model("User", userSchema);

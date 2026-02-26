@@ -20,8 +20,34 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: 'MODERNIST | Redefining Everyday Fashion',
-  description: 'Premium fabrics for modern lifestyle.',
+  title: {
+    template: '%s | MODERNIST',
+    default: 'MODERNIST | Redefining Everyday Fashion',
+  },
+  description: 'Discover premium fabrics for the modern lifestyle. Shop our exclusive collection of minimalist, timeless fashion for both men and women.',
+  keywords: ['fashion', 'modernist', 'clothing', 'minimalist style', 'premium fabrics', 'streetwear', 'online boutique'],
+  openGraph: {
+    title: 'MODERNIST | Redefining Everyday Fashion',
+    description: 'Discover premium fabrics for the modern lifestyle. Shop our exclusive collection.',
+    url: 'https://modernist.com',
+    siteName: 'MODERNIST',
+    images: [
+      {
+        url: '/hero-image.jpg', // Assuming you have a default hero image in public
+        width: 1200,
+        height: 630,
+        alt: 'MODERNIST Fashion Hero Image',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MODERNIST | Redefining Everyday Fashion',
+    description: 'Discover premium fabrics for the modern lifestyle. Shop our exclusive collection.',
+    images: ['/hero-image.jpg'],
+  },
 };
 
 export default function RootLayout({

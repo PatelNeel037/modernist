@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
+import { Heart, Plus } from 'lucide-react';
 
 interface ProductProps {
     id: number;
@@ -66,15 +67,18 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                 {/* Wishlist Button - Top Right */}
                 <button
                     onClick={toggleWishlist}
-                    className={`absolute top-4 right-4 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-sm hover:bg-white transition-colors z-20 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 duration-300 ${isIn ? 'text-red-500' : 'hover:text-red-500'}`}
+                    className={`absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm hover:bg-white transition-all z-20 duration-300 flex items-center justify-center ${isIn
+                            ? 'text-red-500 opacity-100 translate-y-0'
+                            : 'text-gray-400 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 hover:text-red-500'
+                        }`}
                 >
-                    <i className={`${isIn ? 'fas' : 'far'} fa-heart`}></i>
+                    <Heart className={`w-5 h-5 transition-transform ${isIn ? 'fill-current scale-110' : 'scale-100'}`} />
                 </button>
 
                 {/* Add to Cart - Bottom overlay */}
                 <div className="absolute inset-x-0 bottom-0 bg-white/95 backdrop-blur-md py-3 flex justify-center items-center translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20 border-t border-gray-100">
-                    <button onClick={handleAddToCart} className="text-sm font-semibold text-content-heading hover:text-brand-primary flex items-center gap-2 transition-colors">
-                        <i className="fas fa-plus"></i> Add to Cart
+                    <button onClick={handleAddToCart} className="text-sm font-semibold text-gray-900 hover:text-gray-600 flex items-center gap-2 transition-colors">
+                        <Plus className="w-4 h-4" /> Add to Cart
                     </button>
                 </div>
 

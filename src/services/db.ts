@@ -322,6 +322,36 @@ export const DB = {
         }
     },
 
+    fetchReviews: async function (productId: string | number) {
+        try {
+            const response = await fetch(`${API_URL}/products/${productId}/reviews`);
+            if (!response.ok) return [];
+            return await response.json();
+        } catch (e) {
+            console.warn("Failed to fetch reviews", e);
+            return [];
+        }
+    },
+
+    submitReview: async function (productId: string | number, rating: number, comment: string) {
+        try {
+            const response = await fetch(`${API_URL}/products/${productId}/reviews`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rating, comment })
+            });
+            const data = await response.json();
+            return {
+                success: response.ok,
+                message: data.message,
+                review: data.review
+            };
+        } catch (e) {
+            console.warn("Failed to submit review", e);
+            return { success: false, message: 'Network error submitting review' };
+        }
+    },
+
     // --- Helper: Merge Guest Data ---
     mergeGuestData: function (newUserId: string | number) {
         if (typeof window === 'undefined') return;

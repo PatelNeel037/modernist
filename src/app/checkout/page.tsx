@@ -339,7 +339,7 @@ function CheckoutContent() {
                             </div>
                             <div className="flex justify-between text-gray-600">
                                 <span>Shipping</span>
-                                <span>{shippingCost === 0 ? 'Free' : `$${shippingCost.toFixed(2)}`}</span>
+                                <span>{shippingCost === 0 ? 'Free' : `$${Number(shippingCost).toFixed(2)}`}</span>
                             </div>
                             <div className="flex justify-between font-bold text-lg text-gray-900 pt-2 border-t border-gray-100 mt-2">
                                 <span>Total</span>

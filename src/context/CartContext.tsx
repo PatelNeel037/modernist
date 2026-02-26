@@ -22,6 +22,9 @@ interface CartContextType {
     getCartCount: () => number;
     getCartTotal: () => number;
     clearCart: () => void;
+    isCartOpen: boolean;
+    openCart: () => void;
+    closeCart: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -59,6 +62,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
     }, [cart]); // Removed 'user' dependency to avoid overwriting DB on context switch with stale cart state
 
+    const [isCartOpen, setIsCartOpen] = useState(false);
+
+    const openCart = () => setIsCartOpen(true);
+    const closeCart = () => setIsCartOpen(false);
+
     const addToCart = (newItem: CartItem) => {
         setCart((prevCart) => {
             const existingItemIndex = prevCart.findIndex(
@@ -79,6 +87,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             return updatedCart;
         });
         showToast(`Added ${newItem.name} to cart`, 'success');
+        openCart(); // Auto-open cart when item is added!
     };
 
     const removeFromCart = (id: number, size?: string) => {
@@ -112,7 +121,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, getCartCount, getCartTotal, clearCart }}>
+        <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, getCartCount, getCartTotal, clearCart, isCartOpen, openCart, closeCart }}>
             {children}
         </CartContext.Provider>
     );

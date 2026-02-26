@@ -4,6 +4,7 @@ import { WishlistProvider } from '@/context/WishlistContext';
 import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { ToastProvider } from '@/context/ToastContext';
+import { Toaster } from 'react-hot-toast';
 import './globals.css';
 
 const playfair = Playfair_Display({
@@ -65,6 +66,31 @@ export default function RootLayout({
           <ToastProvider>
             <WishlistProvider>
               <CartProvider>
+                <Toaster
+                  position="bottom-right"
+                  toastOptions={{
+                    duration: 4000,
+                    style: {
+                      background: '#331C08',
+                      color: '#fff',
+                      padding: '16px',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                    },
+                    success: {
+                      iconTheme: {
+                        primary: '#4ade80',
+                        secondary: '#331C08',
+                      },
+                    },
+                    error: {
+                      iconTheme: {
+                        primary: '#ef4444',
+                        secondary: '#331C08',
+                      },
+                    },
+                  }}
+                />
                 {children}
               </CartProvider>
             </WishlistProvider>

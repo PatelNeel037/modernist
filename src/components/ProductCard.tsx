@@ -11,6 +11,7 @@ interface ProductProps {
     price: string;
     image: string;
     sale?: boolean;
+    hoverImage?: string;
 }
 
 export default function ProductCard({ product }: { product: ProductProps }) {
@@ -48,18 +49,30 @@ export default function ProductCard({ product }: { product: ProductProps }) {
         });
     };
 
+    // Determine fallback hover image
+    const hoverImageSrc = product.hoverImage || product.image.replace('lifestyle', 'studio').replace('1', '2') || `https://placehold.co/400x500/E5E5E5/31343C?text=${encodeURIComponent(product.name)}+Back`;
+
     return (
         <div className="group relative bg-white border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
             {/* Image Container */}
             <div className="aspect-[4/5] bg-gray-200 relative overflow-hidden">
-                <Link href={`/product/${product.id}`}>
-                    {/* ... image logic ... */}
+                <Link href={`/product/${product.id}`} className="block w-full h-full cursor-pointer">
+                    {/* Primary Image */}
                     <img
                         src={product.image}
                         alt={product.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 cursor-pointer"
+                        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out group-hover:opacity-0 z-10"
                         onError={(e) => {
-                            e.currentTarget.src = `https://placehold.co/400x500/F5F5F5/31343C?text=${product.name}`;
+                            e.currentTarget.src = `https://placehold.co/400x500/F5F5F5/31343C?text=${encodeURIComponent(product.name)}`;
+                        }}
+                    />
+                    {/* Secondary/Hover Image */}
+                    <img
+                        src={hoverImageSrc}
+                        alt={`${product.name} Alternative View`}
+                        className="absolute inset-0 w-full h-full object-cover opacity-0 transition-all duration-700 ease-in-out group-hover:opacity-100 group-hover:scale-110 z-0"
+                        onError={(e) => {
+                            e.currentTarget.src = `https://placehold.co/400x500/EAEAEA/31343C?text=${encodeURIComponent(product.name)}+Back`;
                         }}
                     />
                 </Link>
@@ -68,8 +81,8 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                 <button
                     onClick={toggleWishlist}
                     className={`absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm hover:bg-white transition-all z-20 duration-300 flex items-center justify-center ${isIn
-                            ? 'text-red-500 opacity-100 translate-y-0'
-                            : 'text-gray-400 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 hover:text-red-500'
+                        ? 'text-red-500 opacity-100 translate-y-0'
+                        : 'text-gray-400 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 hover:text-red-500'
                         }`}
                 >
                     <Heart className={`w-5 h-5 transition-transform ${isIn ? 'fill-current scale-110' : 'scale-100'}`} />

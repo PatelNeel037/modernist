@@ -21,6 +21,7 @@ import {
     XCircle,
     ShoppingBag
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface OrderItem {
     id: number;
@@ -114,14 +115,14 @@ export default function OrdersPage() {
                 setOrders(prev => prev.map(o =>
                     o.id === orderId ? { ...o, status: 'Cancelled' } : o
                 ));
-                alert("Order cancelled successfully.");
+                toast.success("Order cancelled successfully.");
             } else {
                 const errorData = await res.json();
-                alert(`Failed to cancel order: ${errorData.message || 'Unknown error'}`);
+                toast.error(`Failed to cancel order: ${errorData.message || 'Unknown error'}`);
             }
         } catch (e) {
             console.error(e);
-            alert("Error cancelling order.");
+            toast.error("Error cancelling order.");
         }
     };
 
@@ -138,13 +139,13 @@ export default function OrdersPage() {
                 size: item.size
             });
         });
-        alert("Items added to cart!");
+        toast.success("Items added to cart!");
         router.push('/cart');
     };
 
     // Handle Download Invoice
     const handleDownloadInvoice = (orderId: string) => {
-        alert(`Downloading invoice for ${orderId}... (Mock PDF)`);
+        toast.success(`Downloading invoice for ${orderId}... (Mock PDF)`);
     };
 
     // Toggle expand

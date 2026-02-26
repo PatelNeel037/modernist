@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import styles from './products.module.css';
 import { Plus, Edit2, Trash2, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 // import { useAuth } from '@/context/AuthContext'; // Assume admin protection from layout
 
 export default function AdminProductsPage() {
@@ -122,11 +123,11 @@ export default function AdminProductsPage() {
             if (res.ok && data.success) {
                 setFormData(prev => ({ ...prev, image: data.url }));
             } else {
-                alert('Image upload failed: ' + data.message);
+                toast.error('Image upload failed: ' + data.message);
             }
         } catch (err) {
             console.error(err);
-            alert('Upload error');
+            toast.error('Upload error');
         }
     };
 
@@ -165,15 +166,15 @@ export default function AdminProductsPage() {
             });
 
             if (res.ok) {
-                alert('Saved successfully!');
+                toast.success('Saved successfully!');
                 closeModal();
                 loadProducts();
             } else {
-                alert('Save failed');
+                toast.error('Save failed');
             }
         } catch (err) {
             console.error(err);
-            alert('Error occurred');
+            toast.error('Error occurred');
         }
     };
 
@@ -184,7 +185,7 @@ export default function AdminProductsPage() {
             if (res.ok) {
                 loadProducts();
             } else {
-                alert('Failed to delete');
+                toast.error('Failed to delete');
             }
         } catch (e) {
             console.error(e);

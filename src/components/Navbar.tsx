@@ -73,11 +73,46 @@ export default function Navbar() {
     const wishlistCount = wishlist.length;
     const cartCount = getCartCount();
 
+    const [isVisible, setIsVisible] = useState(true);
+    const lastScrollY = useRef(0);
+
     useEffect(() => {
+        let ticking = false;
+
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 0);
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const currentScrollY = window.scrollY;
+
+                    // Determine if scrolled past top (for glassmorphism effect)
+                    setIsScrolled(currentScrollY > 20);
+
+                    // Bounce fix for macOS / iOS
+                    if (currentScrollY <= 0) {
+                        setIsVisible(true);
+                    } else {
+                        const difference = currentScrollY - lastScrollY.current;
+
+                        if (currentScrollY > 80 && difference > 8) {
+                            // Scrolling down by more than 8px -> hide
+                            setIsVisible(false);
+                        } else if (difference < -8 || currentScrollY <= 80) {
+                            // Scrolling up by more than 8px or near top -> show
+                            setIsVisible(true);
+                        }
+                    }
+
+                    // Update last scroll position only if moved enough
+                    if (Math.abs(currentScrollY - lastScrollY.current) > 8 || currentScrollY <= 80) {
+                        lastScrollY.current = currentScrollY > 0 ? currentScrollY : 0;
+                    }
+
+                    ticking = false;
+                });
+                ticking = true;
+            }
         };
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, { passive: true });
 
         const handleClickOutside = (event: MouseEvent) => {
             if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -116,7 +151,7 @@ export default function Navbar() {
     };
 
     return (
-        <nav className="fixed w-full z-50 transition-all duration-300 bg-brand-dark shadow-md py-4">
+        <nav className={`fixed w-full z-50 transition-all duration-300 ${(isVisible || isOpen || isSearchOpen || isUserOpen) ? 'translate-y-0' : '-translate-y-full'} ${isScrolled ? 'bg-brand-dark/95 backdrop-blur-md shadow-md py-2' : 'bg-brand-dark py-4'}`}>
             <div className="container mx-auto px-6 flex justify-between items-center">
 
                 {/* Logo */}

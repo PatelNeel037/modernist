@@ -10,6 +10,7 @@ import {
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import toast from 'react-hot-toast';
 
 interface Order {
     id: string;
@@ -79,7 +80,7 @@ export default function CustomerDetailPage() {
                 setData(json);
                 setNotes(json.user.adminNotes || '');
             } else {
-                alert('Customer not found');
+                toast.error('Customer not found');
                 router.push('/admin/customers');
             }
         } catch (e) {
@@ -106,11 +107,11 @@ export default function CustomerDetailPage() {
             try {
                 const res = await fetch(`/api/admin/users/${data.user.id}`, { method: 'DELETE' });
                 if (res.ok) {
-                    alert('User deleted successfully');
+                    toast.success('User deleted successfully');
                     router.push('/admin/customers');
                 }
             } catch (e) {
-                alert('Failed to delete user');
+                toast.error('Failed to delete user');
             }
             return;
         }
@@ -123,11 +124,11 @@ export default function CustomerDetailPage() {
                 body: JSON.stringify({ action })
             });
             if (res.ok) {
-                alert(`Action ${action} successful`);
+                toast.success(`Action ${action} successful`);
                 fetchCustomerData(data.user.id.toString());
             }
         } catch (e) {
-            alert('Action failed');
+            toast.error('Action failed');
         }
     };
 
@@ -141,10 +142,10 @@ export default function CustomerDetailPage() {
                 body: JSON.stringify({ notes })
             });
             if (res.ok) {
-                alert('Notes saved');
+                toast.success('Notes saved');
             }
         } catch (e) {
-            alert('Failed to save notes');
+            toast.error('Failed to save notes');
         } finally {
             setIsSavingNotes(false);
         }

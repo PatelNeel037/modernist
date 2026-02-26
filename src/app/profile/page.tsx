@@ -11,6 +11,7 @@ import {
     Plus, Edit2, Trash2, CheckCircle, AlertCircle,
     Shield, Bell, Lock, Smartphone, Moon, Sun, Monitor
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function ProfilePage() {
     const { user, logout, addAddress, updateAddress, deleteAddress, updateUser, changePassword, isLoading } = useAuth();
@@ -84,7 +85,7 @@ export default function ProfilePage() {
         const address = user?.addresses?.find(a => a.id === id);
         if (address) {
             updateAddress({ ...address, isDefault: true });
-            alert('Default address updated');
+            toast.success('Default address updated');
         }
     };
 
@@ -134,10 +135,10 @@ export default function ProfilePage() {
 
         if (editingAddress) {
             updateAddress(payload);
-            alert('Address updated successfully!');
+            toast.success('Address updated successfully!');
         } else {
             addAddress(payload);
-            alert('Address added successfully!');
+            toast.success('Address added successfully!');
         }
         setIsAddressModalOpen(false);
     };
@@ -152,23 +153,23 @@ export default function ProfilePage() {
     const handleProfileUpdate = (e: React.FormEvent) => {
         e.preventDefault();
         updateUser({ name: profileForm.name, email: profileForm.email });
-        alert('Profile updated successfully!');
+        toast.success('Profile updated successfully!');
     };
 
     const handlePasswordUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
         if (passwordForm.new !== passwordForm.confirm) {
-            alert("New passwords do not match!");
+            toast.error("New passwords do not match!");
             return;
         }
 
         const result = await changePassword(passwordForm.current, passwordForm.new);
 
         if (result.success) {
-            alert('Password updated successfully!');
+            toast.success('Password updated successfully!');
             setPasswordForm({ current: '', new: '', confirm: '' });
         } else {
-            alert(result.message || 'Failed to update password');
+            toast.error(result.message || 'Failed to update password');
         }
     };
 
@@ -181,7 +182,7 @@ export default function ProfilePage() {
     const handleDeleteAccount = () => {
         const confirmText = prompt("Type 'DELETE' to confirm account deletion. This cannot be undone.");
         if (confirmText === 'DELETE') {
-            alert('Account deleted.');
+            toast.success('Account deleted.');
             logout();
             window.location.href = '/';
         }
@@ -497,7 +498,7 @@ export default function ProfilePage() {
                                                     {user.isVerified ? 'Verified' : 'Unverified'}
                                                 </p>
                                                 {!user.isVerified && (
-                                                    <button onClick={() => alert('Verification email sent!')} className="text-xs bg-black text-white px-2 py-1 rounded">Verify Now</button>
+                                                    <button onClick={() => toast.success('Verification email sent!')} className="text-xs bg-black text-white px-2 py-1 rounded">Verify Now</button>
                                                 )}
                                             </div>
                                         </div>

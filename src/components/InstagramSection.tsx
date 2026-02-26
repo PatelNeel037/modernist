@@ -1,6 +1,7 @@
 'use client';
 
 import { Instagram } from 'lucide-react';
+import ScrollReveal from './ui/ScrollReveal';
 
 export default function InstagramSection() {
     const images = [
@@ -13,17 +14,17 @@ export default function InstagramSection() {
     return (
         <section className="py-20 bg-white">
             <div className="container mx-auto px-6">
-                <div className="flex flex-col items-center mb-12">
+                <ScrollReveal direction="up" className="flex flex-col items-center mb-12">
                     <Instagram className="w-8 h-8 text-brand-primary mb-4" />
                     <h2 className="text-2xl md:text-3xl font-playfair font-bold text-content-heading text-center">
                         Follow us on Instagram
                     </h2>
                     <a href="#" className="text-brand-primary font-medium mt-2 hover:underline">@modernist.official</a>
-                </div>
+                </ScrollReveal>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {images.map((img, idx) => (
-                        <div key={idx} className="group relative aspect-square overflow-hidden rounded-lg cursor-pointer">
+                        <ScrollReveal direction="up" delay={0.1 * idx} key={idx} className="group relative aspect-square overflow-hidden rounded-lg cursor-pointer">
                             <img
                                 src={img}
                                 alt={`Instagram post ${idx + 1}`}
@@ -32,7 +33,7 @@ export default function InstagramSection() {
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                                 <Instagram className="w-8 h-8 text-white" />
                             </div>
-                        </div>
+                        </ScrollReveal>
                     ))}
                 </div>
             </div>

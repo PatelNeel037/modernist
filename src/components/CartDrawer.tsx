@@ -52,7 +52,12 @@ export default function CartDrawer() {
                         {/* Cart Items */}
                         <div className="flex-1 overflow-y-auto p-6">
                             {cart.length === 0 ? (
-                                <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="h-full flex flex-col items-center justify-center text-center space-y-4"
+                                >
                                     <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-2">
                                         <ShoppingBag className="w-10 h-10 text-gray-300" />
                                     </div>
@@ -61,67 +66,93 @@ export default function CartDrawer() {
                                     <button onClick={closeCart} className="mt-4 px-6 py-2 bg-brand-dark text-white rounded font-medium hover:bg-brand-primary transition-colors text-sm">
                                         Continue Shopping
                                     </button>
-                                </div>
+                                </motion.div>
                             ) : (
-                                <ul className="space-y-6">
-                                    {cart.map((item) => (
-                                        <li key={`${item.id}-${item.size}`} className="flex gap-4 border border-gray-100 p-3 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
-                                            {/* Image */}
-                                            <div className="w-24 h-32 bg-gray-50 rounded overflow-hidden flex-shrink-0 border border-gray-50">
-                                                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                                            </div>
-
-                                            {/* Details */}
-                                            <div className="flex flex-1 flex-col justify-between">
-                                                <div>
-                                                    <div className="flex justify-between items-start">
-                                                        <h3 className="font-semibold text-gray-900 text-sm md:text-base leading-tight pr-4">{item.name}</h3>
-                                                        <button
-                                                            onClick={() => removeFromCart(item.id, item.size)}
-                                                            className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                                                            title="Remove Item"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
-                                                    <p className="text-gray-500 text-xs mt-1">Size: {item.size || 'N/A'}</p>
+                                <motion.ul
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={{
+                                        hidden: { opacity: 0 },
+                                        visible: {
+                                            opacity: 1,
+                                            transition: { staggerChildren: 0.1 }
+                                        }
+                                    }}
+                                    className="space-y-6"
+                                >
+                                    <AnimatePresence initial={false}>
+                                        {cart.map((item) => (
+                                            <motion.li
+                                                key={`${item.id}-${item.size}`}
+                                                layout
+                                                initial={{ opacity: 0, x: 50, scale: 0.9 }}
+                                                animate={{ opacity: 1, x: 0, scale: 1 }}
+                                                exit={{ opacity: 0, x: -50, scale: 0.9, transition: { duration: 0.2 } }}
+                                                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                                                className="flex gap-4 border border-gray-100 p-3 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow"
+                                            >
+                                                {/* Image */}
+                                                <div className="w-24 h-32 bg-gray-50 rounded overflow-hidden flex-shrink-0 border border-gray-50">
+                                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                                                 </div>
 
-                                                <div className="flex items-center justify-between mt-4">
-                                                    {/* Quantity Controls */}
-                                                    <div className="flex items-center border border-gray-200 rounded">
-                                                        <button
-                                                            onClick={() => updateQuantity(item.id, item.size, item.quantity - 1)}
-                                                            className="p-1 px-2 hover:bg-gray-100 text-gray-600 transition-colors disabled:opacity-50"
-                                                            disabled={item.quantity <= 1}
-                                                        >
-                                                            <Minus className="w-3 h-3" />
-                                                        </button>
-                                                        <span className="w-8 text-center text-sm font-medium text-gray-900">
-                                                            {item.quantity}
-                                                        </span>
-                                                        <button
-                                                            onClick={() => updateQuantity(item.id, item.size, item.quantity + 1)}
-                                                            className="p-1 px-2 hover:bg-gray-100 text-gray-600 transition-colors"
-                                                        >
-                                                            <Plus className="w-3 h-3" />
-                                                        </button>
+                                                {/* Details */}
+                                                <div className="flex flex-1 flex-col justify-between">
+                                                    <div>
+                                                        <div className="flex justify-between items-start">
+                                                            <h3 className="font-semibold text-gray-900 text-sm md:text-base leading-tight pr-4">{item.name}</h3>
+                                                            <button
+                                                                onClick={() => removeFromCart(item.id, item.size)}
+                                                                className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                                                                title="Remove Item"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                        <p className="text-gray-500 text-xs mt-1">Size: {item.size || 'N/A'}</p>
                                                     </div>
 
-                                                    <p className="font-bold text-brand-dark">
-                                                        ${(item.price * item.quantity).toFixed(2)}
-                                                    </p>
+                                                    <div className="flex items-center justify-between mt-4">
+                                                        {/* Quantity Controls */}
+                                                        <div className="flex items-center border border-gray-200 rounded">
+                                                            <button
+                                                                onClick={() => updateQuantity(item.id, item.size, item.quantity - 1)}
+                                                                className="p-1 px-2 hover:bg-gray-100 text-gray-600 transition-colors disabled:opacity-50"
+                                                                disabled={item.quantity <= 1}
+                                                            >
+                                                                <Minus className="w-3 h-3" />
+                                                            </button>
+                                                            <span className="w-8 text-center text-sm font-medium text-gray-900">
+                                                                {item.quantity}
+                                                            </span>
+                                                            <button
+                                                                onClick={() => updateQuantity(item.id, item.size, item.quantity + 1)}
+                                                                className="p-1 px-2 hover:bg-gray-100 text-gray-600 transition-colors"
+                                                            >
+                                                                <Plus className="w-3 h-3" />
+                                                            </button>
+                                                        </div>
+
+                                                        <p className="font-bold text-brand-dark">
+                                                            ${(item.price * item.quantity).toFixed(2)}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
+                                            </motion.li>
+                                        ))}
+                                    </AnimatePresence>
+                                </motion.ul>
                             )}
                         </div>
 
                         {/* Footer (Total & Checkout) */}
                         {cart.length > 0 && (
-                            <div className="p-6 border-t border-gray-200 bg-gray-50/80">
+                            <motion.div
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2, duration: 0.4 }}
+                                className="p-6 border-t border-gray-200 bg-gray-50/80"
+                            >
                                 <div className="space-y-3 mb-6">
                                     <div className="flex justify-between text-gray-500 text-sm">
                                         <span>Subtotal</span>
@@ -144,7 +175,7 @@ export default function CartDrawer() {
                                 <p className="text-center text-xs text-gray-400 mt-4 flex items-center justify-center gap-1">
                                     <LockIcon /> Secure encrypted checkout
                                 </p>
-                            </div>
+                            </motion.div>
                         )}
                     </motion.div>
                 </>

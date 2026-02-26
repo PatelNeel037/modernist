@@ -17,6 +17,7 @@ import {
     Truck
 } from 'lucide-react';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 
 export default function OrderDetailsPage() {
     const params = useParams();
@@ -41,7 +42,7 @@ export default function OrderDetailsPage() {
                 setTrackingId(data.trackingId || '');
                 setRefundStatus(data.refundStatus || '');
             } else {
-                alert('Order not found');
+                toast.error('Order not found');
                 router.push('/admin/orders');
             }
         } catch (e) {
@@ -85,13 +86,13 @@ export default function OrderDetailsPage() {
                 if (updated.carrier !== undefined) setCarrier(updated.carrier || '');
                 if (updated.refundStatus !== undefined) setRefundStatus(updated.refundStatus || '');
 
-                alert('Order updated successfully');
+                toast.success('Order updated successfully');
             } else {
-                alert('Update failed');
+                toast.error('Update failed');
             }
         } catch (e) {
             console.error(e);
-            alert('Error updating status');
+            toast.error('Error updating status');
         }
     };
 

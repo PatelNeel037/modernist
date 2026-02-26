@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { Check, User, MapPin, Truck, CreditCard } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 function CheckoutContent() {
     const router = useRouter();
@@ -123,7 +124,7 @@ function CheckoutContent() {
                 } else {
                     const errorData = await response.json();
                     console.error("API Order Failed", errorData);
-                    alert(`Order Failed: ${errorData.message || 'Unknown Error'} \nDetails: ${errorData.error}`);
+                    toast.error(`Order Failed: ${errorData.message || 'Unknown Error'} \nDetails: ${errorData.error}`);
                     setIsLoading(false); // Stop loading so they can retry
                     return; // Don't proceed to clear cart
                 }

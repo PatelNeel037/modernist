@@ -1,27 +1,33 @@
 import { NextResponse } from 'next/server';
-import { MockUserStore } from '@/lib/mock-store';
+import { connectDB } from '@/lib/db';
+import User from '@/models/User';
 
 export async function PUT(request: Request) {
     try {
+        await connectDB();
         const body = await request.json();
-        const { email } = body;
+        const { email, ...updateFields } = body;
 
         if (!email) {
             return NextResponse.json({ success: false, message: 'User email required' }, { status: 400 });
         }
 
-        const user = MockUserStore.findByEmail(email);
-        if (user && user.isBlocked) {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
+        }
+        if (user.isBlocked) {
             return NextResponse.json({ success: false, message: 'Account is blocked' }, { status: 403 });
         }
 
-        const updatedUser = MockUserStore.update(email, body);
+        const updatedUser = await User.findOneAndUpdate({ email }, { $set: updateFields }, { new: true });
 
         if (updatedUser) {
+            const { password, ...safeUser } = updatedUser.toObject();
             return NextResponse.json({
                 success: true,
                 message: 'Profile updated successfully',
-                user: updatedUser
+                user: safeUser
             });
         }
 

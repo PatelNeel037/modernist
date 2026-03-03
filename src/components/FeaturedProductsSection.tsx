@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-// import { allProducts } from '@/data/products'; // Remove static
 import { DB } from '@/services/db';
 import ProductCard from '@/components/ProductCard';
 import ScrollReveal from './ui/ScrollReveal';
@@ -44,14 +43,15 @@ export default function FeaturedProductsSection() {
                             <ProductCard product={{
                                 ...product,
                                 price: typeof product.price === 'number' ? product.price.toFixed(2) : product.price,
-                                image: product.images[0]
+                                image: product.images?.[0] || product.image,
+                                images: product.images
                             }} />
                         </ScrollReveal>
                     ))}
                 </div>
 
                 <ScrollReveal direction="up" delay={0.4} className="text-center mt-12">
-                    <Link href="/shop" className="inline-block px-10 py-4 bg-brand-primary text-white font-semibold text-sm hover:bg-brand-dark transition-all rounded-full uppercase tracking-wider hover:shadow-xl shadow-lg transform hover:-translate-y-1">
+                    <Link href="/shop" className="inline-block px-10 py-4 bg-brand-primary text-bg-main font-semibold text-sm hover:bg-brand-dark hover:text-white transition-all rounded-full uppercase tracking-wider hover:shadow-xl shadow-lg transform hover:-translate-y-1">
                         View All Products
                     </Link>
                 </ScrollReveal>

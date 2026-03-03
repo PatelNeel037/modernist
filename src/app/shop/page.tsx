@@ -156,10 +156,10 @@ function ShopContent() {
     return (
         <>
             {/* Header */}
-            <div className="pt-32 pb-12 text-center bg-gray-50 border-b border-gray-100">
+            <div className="pt-32 pb-12 text-center bg-bg-soft border-b border-bg-accent transition-colors">
                 <div className="container mx-auto px-6">
-                    <h1 className="text-4xl md:text-5xl font-playfair font-bold mb-4">Our Collections</h1>
-                    <p className="text-gray-600 text-lg">Explore our carefully curated styles for every occasion.</p>
+                    <h1 className="text-4xl md:text-5xl font-playfair font-bold mb-4 text-content-heading">Our Collections</h1>
+                    <p className="text-content-body text-lg">Explore our carefully curated styles for every occasion.</p>
                 </div>
             </div>
 
@@ -167,24 +167,24 @@ function ShopContent() {
 
                 {/* Mobile Filter Toggle */}
                 <button
-                    className="md:hidden w-full flex items-center justify-center gap-2 py-3 border border-gray-300 rounded"
+                    className="md:hidden w-full flex items-center justify-center gap-2 py-3 border border-bg-accent text-content-heading rounded hover:bg-bg-soft transition-colors"
                     onClick={() => setShowMobileFilters(!showMobileFilters)}
                 >
                     <Filter size={18} /> {showMobileFilters ? 'Hide Filters' : 'Show Filters'}
                 </button>
 
                 {/* Sidebar Filters */}
-                <aside className={`w-full md:w-64 flex-shrink-0 space-y-8 ${showMobileFilters ? 'block' : 'hidden md:block'}`}>
+                <aside className={`w-full md:w-64 shrink-0 space-y-8 ${showMobileFilters ? 'block' : 'hidden md:block'}`}>
 
                     {/* Category */}
                     <div>
-                        <h3 className="font-bold mb-4 text-gray-900 border-b pb-2">Category</h3>
+                        <h3 className="font-bold mb-4 text-content-heading border-b border-bg-accent pb-2">Category</h3>
                         <div className="space-y-2">
                             {['All', 'Men', 'Women', 'Kids'].map(cat => (
                                 <button
                                     key={cat}
                                     onClick={() => { setActiveCategory(cat); setActiveType('All'); }}
-                                    className={`block w-full text-left px-3 py-2 rounded text-sm transition-colors ${activeCategory === cat ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                                    className={`block w-full text-left px-3 py-2 rounded text-sm transition-colors ${activeCategory === cat ? 'bg-content-heading text-bg-main' : 'text-content-body hover:bg-bg-soft hover:text-content-heading'}`}
                                 >
                                     {cat}
                                 </button>
@@ -194,17 +194,17 @@ function ShopContent() {
 
                     {/* Price */}
                     <div>
-                        <h3 className="font-bold mb-4 text-gray-900 border-b pb-2">Price</h3>
+                        <h3 className="font-bold mb-4 text-content-heading border-b border-bg-accent pb-2">Price</h3>
                         <div className="space-y-2">
                             {['0-50', '50-100', '100-200', '200+'].map(range => (
-                                <label key={range} className="flex items-center gap-3 cursor-pointer">
+                                <label key={range} className="flex items-center gap-3 cursor-pointer group">
                                     <input
                                         type="checkbox"
                                         checked={priceFilters.includes(range)}
                                         onChange={() => togglePrice(range)}
-                                        className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
+                                        className="w-4 h-4 rounded border-bg-accent bg-bg-soft text-content-heading focus:ring-content-heading checked:bg-content-heading checked:border-content-heading transition-colors"
                                     />
-                                    <span className="text-sm text-gray-600">
+                                    <span className="text-sm text-content-body group-hover:text-content-heading transition-colors">
                                         {range === '200+' ? '$200+' : `$${range.replace('-', ' - $')}`}
                                     </span>
                                 </label>
@@ -215,17 +215,17 @@ function ShopContent() {
                     {/* Material */}
                     {availableMaterials.length > 0 && (
                         <div>
-                            <h3 className="font-bold mb-4 text-gray-900 border-b pb-2">Material</h3>
-                            <div className="space-y-2 max-h-48 overflow-y-auto">
+                            <h3 className="font-bold mb-4 text-content-heading border-b border-bg-accent pb-2">Material</h3>
+                            <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
                                 {availableMaterials.map(mat => (
-                                    <label key={mat} className="flex items-center gap-3 cursor-pointer">
+                                    <label key={mat} className="flex items-center gap-3 cursor-pointer group">
                                         <input
                                             type="checkbox"
                                             checked={materialFilters.includes(mat)}
                                             onChange={() => toggleMaterial(mat)}
-                                            className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
+                                            className="w-4 h-4 rounded border-bg-accent bg-bg-soft text-content-heading focus:ring-content-heading checked:bg-content-heading checked:border-content-heading transition-colors"
                                         />
-                                        <span className="text-sm text-gray-600 capitalize">{mat}</span>
+                                        <span className="text-sm text-content-body group-hover:text-content-heading transition-colors capitalize">{mat}</span>
                                     </label>
                                 ))}
                             </div>
@@ -235,15 +235,15 @@ function ShopContent() {
                     {/* Size */}
                     {availableSizes.length > 0 && (
                         <div>
-                            <h3 className="font-bold mb-4 text-gray-900 border-b pb-2">Size</h3>
+                            <h3 className="font-bold mb-4 text-content-heading border-b border-bg-accent pb-2">Size</h3>
                             <div className="grid grid-cols-3 gap-2">
                                 {availableSizes.map(sz => (
                                     <button
                                         key={sz}
                                         onClick={() => toggleSize(sz)}
                                         className={`py-1.5 text-xs font-medium border rounded transition-colors ${sizeFilters.includes(sz)
-                                                ? 'bg-black text-white border-black'
-                                                : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                                            ? 'bg-content-heading text-bg-main border-content-heading'
+                                            : 'bg-bg-main text-content-heading border-bg-accent hover:border-content-heading'
                                             }`}
                                     >
                                         {sz}
@@ -253,7 +253,7 @@ function ShopContent() {
                         </div>
                     )}
 
-                    <button onClick={clearAll} className="w-full py-2 text-sm text-gray-500 underline hover:text-black">
+                    <button onClick={clearAll} className="w-full py-2 text-sm text-content-body underline hover:text-brand-primary transition-colors">
                         Reset All Filters
                     </button>
                 </aside>
@@ -271,8 +271,8 @@ function ShopContent() {
                                     key={type}
                                     onClick={() => setActiveType(type)}
                                     className={`px-4 py-1.5 rounded-full text-xs font-medium border transition-all ${activeType === type
-                                        ? 'border-black bg-black text-white'
-                                        : 'border-gray-200 text-gray-500 hover:border-gray-400'
+                                        ? 'border-brand-primary bg-brand-primary text-white'
+                                        : 'border-bg-accent text-content-body bg-bg-soft hover:border-content-heading hover:text-content-heading'
                                         }`}
                                 >
                                     {type}
@@ -282,19 +282,19 @@ function ShopContent() {
 
                         {/* Sort */}
                         <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-500">Sort by:</span>
+                            <span className="text-sm text-content-body">Sort by:</span>
                             <div className="relative">
                                 <select
                                     value={sortOption}
                                     onChange={(e) => setSortOption(e.target.value)}
-                                    className="appearance-none bg-transparent border-none text-sm font-medium focus:ring-0 cursor-pointer pr-6"
+                                    className="appearance-none bg-transparent border-none text-sm font-medium focus:ring-0 cursor-pointer pr-6 text-content-heading outline-none"
                                 >
-                                    <option value="featured">Featured</option>
-                                    <option value="low-high">Price: Low to High</option>
-                                    <option value="high-low">Price: High to Low</option>
-                                    <option value="newest">Newest Arrivals</option>
+                                    <option className="bg-bg-main" value="featured">Featured</option>
+                                    <option className="bg-bg-main" value="low-high">Price: Low to High</option>
+                                    <option className="bg-bg-main" value="high-low">Price: High to Low</option>
+                                    <option className="bg-bg-main" value="newest">Newest Arrivals</option>
                                 </select>
-                                <ChevronDown size={14} className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                <ChevronDown size={14} className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-content-heading" />
                             </div>
                         </div>
                     </div>
@@ -302,7 +302,7 @@ function ShopContent() {
                     {/* Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                         {loading ? (
-                            <div className="col-span-full text-center py-20">Loading products...</div>
+                            <div className="col-span-full text-center py-20 text-content-body">Loading products...</div>
                         ) : filteredProducts.length > 0 ? (
                             filteredProducts.map(product => (
                                 <ProductCard
@@ -311,15 +311,16 @@ function ShopContent() {
                                         id: product.id,
                                         name: product.name,
                                         price: typeof product.price === 'number' ? product.price.toFixed(2) : product.price,
-                                        image: product.images[0],
+                                        image: product.images?.[0] || product.image,
+                                        images: product.images,
                                         sale: product.sale
                                     }}
                                 />
                             ))
                         ) : (
-                            <div className="col-span-full text-center py-20 text-gray-500 bg-gray-50 rounded">
-                                <p className="text-xl mb-4">No products found matching your filters.</p>
-                                <button onClick={clearAll} className="px-6 py-2 bg-black text-white rounded hover:bg-gray-800">
+                            <div className="col-span-full text-center py-20 text-content-body bg-bg-soft border border-bg-accent rounded-xl">
+                                <p className="text-xl mb-4 text-content-heading font-medium">No products found matching your filters.</p>
+                                <button onClick={clearAll} className="px-6 py-2 bg-brand-primary text-white rounded hover:bg-brand-primary/90 transition-colors">
                                     Clear Filters
                                 </button>
                             </div>
@@ -334,9 +335,9 @@ function ShopContent() {
 
 export default function ShopPage() {
     return (
-        <main className="min-h-screen bg-white font-sans text-gray-900">
+        <main className="min-h-screen bg-bg-main font-sans text-content-body transition-colors">
             <Navbar />
-            <Suspense fallback={<div className="text-center pt-32">Loading shop...</div>}>
+            <Suspense fallback={<div className="text-center pt-32 text-content-heading">Loading shop...</div>}>
                 <ShopContent />
             </Suspense>
             <Footer />

@@ -4,7 +4,7 @@ export default function Footer() {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="bg-brand-dark text-white pt-16 pb-8">
+        <footer className="bg-bg-soft text-content-heading pt-16 pb-8 border-t border-bg-accent">
             <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 text-center md:text-left">
 
                 {/* Brand Column */}
@@ -16,13 +16,13 @@ export default function Footer() {
                         Redefining everyday fashion with timeless essentials.
                     </p>
                     <div className="flex justify-center md:justify-start space-x-4">
-                        <a href="#" className="w-10 h-10 rounded-full bg-brand-primary flex items-center justify-center text-white hover:bg-white hover:text-brand-dark transition-all duration-300">
+                        <a href="#" className="w-10 h-10 rounded-full bg-brand-primary flex items-center justify-center text-bg-main hover:bg-bg-main hover:text-brand-primary border border-transparent hover:border-brand-primary transition-all duration-300">
                             <i className="fab fa-instagram text-lg"></i>
                         </a>
-                        <a href="#" className="w-10 h-10 rounded-full bg-brand-primary flex items-center justify-center text-white hover:bg-white hover:text-brand-dark transition-all duration-300">
+                        <a href="#" className="w-10 h-10 rounded-full bg-brand-primary flex items-center justify-center text-bg-main hover:bg-bg-main hover:text-brand-primary border border-transparent hover:border-brand-primary transition-all duration-300">
                             <i className="fab fa-facebook-f text-lg"></i>
                         </a>
-                        <a href="#" className="w-10 h-10 rounded-full bg-brand-primary flex items-center justify-center text-white hover:bg-white hover:text-brand-dark transition-all duration-300">
+                        <a href="#" className="w-10 h-10 rounded-full bg-brand-primary flex items-center justify-center text-bg-main hover:bg-bg-main hover:text-brand-primary border border-transparent hover:border-brand-primary transition-all duration-300">
                             <i className="fab fa-twitter text-lg"></i>
                         </a>
                     </div>
@@ -32,10 +32,10 @@ export default function Footer() {
                 <div>
                     <h4 className="text-lg font-semibold mb-6">Shop</h4>
                     <ul className="space-y-4">
-                        <li><Link href="/shop/men" className="text-gray-400 hover:text-white transition-colors text-sm">Men</Link></li>
-                        <li><Link href="/shop/women" className="text-gray-400 hover:text-white transition-colors text-sm">Women</Link></li>
-                        <li><Link href="/shop/kids" className="text-gray-400 hover:text-white transition-colors text-sm">Kids</Link></li>
-                        <li><Link href="#new-arrivals" className="text-gray-400 hover:text-white transition-colors text-sm">New Arrivals</Link></li>
+                        <li><Link href="/shop/men" className="text-content-body hover:text-brand-primary transition-colors text-sm">Men</Link></li>
+                        <li><Link href="/shop/women" className="text-content-body hover:text-brand-primary transition-colors text-sm">Women</Link></li>
+                        <li><Link href="/shop/kids" className="text-content-body hover:text-brand-primary transition-colors text-sm">Kids</Link></li>
+                        <li><Link href="#new-arrivals" className="text-content-body hover:text-brand-primary transition-colors text-sm">New Arrivals</Link></li>
                     </ul>
                 </div>
 
@@ -43,10 +43,10 @@ export default function Footer() {
                 <div>
                     <h4 className="text-lg font-semibold mb-6">Help</h4>
                     <ul className="space-y-4">
-                        <li><Link href="/customer-service" className="text-gray-400 hover:text-white transition-colors text-sm">Customer Service</Link></li>
-                        <li><Link href="/returns-exchanges" className="text-gray-400 hover:text-white transition-colors text-sm">Returns & Exchanges</Link></li>
-                        <li><Link href="/shipping-info" className="text-gray-400 hover:text-white transition-colors text-sm">Shipping Info</Link></li>
-                        <li><Link href="/size-guide" className="text-gray-400 hover:text-white transition-colors text-sm">Size Guide</Link></li>
+                        <li><Link href="/customer-service" className="text-content-body hover:text-brand-primary transition-colors text-sm">Customer Service</Link></li>
+                        <li><Link href="/returns-exchanges" className="text-content-body hover:text-brand-primary transition-colors text-sm">Returns & Exchanges</Link></li>
+                        <li><Link href="/shipping-info" className="text-content-body hover:text-brand-primary transition-colors text-sm">Shipping Info</Link></li>
+                        <li><Link href="/size-guide" className="text-content-body hover:text-brand-primary transition-colors text-sm">Size Guide</Link></li>
                     </ul>
                 </div>
 
@@ -54,19 +54,19 @@ export default function Footer() {
                 <div>
                     <h4 className="text-lg font-semibold mb-6">Legal</h4>
                     <ul className="space-y-4 mb-8">
-                        <li><Link href="/privacy-policy" className="text-gray-400 hover:text-white transition-colors text-sm">Privacy Policy</Link></li>
-                        <li><Link href="/terms-of-service" className="text-gray-400 hover:text-white transition-colors text-sm">Terms of Service</Link></li>
+                        <li><Link href="/privacy-policy" className="text-content-body hover:text-brand-primary transition-colors text-sm">Privacy Policy</Link></li>
+                        <li><Link href="/terms-of-service" className="text-content-body hover:text-brand-primary transition-colors text-sm">Terms of Service</Link></li>
                     </ul>
-                    <div className="flex justify-center md:justify-start gap-4 text-2xl text-gray-400">
+                    <div className="flex justify-center md:justify-start gap-4 text-2xl text-content-body">
                         {/* Genuine Payment Icons via FontAwesome */}
-                        <i className="fab fa-cc-visa hover:text-white transition-colors"></i>
-                        <i className="fab fa-cc-mastercard hover:text-white transition-colors"></i>
-                        <i className="fab fa-cc-paypal hover:text-white transition-colors"></i>
+                        <i className="fab fa-cc-visa hover:text-brand-primary transition-colors"></i>
+                        <i className="fab fa-cc-mastercard hover:text-brand-primary transition-colors"></i>
+                        <i className="fab fa-cc-paypal hover:text-brand-primary transition-colors"></i>
                     </div>
                 </div>
             </div>
 
-            <div className="mt-16 pt-8 border-t border-gray-800 text-center text-sm text-gray-600">
+            <div className="mt-16 pt-8 border-t border-bg-accent text-center text-sm text-content-body">
                 <p>&copy; {currentYear} MODERNIST. All rights reserved.</p>
             </div>
         </footer>

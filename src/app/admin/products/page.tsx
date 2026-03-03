@@ -26,7 +26,7 @@ export default function AdminProductsPage() {
         discountPrice: '',
         stock: '',
         status: 'active',
-        image: '',
+        imagesText: '',
         description: '',
         material: '',
         fit: '',
@@ -73,7 +73,7 @@ export default function AdminProductsPage() {
                 discountPrice: product.discountPrice || '',
                 stock: product.stock,
                 status: product.status || 'active',
-                image: product.images ? product.images[0] : '', // simplify for MVP
+                imagesText: product.images ? product.images.join('\n') : '',
                 description: product.description || '',
                 material: product.material || '',
                 fit: product.fit || '',
@@ -90,7 +90,7 @@ export default function AdminProductsPage() {
                 discountPrice: '',
                 stock: '',
                 status: 'active',
-                image: '',
+                imagesText: '',
                 description: '',
                 material: '',
                 fit: '',
@@ -121,7 +121,10 @@ export default function AdminProductsPage() {
 
             const data = await res.json();
             if (res.ok && data.success) {
-                setFormData(prev => ({ ...prev, image: data.url }));
+                setFormData(prev => ({
+                    ...prev,
+                    imagesText: prev.imagesText ? `${prev.imagesText}, ${data.url}` : data.url
+                }));
             } else {
                 toast.error('Image upload failed: ' + data.message);
             }
@@ -152,8 +155,10 @@ export default function AdminProductsPage() {
             price: parseFloat(formData.price),
             stock: parseInt(formData.stock),
             discountPrice: formData.discountPrice ? parseFloat(formData.discountPrice) : null,
-            tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean)
+            tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
+            images: formData.imagesText.split(/[\n,]+/).map(i => i.trim()).filter(Boolean)
         };
+        delete (payload as any).imagesText;
 
         try {
             const url = editingProduct ? `/api/products/${editingProduct.id}` : '/api/products';
@@ -334,12 +339,14 @@ export default function AdminProductsPage() {
                             </div>
 
                             <div className={styles.formGroup}>
-                                <label>Image URL or Upload</label>
+                                <label>Images (Comma or Newline-separated URLs or Upload)</label>
                                 <input type="file" onChange={handleImageUpload} className={styles.formControl} accept="image/*" style={{ marginBottom: '10px' }} />
-                                <input name="image" value={formData.image} onChange={handleChange} className={styles.formControl} placeholder="https://..." />
-                                {formData.image && (
-                                    <img src={formData.image} alt="Preview" style={{ marginTop: '10px', maxHeight: '100px', borderRadius: '8px' }} />
-                                )}
+                                <textarea name="imagesText" value={formData.imagesText} onChange={handleChange} className={styles.formControl} placeholder="https://...,&#10;https://..." rows={3} />
+                                <div style={{ display: 'flex', gap: '10px', marginTop: '10px', overflowX: 'auto' }}>
+                                    {formData.imagesText.split(/[\n,]+/).map(s => s.trim()).filter(Boolean).map((img, i) => (
+                                        <img key={i} src={img} alt={`Preview ${i}`} style={{ height: '80px', borderRadius: '8px', objectFit: 'cover' }} />
+                                    ))}
+                                </div>
                             </div>
 
                             <div className={styles.formGroup}>

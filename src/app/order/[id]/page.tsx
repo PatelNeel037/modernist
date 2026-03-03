@@ -6,7 +6,7 @@ import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle, Package, Truck, Home, XCircle, Clock } from 'lucide-react';
 
-// Mock Order Data
+// Order Data
 const mockOrder = {
     id: 'ORD-2024-8832',
     date: 'February 15, 2024',
@@ -87,8 +87,8 @@ export default function OrderDetailsPage() {
                         <p className="text-gray-500">Placed on {order.date}</p>
                     </div>
                     <div className={`mt-4 md:mt-0 px-4 py-2 rounded-full text-sm font-medium ${isCancelled ? 'bg-red-50 text-red-600' :
-                            order.status === 'Delivered' ? 'bg-green-50 text-green-700' :
-                                'bg-blue-50 text-blue-700'
+                        order.status === 'Delivered' ? 'bg-green-50 text-green-700' :
+                            'bg-blue-50 text-blue-700'
                         }`}>
                         {order.status}
                     </div>

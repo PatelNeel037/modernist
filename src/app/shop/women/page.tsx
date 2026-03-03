@@ -154,7 +154,8 @@ export default function WomenPage() {
                                 {filteredProducts.map(product => (
                                     <ProductCard key={product.id} product={{
                                         ...product,
-                                        image: product.images ? product.images[0] : '',
+                                        image: product.images?.[0] || product.image,
+                                        images: product.images,
                                         price: typeof product.price === 'number' ? product.price.toFixed(2) : product.price
                                     }} />
                                 ))}

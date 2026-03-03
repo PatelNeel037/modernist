@@ -4,7 +4,7 @@ import ScrollReveal from './ui/ScrollReveal';
 
 export default function BrandStatement() {
     return (
-        <section className="py-24 bg-white text-center px-6">
+        <section className="py-24 bg-bg-main text-center px-6">
             <div className="container mx-auto max-w-4xl">
                 <ScrollReveal direction="up" duration={0.8}>
                     <h2 className="text-3xl md:text-5xl font-playfair leading-tight text-content-heading">

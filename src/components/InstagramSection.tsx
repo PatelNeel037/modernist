@@ -12,7 +12,7 @@ export default function InstagramSection() {
     ];
 
     return (
-        <section className="py-20 bg-white">
+        <section className="py-20 bg-bg-main">
             <div className="container mx-auto px-6">
                 <ScrollReveal direction="up" className="flex flex-col items-center mb-12">
                     <Instagram className="w-8 h-8 text-brand-primary mb-4" />

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, useRef, use } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
@@ -12,7 +12,28 @@ import ProductCard from '@/components/ProductCard';
 import { useToast } from '@/context/ToastContext';
 import { Star, Truck, RefreshCw, ShieldCheck, Heart, ShoppingBag, Zap, X } from 'lucide-react';
 import { DB } from '@/services/db';
-import { allProducts } from '@/data/products';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { createPortal } from 'react-dom';
+
+const ParallaxGalleryImage = ({ src, alt, index }: { src: string, alt: string, index: number }) => {
+    const ref = useRef<HTMLDivElement>(null);
+    const { scrollYProgress } = useScroll({
+        target: ref,
+        offset: ["start end", "end start"]
+    });
+    const y = useTransform(scrollYProgress, [0, 1], ["-15%", "15%"]);
+
+    return (
+        <div ref={ref} className="aspect-4/5 bg-bg-soft rounded-xl overflow-hidden relative shadow-sm hover:shadow-md transition-shadow">
+            <motion.img
+                src={src}
+                alt={`${alt} ${index + 1}`}
+                style={{ y }}
+                className="w-full h-[130%] object-cover absolute top-[-15%] origin-center pointer-events-none"
+            />
+        </div>
+    );
+};
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
@@ -26,6 +47,14 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     const [mainImage, setMainImage] = useState('');
     const [quantity, setQuantity] = useState(1);
     const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [flyItems, setFlyItems] = useState<{ id: number; x: number; y: number; }[]>([]);
+    const [recentlyViewed, setRecentlyViewed] = useState<any[]>([]);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const [reviews, setReviews] = useState<any[]>([]);
     const [reviewLoading, setReviewLoading] = useState(true);
@@ -103,6 +132,43 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         loadRelated();
     }, [product]);
 
+    // Track Recently Viewed
+    useEffect(() => {
+        if (!product) return;
+
+        try {
+            const existingRaw = localStorage.getItem('modernist_recently_viewed');
+            let existing = existingRaw ? JSON.parse(existingRaw) : [];
+
+            // Remove if already exists so we can move it to front
+            existing = existing.filter((p: any) => p.id !== product.id);
+
+            // Add current product to front
+            existing.unshift({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                images: product.images,
+                image: product.images[0], // ProductCard expects 'image'
+                category: product.category,
+                sale: product.sale,
+                hoverImage: product.hoverImage,
+                rating: product.rating,
+                reviews: product.reviews
+            });
+
+            // Keep only latest 6 items
+            existing = existing.slice(0, 6);
+
+            localStorage.setItem('modernist_recently_viewed', JSON.stringify(existing));
+
+            // Set state (excluding the exact product being viewed to prevent self-looping in the ui) 
+            setRecentlyViewed(existing.filter((p: any) => p.id !== product.id).slice(0, 4));
+        } catch (e) {
+            console.error("Failed to parse recently viewed memory", e);
+        }
+    }, [product]);
+
     if (loading) {
         return <div className="min-h-screen flex items-center justify-center">Loading product...</div>;
     }
@@ -128,7 +194,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         }
     };
 
-    const handleAddToCart = () => {
+    const handleAddToCart = (e: React.MouseEvent) => {
         if (!selectedSize) {
             showToast('Please select a size', 'error');
             return;
@@ -142,6 +208,20 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             size: selectedSize,
             quantity: quantity
         });
+
+        // Trigger Fly-to-Cart Animation
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        const newFlyItem = {
+            id: Date.now(),
+            x: rect.left + rect.width / 2 - 20,
+            y: rect.top + rect.height / 2 - 20
+        };
+
+        setFlyItems(prev => [...prev, newFlyItem]);
+
+        setTimeout(() => {
+            setFlyItems(prev => prev.filter(item => item.id !== newFlyItem.id));
+        }, 800);
     };
 
     const handleBuyNow = () => {
@@ -186,32 +266,73 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             </div>
 
             <div className="container mx-auto px-6 py-12 max-w-7xl">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-start">
 
-                    {/* Image Section */}
-                    <div className="space-y-4">
-                        <div className="aspect-[4/5] bg-gray-100 rounded-lg overflow-hidden relative group">
-                            <img
-                                src={mainImage}
-                                alt={product.name}
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            />
+                    {/* Parallax Image Gallery (Desktop) */}
+                    <div className="hidden md:flex flex-col gap-8 relative">
+                        {product.images.map((img: string, idx: number) => (
+                            <ParallaxGalleryImage key={idx} src={img} alt={product.name} index={idx} />
+                        ))}
+                    </div>
+
+                    {/* Swipeable Image Carousel (Mobile) */}
+                    <div className="md:hidden space-y-4">
+                        <div className="aspect-4/5 bg-bg-soft rounded-lg overflow-hidden relative group cursor-grab active:cursor-grabbing">
+                            {/* Inner Drag Constraint Container */}
+                            <motion.div
+                                className="flex h-full"
+                                style={{ width: `${product.images.length * 100}%` }}
+                                drag="x"
+                                dragConstraints={{ right: 0, left: 0 }} // Managed via state/animation visually
+                                animate={{ x: `-${currentImageIndex * (100 / product.images.length)}%` }}
+                                dragElastic={0.2}
+                                dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+                                onDragEnd={(e, { offset, velocity }) => {
+                                    const swipeThreshold = 50;
+                                    if (offset.x < -swipeThreshold && currentImageIndex < product.images.length - 1) {
+                                        setCurrentImageIndex(currentImageIndex + 1);
+                                    } else if (offset.x > swipeThreshold && currentImageIndex > 0) {
+                                        setCurrentImageIndex(currentImageIndex - 1);
+                                    }
+                                }}
+                            >
+                                {product.images.map((img: string, idx: number) => (
+                                    <motion.div
+                                        key={idx}
+                                        className="h-full shrink-0 flex-none"
+                                        style={{ width: `${100 / product.images.length}%` }}
+                                    >
+                                        <img
+                                            src={img || '/images/fallback-product.png'}
+                                            alt={`${product.name} ${idx + 1}`}
+                                            className="w-full h-full object-cover pointer-events-none" // Disable pointer events so drag works smoothly over images
+                                            onError={(e) => { e.currentTarget.src = '/images/fallback-product.png'; }}
+                                        />
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+
+                            {/* Floating Helper Pill */}
+                            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/40 backdrop-blur-md text-white text-xs px-4 py-2 rounded-full flex items-center gap-2 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <span className="animate-pulse">←</span> Swipe to explore <span className="animate-pulse">→</span>
+                            </div>
                         </div>
-                        <div className="flex space-x-4 overflow-x-auto pb-2">
-                            {product.images.map((img: string, idx: number) => (
+
+                        {/* Pagination Dots (Optional Visual Indicator instead of old thumbnails) */}
+                        <div className="flex justify-center space-x-2 pt-2">
+                            {product.images.map((_: string, idx: number) => (
                                 <button
                                     key={idx}
-                                    onClick={() => setMainImage(img)}
-                                    className={`w-20 h-24 flex-shrink-0 rounded-md overflow-hidden border-2 transition-all ${mainImage === img ? 'border-gray-900 opacity-100' : 'border-transparent opacity-70 hover:opacity-100'}`}
-                                >
-                                    <img src={img} alt={`${product.name} ${idx + 1}`} className="w-full h-full object-cover" />
-                                </button>
+                                    onClick={() => setCurrentImageIndex(idx)}
+                                    aria-label={`Go to slide ${idx + 1}`}
+                                    className={`h-2 rounded-full transition-all duration-300 ${idx === currentImageIndex ? 'bg-gray-900 w-4' : 'bg-gray-300 w-2 hover:bg-gray-400'}`}
+                                ></button>
                             ))}
                         </div>
                     </div>
 
                     {/* Product Info */}
-                    <div>
+                    <div className="md:sticky md:top-36 bg-bg-main p-0 md:p-6 md:-m-6 rounded-xl">
                         <div className="mb-2 flex items-center gap-2">
                             <div className="flex text-yellow-400 text-sm gap-1">
                                 {[...Array(5)].map((_, i) => (
@@ -239,16 +360,19 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                             </div>
                             <div className="flex flex-wrap gap-3">
                                 {product.sizes.map((size: string) => (
-                                    <button
+                                    <motion.button
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.9 }}
+                                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
                                         key={size}
                                         onClick={() => setSelectedSize(size)}
-                                        className={`w-12 h-12 flex items-center justify-center rounded border transition-all ${selectedSize === size
+                                        className={`w-12 h-12 flex items-center justify-center rounded border transition-colors ${selectedSize === size
                                             ? 'bg-gray-900 text-white border-gray-900'
                                             : 'text-gray-600 border-gray-200 hover:border-gray-900'
                                             }`}
                                     >
                                         {size}
-                                    </button>
+                                    </motion.button>
                                 ))}
                             </div>
                         </div>
@@ -267,30 +391,39 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                         className="px-3 py-3 text-gray-600 hover:text-gray-900 transition-colors"
                                     >+</button>
                                 </div>
-                                <button
+                                <motion.button
+                                    whileHover={{ scale: 1.15 }}
+                                    whileTap={{ scale: 0.85 }}
+                                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
                                     onClick={toggleWishlist}
-                                    className={`w-14 h-auto flex items-center justify-center border rounded transition-all duration-300 ${isIn
-                                            ? 'text-red-500 border-red-200 bg-red-50 shadow-sm'
-                                            : 'text-gray-400 border-gray-200 hover:text-red-500 hover:border-red-200 hover:bg-red-50/30'
+                                    className={`w-14 h-auto flex items-center justify-center border rounded transition-colors duration-300 ${isIn
+                                        ? 'text-red-500 border-red-200 bg-red-50 shadow-sm'
+                                        : 'text-gray-400 border-gray-200 hover:text-red-500 hover:border-red-200 hover:bg-red-50/30'
                                         }`}
                                 >
                                     <Heart className={`w-6 h-6 transition-transform duration-300 ${isIn ? 'fill-current scale-110' : 'scale-100 hover:scale-110'}`} />
-                                </button>
+                                </motion.button>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
-                                <button
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
                                     onClick={handleAddToCart}
-                                    className="bg-white border border-gray-900 text-gray-900 py-3 px-6 rounded font-medium hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+                                    className="bg-white border border-gray-900 text-gray-900 py-3 px-6 rounded font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 cursor-pointer"
                                 >
                                     <ShoppingBag className="w-5 h-5" /> Add to Cart
-                                </button>
-                                <button
+                                </motion.button>
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
                                     onClick={handleBuyNow}
-                                    className="bg-gray-900 text-white py-3 px-6 rounded font-medium hover:bg-800 transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                                    className="bg-gray-900 text-white py-3 px-6 rounded font-medium hover:bg-800 transition-colors flex items-center justify-center gap-2 shadow-lg hover:shadow-xl cursor-pointer"
                                 >
                                     <Zap className="w-5 h-5" /> Buy Now
-                                </button>
+                                </motion.button>
                             </div>
                         </div>
 
@@ -341,7 +474,10 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                 <span className="text-gray-500">({product.reviews || 0} reviews)</span>
                             </div>
                         </div>
-                        <button
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.95 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             onClick={() => {
                                 if (!user) {
                                     showToast('Please login to leave a review', 'error');
@@ -350,10 +486,10 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                     setShowReviewForm(!showReviewForm);
                                 }
                             }}
-                            className="bg-gray-900 text-white px-8 py-3 rounded-md hover:bg-gray-800 transition-all font-medium"
+                            className="bg-gray-900 text-white px-8 py-3 rounded-md hover:bg-gray-800 transition-colors font-medium"
                         >
                             {showReviewForm ? 'Cancel' : 'Write a Review'}
-                        </button>
+                        </motion.button>
                     </div>
 
                     {showReviewForm && (
@@ -364,14 +500,16 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Your Rating</label>
                                     <div className="flex gap-2">
                                         {[1, 2, 3, 4, 5].map((num) => (
-                                            <button
+                                            <motion.button
+                                                whileHover={{ scale: 1.2 }}
+                                                whileTap={{ scale: 0.8 }}
                                                 key={num}
                                                 type="button"
                                                 onClick={() => setNewRating(num)}
-                                                className="transition-transform hover:scale-110"
+                                                className=""
                                             >
                                                 <Star className={`w-8 h-8 ${num <= newRating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
-                                            </button>
+                                            </motion.button>
                                         ))}
                                     </div>
                                 </div>
@@ -386,13 +524,16 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                         placeholder="What did you like or dislike about this product?"
                                     />
                                 </div>
-                                <button
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
                                     disabled={submittingReview}
                                     type="submit"
-                                    className="w-full md:w-auto bg-gray-900 text-white px-10 py-3 rounded-md hover:bg-gray-800 transition-all font-medium disabled:bg-gray-400"
+                                    className="w-full md:w-auto bg-gray-900 text-white px-10 py-3 rounded-md hover:bg-gray-800 transition-colors font-medium disabled:bg-gray-400 cursor-pointer disabled:cursor-not-allowed"
                                 >
                                     {submittingReview ? 'Submitting...' : 'Post Review'}
-                                </button>
+                                </motion.button>
                             </form>
                         </div>
                     )}
@@ -428,21 +569,46 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 </div>
 
                 {/* Related Products */}
-                <div className="mt-24">
-                    <h2 className="text-2xl font-playfair font-bold text-gray-900 mb-8 text-center">You May Also Like</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-                        {relatedProducts.map(prod => (
-                            <ProductCard
-                                key={prod.id}
-                                product={{
-                                    ...prod,
-                                    image: prod.images[0],
-                                    price: typeof prod.price === 'number' ? prod.price.toFixed(2) : prod.price
-                                }}
-                            />
-                        ))}
+                {relatedProducts.length > 0 && (
+                    <div className="mt-24">
+                        <h2 className="text-2xl font-playfair font-bold text-gray-900 mb-8 text-center">You May Also Like</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+                            {relatedProducts.map(prod => (
+                                <ProductCard
+                                    key={prod.id}
+                                    product={{
+                                        ...prod,
+                                        image: prod.images?.[0] || prod.image,
+                                        images: prod.images,
+                                        price: typeof prod.price === 'number' ? prod.price.toFixed(2) : prod.price
+                                    }}
+                                />
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
+
+                {/* Recently Viewed */}
+                {recentlyViewed.length > 0 && (
+                    <div className="mt-24 mb-12">
+                        <div className="flex items-center justify-between mb-8">
+                            <h2 className="text-2xl font-playfair font-bold text-gray-900">Recently Viewed</h2>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+                            {recentlyViewed.map(prod => (
+                                <ProductCard
+                                    key={`recent-${prod.id}`}
+                                    product={{
+                                        ...prod,
+                                        image: prod.images?.[0] || prod.image,
+                                        images: prod.images,
+                                        price: typeof prod.price === 'number' ? prod.price.toFixed(2) : prod.price
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Size Guide Modal */}
@@ -535,6 +701,35 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Fly to Cart Animation Overlay */}
+            {mounted && createPortal(
+                <AnimatePresence>
+                    {flyItems.map(item => (
+                        <motion.div
+                            key={item.id}
+                            initial={{ opacity: 1, scale: 0.5, x: item.x, y: item.y }}
+                            animate={{
+                                opacity: [1, 1, 0],
+                                scale: [0.5, 1, 0.2],
+                                x: window.innerWidth - 60, // Top right corner approximation
+                                y: 20
+                            }}
+                            transition={{
+                                duration: 0.8,
+                                ease: "easeInOut",
+                                times: [0, 0.4, 1] // Adjust timing for a trajectory arc
+                            }}
+                            style={{ position: 'fixed', zIndex: 9999, pointerEvents: 'none', top: 0, left: 0 }}
+                        >
+                            <div className="w-10 h-10 rounded-full bg-brand-primary flex items-center justify-center text-white shadow-2xl overflow-hidden border-2 border-white">
+                                <img src={mainImage || '/images/fallback-product.png'} className="w-full h-full object-cover opacity-80" alt="" onError={(e) => { e.currentTarget.src = '/images/fallback-product.png'; }} />
+                            </div>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>,
+                document.body
             )}
 
             <Footer />

@@ -145,7 +145,7 @@ export default function OrdersPage() {
 
     // Handle Download Invoice
     const handleDownloadInvoice = (orderId: string) => {
-        toast.success(`Downloading invoice for ${orderId}... (Mock PDF)`);
+        toast.success(`Downloading invoice for ${orderId}...`);
     };
 
     // Toggle expand

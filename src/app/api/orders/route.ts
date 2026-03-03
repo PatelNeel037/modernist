@@ -14,9 +14,7 @@ export async function POST(request: Request) {
         let customerEmail = guestInfo?.email;
         let customerName = guestInfo?.name || shippingAddress?.name || 'Customer';
 
-        // Since the website uses a mock-store and local storage instead of http cookies,
-        // we'll disable the server-side JWT check for orders.
-        // We will just verify block status if the user is in the database.
+        // We will verify block status if the user is in the database.
         if (userId && userId !== 'GUEST') {
             const user = await User.findById(userId);
             if (user) {

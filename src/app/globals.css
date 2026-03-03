@@ -1,25 +1,39 @@
 @import "tailwindcss";
 
+:root {
+  --color-brand-primary: #664c36;
+  --color-brand-secondary: #ffd3ac;
+  --color-brand-dark: #331c08;
+  --color-content-heading: #331c08;
+  --color-content-body: #5c4a3d;
+  --color-bg-soft: #f9f7f5;
+  --color-bg-accent: #ccbeb1;
+  --color-bg-main: #ffffff;
+}
+
+.dark {
+  --color-brand-primary: #ffd3ac;
+  --color-brand-secondary: #664c36;
+  --color-brand-dark: #f9f7f5;
+  --color-content-heading: #f9f7f5;
+  --color-content-body: #ccbeb1;
+  --color-bg-soft: #181512;
+  --color-bg-accent: #2a241f;
+  --color-bg-main: #0c0a09;
+}
+
 @theme {
   --font-playfair: var(--font-playfair);
   --font-roboto: var(--font-roboto);
 
-  --color-brand-primary: #664C36;
-  /* Earthy Brown - Accent/Buttons */
-  --color-brand-secondary: #FFD3AC;
-  /* Peach - Special Sections/Newsletter */
-  --color-brand-dark: #331C08;
-  /* Dark Brown - Hover/Navbar/Luxury Text */
-
-  --color-content-heading: #331C08;
-  /* Dark Brown */
-  --color-content-body: #5C4A3D;
-  /* Muted Brown/Grey */
-
-  --color-bg-soft: #F9F7F5;
-  /* Very light beige/white mix. #CCBEB1 is too dark for main bg if user wants "Keep main background white". I will use a very light tint for soft bg. */
-  --color-bg-accent: #CCBEB1;
-  /* The requested soft section color */
+  --color-brand-primary: var(--color-brand-primary);
+  --color-brand-secondary: var(--color-brand-secondary);
+  --color-brand-dark: var(--color-brand-dark);
+  --color-content-heading: var(--color-content-heading);
+  --color-content-body: var(--color-content-body);
+  --color-bg-soft: var(--color-bg-soft);
+  --color-bg-accent: var(--color-bg-accent);
+  --color-bg-main: var(--color-bg-main);
 
   --animate-fade-in-up: fade-in-up 0.8s ease-out forwards;
 
@@ -38,7 +52,7 @@
 
 @layer base {
   body {
-    background-color: #ffffff;
+    background-color: var(--color-bg-main);
     color: var(--color-content-heading);
   }
 
@@ -72,4 +86,15 @@
   .delay-200 {
     animation-delay: 200ms;
   }
+}
+
+/* Fluid Dark Mode View Transitions */
+::view-transition-group(root) {
+  animation-duration: 0.7s;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }

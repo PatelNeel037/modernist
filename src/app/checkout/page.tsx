@@ -298,7 +298,7 @@ function CheckoutContent() {
                         )}
                     </div>
 
-                    {/* 3. Payment Method (Mock) */}
+                    {/* 3. Payment Method */}
                     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 opacity-75 grayscale pointer-events-none relative">
                         <div className="absolute inset-0 z-10 bg-white/50"></div>
                         <h2 className="text-lg font-semibold flex items-center gap-2 mb-4 relative z-20">

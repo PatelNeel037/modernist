@@ -11,6 +11,7 @@ interface WishlistItem {
     name: string;
     price: number | string; // Handle both types
     image: string;
+    images?: string[];
 }
 
 interface WishlistContextType {

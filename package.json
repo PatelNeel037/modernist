@@ -24,7 +24,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hot-toast": "^2.6.0",
-    "resend": "^6.9.2",
+    "resend": "^6.9.3",
     "stripe": "^20.4.0",
     "tailwind-merge": "^3.5.0"
   },
@@ -39,5 +39,11 @@
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "description": "This is a modern version of the Modernist fashion store, built with Next.js 15, React 19, and Tailwind CSS v4.",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
 }

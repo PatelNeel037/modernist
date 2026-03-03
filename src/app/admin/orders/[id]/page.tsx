@@ -297,7 +297,7 @@ export default function OrderDetailsPage() {
                         <div className="space-y-4">
                             <div>
                                 <div className={styles.infoLabel}>Name</div>
-                                <div className="font-medium text-lg">{order.user?.name || order.guestInfo?.name || 'Guest User'}</div>
+                                <div className="font-medium text-lg">{order.shippingAddress?.name || order.guestInfo?.name || 'Guest User'}</div>
                             </div>
                             <div>
                                 <div className={styles.infoLabel}>Contact Info</div>

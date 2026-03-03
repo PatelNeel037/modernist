@@ -14,6 +14,7 @@ interface Order {
     totalAmount: number;
     user?: { name: string };
     guestInfo?: { name: string };
+    shippingAddress?: { name: string };
 }
 
 export default function AdminOrdersPage() {
@@ -75,7 +76,7 @@ export default function AdminOrdersPage() {
             const lowerSearch = searchTerm.toLowerCase();
             result = result.filter(order => {
                 const matchesId = order.id.toLowerCase().includes(lowerSearch);
-                const userName = order.user?.name || order.guestInfo?.name || 'Guest';
+                const userName = order.shippingAddress?.name || order.guestInfo?.name || 'Guest';
                 const matchesName = userName.toLowerCase().includes(lowerSearch);
                 return matchesId || matchesName;
             });
@@ -164,7 +165,7 @@ export default function AdminOrdersPage() {
                                             #{order.id.length > 10 ? order.id.substring(4, 10) + '...' : order.id}
                                         </td>
                                         <td>
-                                            {order.user?.name || order.guestInfo?.name || 'Guest'}
+                                            {order.shippingAddress?.name || order.guestInfo?.name || 'Guest'}
                                         </td>
                                         <td>
                                             {new Date(order.createdAt).toLocaleDateString()}

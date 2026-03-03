@@ -158,7 +158,7 @@ export default function AdminDashboard() {
                                             <td className="font-mono text-gray-600">
                                                 #{order.id && typeof order.id === 'string' && order.id.length > 10 ? order.id.substring(4, 10) + '...' : order.id}
                                             </td>
-                                            <td> {order.user?.name || order.guestInfo?.name || order.userEmail || 'Guest'}</td>
+                                            <td> {order.shippingAddress?.name || order.guestInfo?.name || order.userEmail || 'Guest'}</td>
                                             <td>
                                                 <span className={`${styles.statusBadge} ${styles['status' + order.status]}`}>
                                                     {order.status}

@@ -61,8 +61,15 @@ export async function DELETE(request: Request, props: { params: Promise<{ id: st
         const params = await props.params;
         const id = params.id;
 
-        // Soft delete
-        const deleted = await Product.findByIdAndUpdate(id, { status: 'deleted' });
+        const { searchParams } = new URL(request.url);
+        const hardDelete = searchParams.get('hard') === 'true';
+
+        let deleted;
+        if (hardDelete) {
+            deleted = await Product.findByIdAndDelete(id);
+        } else {
+            deleted = await Product.findByIdAndUpdate(id, { status: 'deleted' });
+        }
 
         if (!deleted) {
             return NextResponse.json({ success: false, message: 'Product not found' }, { status: 404 });

@@ -57,6 +57,11 @@
     min-width: 200px;
     outline: none;
     transition: border-color 0.2s;
+    color: #2c3e50;
+}
+
+.filterInput::placeholder {
+    color: #95a5a6;
 }
 
 .filterInput:focus {
@@ -283,6 +288,11 @@
     border-radius: 6px;
     font-size: 0.95rem;
     transition: border-color 0.2s;
+    color: #2c3e50;
+}
+
+.formControl::placeholder {
+    color: #95a5a6;
 }
 
 .formControl:focus {

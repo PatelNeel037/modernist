@@ -37,6 +37,11 @@
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
+    color: #2c3e50;
+}
+
+.formGroup input::placeholder {
+    color: #95a5a6;
 }
 
 .formGroup input:focus {

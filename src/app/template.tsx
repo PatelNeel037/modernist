@@ -1,21 +1,56 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function Template({ children }: { children: React.ReactNode }) {
+    const pathname = usePathname();
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    // Don't show confusing animations for admin paths (it breaks their UX forms)
+    const isAdmin = pathname.startsWith('/admin');
+
+    if (isAdmin || !isMounted) {
+        return <div className="w-full h-full">{children}</div>;
+    }
+
     return (
-        <motion.div
-            initial={{ opacity: 0, x: 15, scale: 0.99, filter: 'blur(4px)' }}
-            animate={{ opacity: 1, x: 0, scale: 1, filter: 'blur(0px)' }}
-            transition={{
-                type: 'spring',
-                stiffness: 350,
-                damping: 30,
-                mass: 0.8
-            }}
-            className="w-full h-full origin-top"
-        >
-            {children}
-        </motion.div>
+        <div className="relative overflow-hidden w-full h-full">
+            {/* The dramatic entrance wipe */}
+            <motion.div
+                className="fixed top-0 left-0 w-full bg-brand-dark z-[100] pointer-events-none flex items-center justify-center shadow-2xl"
+                initial={{ height: '100vh', opacity: 1 }}
+                animate={{ height: '0vh', opacity: 0 }}
+                transition={{ duration: 0.9, ease: [0.77, 0, 0.175, 1], delay: 0.1 }}
+            >
+                <motion.span
+                    className="font-playfair font-bold text-white text-5xl md:text-7xl tracking-[0.2em] shadow-lg"
+                    initial={{ opacity: 1, scale: 0.9 }}
+                    animate={{ opacity: 0, scale: 1.1 }}
+                    transition={{ duration: 0.8, ease: "easeInOut", delay: 0.2 }}
+                >
+                    MODERNIST
+                </motion.span>
+            </motion.div>
+
+            {/* The page content entry */}
+            <motion.div
+                initial={{ opacity: 0, y: 40, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{
+                    duration: 0.8,
+                    ease: [0.22, 1, 0.36, 1],
+                    delay: 0.2
+                }}
+                className="w-full h-full origin-bottom will-change-transform"
+            >
+                {children}
+            </motion.div>
+        </div>
     );
 }

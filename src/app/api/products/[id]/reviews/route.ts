@@ -32,7 +32,7 @@ export async function POST(req: Request, { params }: { params: any }) {
         await connectDB();
         const { id } = await params;
         const body = await req.json();
-        const { rating, comment } = body;
+        const { rating, comment, reviewerName } = body;
 
         if (!rating || !comment) {
             return NextResponse.json({ message: 'Rating and comment are required' }, { status: 400 });
@@ -45,7 +45,7 @@ export async function POST(req: Request, { params }: { params: any }) {
         }
 
         // Get User Name (Handle old tokens that might not have the name field)
-        let userName = decoded.name || 'Anonymous';
+        let userName = reviewerName?.trim() || decoded.name || 'Anonymous';
 
 
         const review = await Review.create({

@@ -94,6 +94,11 @@
     border-bottom: 1px solid #f0f0f0;
 }
 
+.adminTable td {
+    color: #2c3e50;
+    font-weight: 500;
+}
+
 .adminTable th {
     background-color: #f8f9fa;
     font-weight: 600;

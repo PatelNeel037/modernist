@@ -61,6 +61,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     const [showReviewForm, setShowReviewForm] = useState(false);
     const [newRating, setNewRating] = useState(5);
     const [newComment, setNewComment] = useState('');
+    const [newReviewName, setNewReviewName] = useState('');
     const [submittingReview, setSubmittingReview] = useState(false);
     const [showSizeGuide, setShowSizeGuide] = useState(false);
 
@@ -98,7 +99,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         }
 
         setSubmittingReview(true);
-        const result = await DB.submitReview(productId, newRating, newComment);
+        const finalName = newReviewName.trim() || user.name || 'Anonymous';
+        const result = await DB.submitReview(productId, newRating, newComment, finalName);
 
         if (result.success) {
             showToast('Review submitted successfully!', 'success');
@@ -483,6 +485,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                     showToast('Please login to leave a review', 'error');
                                     router.push('/login');
                                 } else {
+                                    setNewReviewName(user?.name || '');
                                     setShowReviewForm(!showReviewForm);
                                 }
                             }}
@@ -496,6 +499,16 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         <div className="bg-gray-50 p-8 rounded-xl mb-12 border border-gray-100 max-w-2xl">
                             <h3 className="text-xl font-bold mb-6">Write your review</h3>
                             <form onSubmit={handleReviewSubmit} className="space-y-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Display Name (Optional)</label>
+                                    <input
+                                        type="text"
+                                        value={newReviewName}
+                                        onChange={(e) => setNewReviewName(e.target.value)}
+                                        className="w-full px-4 py-3 rounded-md border border-gray-200 focus:ring-1 focus:ring-gray-900 outline-none"
+                                        placeholder="How should we display your name?"
+                                    />
+                                </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Your Rating</label>
                                     <div className="flex gap-2">

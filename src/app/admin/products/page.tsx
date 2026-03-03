@@ -183,17 +183,25 @@ export default function AdminProductsPage() {
         }
     };
 
-    const handleDelete = async (id: number) => {
-        if (!confirm('Are you sure you want to delete this product?')) return;
+    const handleDelete = async (id: number, isHard: boolean = false) => {
+        const msg = isHard
+            ? 'Are you SURE you want to PERMANENTLY delete this product? This action cannot be undone.'
+            : 'Are you sure you want to delete this product?';
+
+        if (!confirm(msg)) return;
+
         try {
-            const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+            const url = isHard ? `/api/products/${id}?hard=true` : `/api/products/${id}`;
+            const res = await fetch(url, { method: 'DELETE' });
             if (res.ok) {
+                toast.success(isHard ? 'Product permanently deleted' : 'Product moved to trash');
                 loadProducts();
             } else {
                 toast.error('Failed to delete');
             }
         } catch (e) {
             console.error(e);
+            toast.error('Error occurred');
         }
     };
 
@@ -266,7 +274,11 @@ export default function AdminProductsPage() {
                                 <button className={styles.btnIcon} onClick={() => openModal(product)}>
                                     <Edit2 size={16} />
                                 </button>
-                                <button className={`${styles.btnIcon} ${styles.btnIconDelete}`} onClick={() => handleDelete(product.id)}>
+                                <button
+                                    className={`${styles.btnIcon} ${styles.btnIconDelete}`}
+                                    onClick={() => handleDelete(product.id, product.status === 'deleted')}
+                                    title={product.status === 'deleted' ? "Delete Permanently" : "Delete"}
+                                >
                                     <Trash2 size={16} />
                                 </button>
                             </div>

@@ -333,12 +333,12 @@ export const DB = {
         }
     },
 
-    submitReview: async function (productId: string | number, rating: number, comment: string) {
+    submitReview: async function (productId: string | number, rating: number, comment: string, reviewerName?: string) {
         try {
             const response = await fetch(`${API_URL}/products/${productId}/reviews`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ rating, comment })
+                body: JSON.stringify({ rating, comment, reviewerName })
             });
             const data = await response.json();
             return {

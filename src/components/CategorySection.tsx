@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import ScrollReveal from './ui/ScrollReveal';
 
 export default function CategorySection() {
@@ -9,30 +9,26 @@ export default function CategorySection() {
         {
             title: 'Men',
             img: 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=1740&auto=format&fit=crop',
-            href: '/shop?category=Men'
+            href: '/shop/men'
         },
         {
             title: 'Women',
             img: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=1778&auto=format&fit=crop',
-            href: '/shop?category=Women'
+            href: '/shop/women'
         },
         {
-            title: 'New Arrivals',
-            img: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1972&auto=format&fit=crop',
-            href: '/shop?category=New Arrivals'
+            title: 'Kids',
+            img: 'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?q=80&w=1972&auto=format&fit=crop',
+            href: '/shop/kids'
         }
     ];
 
     return (
         <section id="categories" className="py-24 px-6 container mx-auto">
-            <ScrollReveal direction="up" className="flex justify-between items-end mb-12">
+            <ScrollReveal direction="up" className="mb-12">
                 <div>
                     <span className="text-brand-primary font-bold uppercase tracking-widest text-xs mb-2 block">Collections</span>
                     <h2 className="text-4xl font-playfair font-bold text-content-heading">Shop by Category</h2>
-                </div>
-                <div className="hidden md:flex space-x-3">
-                    <button className="w-12 h-12 flex items-center justify-center border border-bg-accent text-content-heading rounded-full hover:bg-brand-primary hover:text-bg-main hover:border-brand-primary transition-all duration-300 shadow-sm hover:shadow-md"><ArrowLeft size={20} /></button>
-                    <button className="w-12 h-12 flex items-center justify-center border border-bg-accent text-content-heading rounded-full hover:bg-brand-primary hover:text-bg-main hover:border-brand-primary transition-all duration-300 shadow-sm hover:shadow-md"><ArrowRight size={20} /></button>
                 </div>
             </ScrollReveal>
 

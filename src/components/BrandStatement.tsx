@@ -8,8 +8,7 @@ export default function BrandStatement() {
             <div className="container mx-auto max-w-4xl">
                 <ScrollReveal direction="up" duration={0.8}>
                     <h2 className="text-3xl md:text-5xl font-playfair leading-tight text-content-heading">
-                        "Crafted for modern individuals who value <br className="hidden md:block" />
-                        <span className="italic text-brand-primary">style</span> and <span className="italic text-brand-primary">simplicity</span>."
+                        "a lodu neel"
                     </h2>
                 </ScrollReveal>
                 <ScrollReveal direction="up" delay={0.3}>

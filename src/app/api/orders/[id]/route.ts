@@ -106,3 +106,24 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
         return NextResponse.json({ message: 'Update failed' }, { status: 500 });
     }
 }
+
+export async function DELETE(request: Request, props: { params: Promise<{ id: string }> }) {
+    try {
+        await verifyAdmin();
+        await connectDB();
+        
+        const params = await props.params;
+        const id = params.id;
+
+        const deletedOrder = await Order.findByIdAndDelete(id);
+
+        if (!deletedOrder) {
+            return NextResponse.json({ message: 'Order not found' }, { status: 404 });
+        }
+
+        return NextResponse.json({ message: 'Order permanently deleted' });
+    } catch (e) {
+        console.error("[API] DELETE Order Error:", e);
+        return NextResponse.json({ message: 'Deletion failed' }, { status: 500 });
+    }
+}

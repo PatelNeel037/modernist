@@ -56,9 +56,23 @@ export default function NewsletterSection() {
                 </ScrollReveal>
 
                 <ScrollReveal direction="up" delay={0.1}>
-                    <h2 className="text-4xl md:text-6xl font-playfair font-bold mb-6 text-brand-dark tracking-tight leading-tight">
-                        Join the List
-                    </h2>
+                    <div className="flex items-center justify-center gap-4 md:gap-8 mb-10">
+                        <motion.div 
+                            initial={{ width: 0, opacity: 0 }}
+                            whileInView={{ width: "100%", opacity: 1 }}
+                            transition={{ duration: 1.5, ease: "circOut" }}
+                            className="h-px bg-brand-dark/20 flex-1" 
+                        />
+                        <h2 className="text-4xl md:text-6xl font-playfair font-bold text-brand-dark tracking-tight leading-tight whitespace-nowrap">
+                            Newsletter
+                        </h2>
+                        <motion.div 
+                            initial={{ width: 0, opacity: 0 }}
+                            whileInView={{ width: "100%", opacity: 1 }}
+                            transition={{ duration: 1.5, ease: "circOut" }}
+                            className="h-px bg-brand-dark/20 flex-1" 
+                        />
+                    </div>
                 </ScrollReveal>
 
                 <ScrollReveal direction="up" delay={0.2}>
@@ -98,12 +112,14 @@ export default function NewsletterSection() {
                                         className="w-full pl-16 pr-8 py-5 rounded-full bg-white/60 backdrop-blur-md border border-brand-dark/10 text-brand-dark placeholder-brand-dark/40 focus:outline-none focus:bg-white/90 focus:border-brand-dark focus:shadow-2xl transition-all duration-500 font-bold" 
                                         required 
                                         disabled={status === 'loading'}
+                                        suppressHydrationWarning
                                     />
                                 </div>
                                 <button 
                                     type="submit" 
                                     disabled={status === 'loading'}
                                     className="w-full md:w-auto bg-brand-dark text-white pl-8 pr-12 py-5 rounded-full font-black hover:bg-brand-primary transition-all duration-500 uppercase tracking-[0.2em] text-xs shadow-xl hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 group flex items-center justify-center relative overflow-hidden"
+                                    suppressHydrationWarning
                                 >
                                     {status === 'loading' ? (
                                         <Loader2 className="w-5 h-5 animate-spin" />

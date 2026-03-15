@@ -223,12 +223,12 @@ export default function AdminProductsPage() {
                     value={filterCategory}
                     onChange={(e) => setFilterCategory(e.target.value)}
                 >
-                    <option value="">All Categories</option>
-                    <option value="Men">Men</option>
-                    <option value="Women">Women</option>
-                    <option value="Kids">Kids</option>
-                    <option value="Home Textile">Home Textile</option>
-                    <option value="Wholesale / B2B">Wholesale / B2B</option>
+                    <option className="bg-[#0f172a] text-white" value="">All Categories</option>
+                    <option className="bg-[#0f172a] text-white" value="Men">Men</option>
+                    <option className="bg-[#0f172a] text-white" value="Women">Women</option>
+                    <option className="bg-[#0f172a] text-white" value="Kids">Kids</option>
+                    <option className="bg-[#0f172a] text-white" value="Home Textile">Home Textile</option>
+                    <option className="bg-[#0f172a] text-white" value="Wholesale / B2B">Wholesale / B2B</option>
                 </select>
                 <input
                     type="text"
@@ -316,11 +316,11 @@ export default function AdminProductsPage() {
                                 <div className={styles.formGroup}>
                                     <label>Category</label>
                                     <select name="category" value={formData.category} onChange={handleChange} className={styles.formControl}>
-                                        <option value="Men">Men</option>
-                                        <option value="Women">Women</option>
-                                        <option value="Kids">Kids</option>
-                                        <option value="Home Textile">Home Textile</option>
-                                        <option value="Wholesale / B2B">Wholesale / B2B</option>
+                                        <option className="bg-[#0f172a] text-white" value="Men">Men</option>
+                                        <option className="bg-[#0f172a] text-white" value="Women">Women</option>
+                                        <option className="bg-[#0f172a] text-white" value="Kids">Kids</option>
+                                        <option className="bg-[#0f172a] text-white" value="Home Textile">Home Textile</option>
+                                        <option className="bg-[#0f172a] text-white" value="Wholesale / B2B">Wholesale / B2B</option>
                                     </select>
                                 </div>
                                 <div className={styles.formGroup}>
@@ -337,7 +337,7 @@ export default function AdminProductsPage() {
 
                             <div className={styles.formRow}>
                                 <div className={styles.formGroup}>
-                                    <label>Price ($)</label>
+                                    <label>Price (₹)</label>
                                     <input type="number" name="price" value={formData.price} onChange={handleChange} className={styles.formControl} step="0.01" required />
                                 </div>
                                 <div className={styles.formGroup}>
@@ -349,11 +349,11 @@ export default function AdminProductsPage() {
                             <div className={styles.formGroup}>
                                 <label>Status</label>
                                 <select name="status" value={formData.status} onChange={handleChange} className={styles.formControl}>
-                                    <option value="active">Active</option>
-                                    <option value="new">New Arrival</option>
-                                    <option value="featured">Featured</option>
-                                    <option value="hidden">Hidden</option>
-                                    <option value="deleted">Deleted</option>
+                                    <option className="bg-[#0f172a] text-white" value="active">Active</option>
+                                    <option className="bg-[#0f172a] text-white" value="new">New Arrival</option>
+                                    <option className="bg-[#0f172a] text-white" value="featured">Featured</option>
+                                    <option className="bg-[#0f172a] text-white" value="hidden">Hidden</option>
+                                    <option className="bg-[#0f172a] text-white" value="deleted">Deleted</option>
                                 </select>
                             </div>
 

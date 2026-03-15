@@ -188,3 +188,23 @@
     color: #58a6ff;
     border-color: rgba(56, 189, 248, 0.3);
 }
+
+.btnIconDelete {
+    padding: 6px;
+    background: rgba(248, 113, 113, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+    color: #f87171;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btnIconDelete:hover {
+    background: rgba(248, 113, 113, 0.2);
+    color: #ff4d4d;
+    border-color: rgba(248, 113, 113, 0.4);
+    transform: scale(1.05);
+}

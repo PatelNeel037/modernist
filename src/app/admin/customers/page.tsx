@@ -102,9 +102,9 @@ export default function AdminCustomersPage() {
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value)}
                     >
-                        <option value="all">All Statuses</option>
-                        <option value="active">Active</option>
-                        <option value="blocked">Blocked</option>
+                        <option className="bg-[#0f172a] text-white" value="all">All Statuses</option>
+                        <option className="bg-[#0f172a] text-white" value="active">Active</option>
+                        <option className="bg-[#0f172a] text-white" value="blocked">Blocked</option>
                     </select>
                 </div>
             </div>

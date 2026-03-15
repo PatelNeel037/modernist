@@ -3,9 +3,6 @@
  * Handles conversion and formatting for the store.
  */
 
-// Exchange rate: 1 USD = 80 INR (Approximate for conversion)
-export const EXCHANGE_RATE = 80;
-
 /**
  * Formats a number as INR currency (e.g., ₹8,000)
  */
@@ -19,18 +16,17 @@ export const formatINR = (amount: number) => {
 };
 
 /**
- * Formats a price value. 
- * If the input is in USD (e.g. from DB), it converts to INR.
+ * Formats a price value directly as INR.
  */
-export const formatPrice = (usdAmount: number | string) => {
-    const amount = typeof usdAmount === 'string' ? parseFloat(usdAmount) : usdAmount;
-    return formatINR(amount * EXCHANGE_RATE);
+export const formatPrice = (amount: number | string) => {
+    const val = typeof amount === 'string' ? parseFloat(amount) : amount;
+    return formatINR(val);
 };
 
 /**
- * Converts USD amount to INR value (number)
+ * Returns the amount directly (used historically for conversion)
  */
-export const convertToINR = (usdAmount: number | string) => {
-    const amount = typeof usdAmount === 'string' ? parseFloat(usdAmount) : usdAmount;
-    return Math.round(amount * EXCHANGE_RATE);
+export const convertToINR = (amount: number | string) => {
+    const val = typeof amount === 'string' ? parseFloat(amount) : amount;
+    return val;
 };

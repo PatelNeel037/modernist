@@ -146,6 +146,7 @@ export default function Footer() {
                 whileHover={{ y: -5, backgroundColor: 'rgba(255,255,255,0.1)' }}
                 whileTap={{ scale: 0.95 }}
                 className="absolute right-12 bottom-12 p-4 rounded-full border border-white/10 text-white/30 hover:text-white transition-colors hidden lg:flex items-center justify-center group"
+                suppressHydrationWarning
             >
                 <ArrowUpRight className="w-5 h-5 -rotate-45 group-hover:text-brand-primary transition-colors" />
             </motion.button>

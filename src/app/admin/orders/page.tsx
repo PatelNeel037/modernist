@@ -2,9 +2,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './orders.module.css';
-import { RefreshCw, Search, Eye } from 'lucide-react';
+import { RefreshCw, Search, Eye, Trash2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { formatINR } from '@/lib/currency';
+import toast from 'react-hot-toast';
 
 interface Order {
     id: string; // The full "ORD-..." ID
@@ -47,6 +48,32 @@ export default function AdminOrdersPage() {
             console.error("Failed to load orders", error);
         } finally {
             setLoading(false);
+        }
+    }
+
+    async function handleDeleteOrder(id: string) {
+        if (!confirm('Are you absolutely sure you want to PERMANENTLY delete this order? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem('modernist_admin_token');
+            const response = await fetch(`/api/orders/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                }
+            });
+
+            if (response.ok) {
+                toast.success('Order deleted successfully');
+                setAllOrders(prev => prev.filter(o => o.id !== id));
+            } else {
+                toast.error('Failed to delete order');
+            }
+        } catch (error) {
+            console.error("Delete failed", error);
+            toast.error('An error occurred during deletion');
         }
     }
 
@@ -104,13 +131,12 @@ export default function AdminOrdersPage() {
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
                     >
-                        <option value="">All Statuses</option>
-                        <option className="bg-[#161b22] text-white" value="">All Statuses</option>
-                        <option className="bg-[#161b22] text-white" value="Pending">Pending</option>
-                        <option className="bg-[#161b22] text-white" value="Processing">Processing</option>
-                        <option className="bg-[#161b22] text-white" value="Shipped">Shipped</option>
-                        <option className="bg-[#161b22] text-white" value="Delivered">Delivered</option>
-                        <option className="bg-[#161b22] text-white" value="Cancelled">Cancelled</option>
+                        <option className="bg-[#0f172a] text-white" value="">All Statuses</option>
+                        <option className="bg-[#0f172a] text-white" value="Pending">Pending</option>
+                        <option className="bg-[#0f172a] text-white" value="Processing">Processing</option>
+                        <option className="bg-[#0f172a] text-white" value="Shipped">Shipped</option>
+                        <option className="bg-[#0f172a] text-white" value="Delivered">Delivered</option>
+                        <option className="bg-[#0f172a] text-white" value="Cancelled">Cancelled</option>
                     </select>
                 </div>
 
@@ -183,7 +209,7 @@ export default function AdminOrdersPage() {
                                             </span>
                                         </td>
                                         <td className="text-slate-100 font-medium">{formatINR(order.totalAmount)}</td>
-                                        <td>
+                                        <td className="flex items-center gap-3">
                                             <Link
                                                 href={`/admin/orders/${order.id}`}
                                                 className={styles.btnView}
@@ -197,6 +223,13 @@ export default function AdminOrdersPage() {
                                                 <Eye size={16} />
                                                 View
                                             </Link>
+                                            <button
+                                                className={styles.btnIconDelete}
+                                                onClick={() => handleDeleteOrder(order.id)}
+                                                title="Delete Permanently"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
                                         </td>
                                     </tr>
                                 ))

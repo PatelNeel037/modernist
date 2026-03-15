@@ -146,6 +146,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                         transition={{ type: "spring", stiffness: 400, damping: 17 }}
                         onClick={toggleWishlist}
                         className={`bg-bg-main/90 backdrop-blur-sm p-2 rounded-full shadow-sm hover:bg-bg-soft flex items-center justify-center transition-colors duration-300 ${isIn ? 'text-red-500' : 'text-content-body hover:text-red-500'}`}
+                        suppressHydrationWarning
                     >
                         <Heart className={`w-5 h-5 transition-transform ${isIn ? 'fill-current scale-110' : 'scale-100'}`} />
                     </motion.button>
@@ -159,6 +160,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                         transition={{ type: "spring", stiffness: 400, damping: 17 }}
                         onClick={handleAddToCart}
                         className="text-sm font-semibold text-content-heading hover:text-brand-primary flex items-center gap-2 transition-colors"
+                        suppressHydrationWarning
                     >
                         <Plus className="w-4 h-4" /> Add to Cart
                     </motion.button>

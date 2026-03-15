@@ -1,19 +1,22 @@
 'use client';
 
-import { Star } from 'lucide-react';
+import { Star, Quote } from 'lucide-react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import ScrollReveal from './ui/ScrollReveal';
+import { useState, useEffect } from 'react';
+import { DB } from '@/services/db';
 
 function TestimonialCard({ test, idx }: { test: any, idx: number }) {
+// ... existing TestimonialCard code ...
     const x = useMotionValue(0.5);
     const y = useMotionValue(0.5);
 
-    const springConfig = { damping: 20, stiffness: 300, mass: 0.5 };
+    const springConfig = { damping: 25, stiffness: 200, mass: 1 };
     const springX = useSpring(x, springConfig);
     const springY = useSpring(y, springConfig);
 
-    const rotateX = useTransform(springY, [0, 1], ["5deg", "-5deg"]);
-    const rotateY = useTransform(springX, [0, 1], ["-5deg", "5deg"]);
+    const rotateX = useTransform(springY, [0, 1], ["2deg", "-2deg"]);
+    const rotateY = useTransform(springX, [0, 1], ["-2deg", "2deg"]);
 
     const handleMouseMove = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         const rect = event.currentTarget.getBoundingClientRect();
@@ -31,45 +34,140 @@ function TestimonialCard({ test, idx }: { test: any, idx: number }) {
             <motion.div
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
+                whileHover={{ y: -10 }}
                 style={{
-                    rotateX,
-                    rotateY,
+                    rotateX: rotateX,
+                    rotateY: rotateY,
                     transformStyle: "preserve-3d",
                 }}
-                className="bg-bg-main p-8 rounded-lg shadow-sm border border-bg-accent h-full flex flex-col"
+                className="bg-bg-main relative p-10 rounded-3xl shadow-xs hover:shadow-2xl border border-bg-accent/30 transition-shadow duration-500 h-full flex flex-col group overflow-hidden"
             >
-                <div className="flex justify-center mb-4 text-emerald-500" style={{ transform: "translateZ(30px)" }}>
-                    {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
+                {/* Decorative Quote Icon */}
+                <div className="absolute top-4 right-6 opacity-5 group-hover:opacity-10 transition-opacity transform rotate-12">
+                    <Quote size={80} />
                 </div>
-                <p className="text-content-body italic mb-6 flex-1" style={{ transform: "translateZ(20px)" }}>"{test.text}"</p>
-                <h4 className="font-semibold text-content-heading" style={{ transform: "translateZ(40px)" }}>- {test.name}</h4>
+
+                <div className="flex justify-center gap-1 mb-6 text-emerald-500 relative z-10" style={{ transform: "translateZ(30px)" }}>
+                    {[...Array(test.rating || 5)].map((_, i) => (
+                        <motion.div
+                            key={i}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.5 + (i * 0.1), type: "spring" }}
+                        >
+                            <Star size={18} fill="currentColor" strokeWidth={0} />
+                        </motion.div>
+                    ))}
+                </div>
+                
+                <p className="text-content-body italic text-lg leading-relaxed mb-8 flex-1 relative z-10" style={{ transform: "translateZ(20px)" }}>
+                    "{test.text}"
+                </p>
+                
+                <div className="flex items-center justify-center gap-3 relative z-10" style={{ transform: "translateZ(40px)" }}>
+                    <div className="h-px bg-brand-primary/20 w-4" />
+                    <h4 className="font-bold text-content-heading tracking-tight">
+                        {test.name}
+                    </h4>
+                    <div className="h-px bg-brand-primary/20 w-4" />
+                </div>
+
+                {/* Glassy reflection effect on hover */}
+                <div className="absolute inset-0 bg-linear-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
             </motion.div>
         </ScrollReveal>
     );
 }
 
 export default function TestimonialSection() {
-    const testimonials = [
+    const defaultTestimonials = [
         { name: 'Sarah M.', text: 'Great quality and fast delivery. Layout is clean and easy to navigate.' },
         { name: 'James D.', text: 'Absolutely love the linen shirts. Perfect for summer!' },
         { name: 'Emily R.', text: 'Customer service was amazing when I needed an exchange.' },
     ];
+    
+    const [testimonials, setTestimonials] = useState<any[]>(defaultTestimonials);
+
+    useEffect(() => {
+        const loadTestimonials = async () => {
+            const data = await DB.fetchTestimonials();
+            if (data && data.length > 0) {
+                setTestimonials(data);
+            }
+        };
+        loadTestimonials();
+    }, []);
 
     return (
-        <section className="py-24 bg-bg-soft border-t border-bg-accent">
+        <section className="py-24 bg-linear-to-b from-bg-main to-bg-soft/30 border-t border-bg-accent/20">
             <div className="container mx-auto px-6 text-center">
                 <ScrollReveal direction="up">
-                    <h2 className="text-3xl font-playfair font-bold text-content-heading mb-12 relative inline-flex items-center gap-4">
-                        <span className="h-px bg-bg-accent w-12" />
-                        Happy Customers
-                        <span className="h-px bg-bg-accent w-12" />
-                    </h2>
+                    <div className="flex items-center justify-center gap-8 mb-16">
+                        <motion.div 
+                            initial={{ width: 0 }}
+                            whileInView={{ width: 80 }}
+                            transition={{ duration: 1, ease: "circOut" }}
+                            className="h-px bg-bg-accent" 
+                        />
+                        <h2 className="text-4xl font-playfair font-bold text-content-heading tracking-tight">
+                            Happy Customers
+                        </h2>
+                        <motion.div 
+                            initial={{ width: 0 }}
+                            whileInView={{ width: 80 }}
+                            transition={{ duration: 1, ease: "circOut" }}
+                            className="h-px bg-bg-accent" 
+                        />
+                    </div>
                 </ScrollReveal>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 perspective-[1000px]">
-                    {testimonials.map((test, idx) => (
-                        <TestimonialCard key={idx} test={test} idx={idx} />
-                    ))}
+                <div className="relative mt-20 overflow-hidden py-10">
+                    {/* Style tag for custom marquee animation */}
+                    <style dangerouslySetInnerHTML={{ __html: `
+                        @keyframes marquee {
+                            0% { transform: translateX(0); }
+                            100% { transform: translateX(calc(-50% - 20px)); }
+                        }
+                        .marquee-container:hover .marquee-content {
+                            animation-play-state: paused;
+                        }
+                    `}} />
+
+                    {testimonials.length > 1 ? (
+                        <div className="marquee-container overflow-hidden">
+                            <div 
+                                className="marquee-content flex gap-10 w-max"
+                                style={{ 
+                                    animation: `marquee ${testimonials.length * 8}s linear infinite`
+                                }}
+                            >
+                                {/* First set */}
+                                {testimonials.map((test, idx) => (
+                                    <div key={`orig-${test._id || idx}`} className="w-[400px] md:w-[500px] shrink-0">
+                                        <TestimonialCard test={test} idx={idx} />
+                                    </div>
+                                ))}
+                                {/* Second set for seamless loop */}
+                                {testimonials.map((test, idx) => (
+                                    <div key={`dup-${test._id || idx}`} className="w-[400px] md:w-[500px] shrink-0">
+                                        <TestimonialCard test={test} idx={idx} />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex justify-center px-6">
+                            {testimonials.map((test, idx) => (
+                                <div key={test._id || idx} className="w-full max-w-[600px]">
+                                    <TestimonialCard test={test} idx={idx} />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Gradient Fades for a premium look */}
+                    <div className="absolute inset-y-0 left-0 w-24 md:w-64 bg-linear-to-r from-bg-main via-bg-main/80 to-transparent z-20 pointer-events-none" />
+                    <div className="absolute inset-y-0 right-0 w-24 md:w-64 bg-linear-to-l from-bg-main via-bg-main/80 to-transparent z-20 pointer-events-none" />
                 </div>
             </div>
         </section>

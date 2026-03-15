@@ -2,30 +2,35 @@
 .adminLayout {
     display: flex;
     min-height: 100vh;
-    background-color: #f4f6f9;
+    background-color: #0d1117; /* Deep stealth bg */
     font-family: 'Roboto', sans-serif;
-  }
-  
-  .sidebar {
+    color: #e2e8f0;
+}
+
+.sidebar {
     width: 250px;
-    background-color: #2c3e50;
-    color: #ecf0f1;
+    background-color: #010409; /* Darker sidebar */
+    color: #94a3b8;
     display: flex;
     flex-direction: column;
     padding: 1rem;
     position: fixed;
     height: 100vh;
     transition: width 0.3s;
-  }
-  
-  .logo {
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.logo {
+    font-family: 'Playfair Display', serif;
     font-size: 1.5rem;
     font-weight: 700;
     text-align: center;
+    color: #ffffff;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    letter-spacing: 1px;
+}
   
   .menu {
     list-style: none;
@@ -42,23 +47,36 @@
     align-items: center;
     gap: 10px;
     padding: 12px 15px;
-    color: #bdc3c7;
+    color: #8b949e;
     text-decoration: none;
-    border-radius: 4px;
+    border-radius: 8px;
     transition: all 0.3s;
-  }
-  
-  .menuLink:hover,
-  .activeLink {
-    background-color: #34495e;
-    color: #fff;
-  }
-  
-  .logout {
+    font-weight: 500;
+}
+
+.menuLink:hover {
+    background: linear-gradient(90deg, rgba(88, 166, 255, 0.1) 0%, rgba(255,255,255,0.01) 100%);
+    color: #58a6ff;
+    box-shadow: inset 3px 0 0 #58a6ff;
+    transform: translateX(4px);
+}
+
+.activeLink {
+    background: linear-gradient(90deg, rgba(56, 189, 248, 0.15) 0%, rgba(255,255,255,0.02) 100%);
+    color: #ffffff;
+    box-shadow: inset 4px 0 0 #38bdf8;
+    font-weight: 600;
+}
+
+.logout {
     margin-top: auto;
-    color: #e74c3c !important;
+    color: #f85149 !important;
     cursor: pointer;
-  }
+}
+.logout:hover {
+    background-color: rgba(248, 81, 73, 0.1);
+    box-shadow: inset 3px 0 0 #f85149;
+}
   
   .mainContent {
     flex: 1;
@@ -72,19 +90,22 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
-  }
-  
-  .header h2 {
-    font-weight: 500;
-    color: #2c3e50;
+}
+
+.header h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: #ffffff;
+    font-size: 2.2rem;
     margin: 0;
-  }
-  
-  .subHeader {
-    color: #7f8c8d;
+    letter-spacing: 0.5px;
+}
+
+.subHeader {
+    color: #8b949e;
     margin-top: 5px;
-    font-size: 0.9rem;
-  }
+    font-size: 0.95rem;
+}
   
   /* Grid Layouts */
   .statsGrid {
@@ -95,90 +116,110 @@
   }
   
   .statCard {
-    background: white;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-  }
-  
-  .statHeader {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.statCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.statHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.5rem;
-  }
-  
-  .statIcon {
-    width: 40px;
-    height: 40px;
+}
+
+.statIcon {
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
-  }
-  
-  .iconBlue { background-color: #e3f2fd; color: #2196f3; }
-  .iconGreen { background-color: #e8f5e9; color: #4caf50; }
-  .iconOrange { background-color: #fff3e0; color: #ff9800; }
-  .iconPurple { background-color: #f3e5f5; color: #9c27b0; }
-  
-  .statValue {
-    font-size: 2rem;
+    border-radius: 10px;
+}
+
+.iconBlue { background-color: rgba(56, 189, 248, 0.1); color: #38bdf8; }
+.iconGreen { background-color: rgba(52, 211, 153, 0.1); color: #34d399; }
+.iconOrange { background-color: rgba(251, 146, 60, 0.1); color: #fb923c; }
+.iconPurple { background-color: rgba(192, 132, 252, 0.1); color: #c084fc; }
+
+.statValue {
+    font-size: 2.2rem;
     font-weight: 700;
-    color: #2c3e50;
-  }
-  
-  .statLabel {
-    color: #7f8c8d;
-    font-size: 0.9rem;
-  }
-  
-  .statChange {
-    font-size: 0.8rem;
-    color: #2ecc71;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+}
+
+.statLabel {
+    color: #8b949e;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.statChange {
+    font-size: 0.85rem;
+    color: #3fb950;
     display: flex;
     align-items: center;
     gap: 5px;
-  }
+}
   
   /* Overview Section */
   .statusOverview {
-    background: white;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
     padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     margin-bottom: 2rem;
-  }
-  
-  .statusGrid {
+}
+
+.statusGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 1rem;
     margin-top: 1rem;
-  }
-  
-  .statusCard {
-    border: 1px solid #eee;
-    border-radius: 6px;
+}
+
+.statusCard {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
     padding: 1rem;
     text-align: center;
-  }
-  
-  .statusCard h4 {
-    font-size: 1.5rem;
+    transition: all 0.2s;
+}
+
+.statusCard:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.statusCard h4 {
+    font-size: 1.8rem;
     margin-bottom: 0.3rem;
-  }
-  
-  .statusCard p {
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.statusCard p {
     font-size: 0.8rem;
-    color: #888;
+    color: #8b949e;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin: 0;
-  }
+    font-weight: 600;
+}
   
   /* Tables and Lists */
   .dashboardRow {
@@ -188,63 +229,80 @@
   }
   
   .card {
-    background: white;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
     padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     height: 100%;
     overflow: hidden;
-  }
-  
-  .cardHeader {
+}
+
+.cardHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
-  }
-  
-  .cardHeader h3 {
-    font-size: 1.1rem;
-    color: #2c3e50;
+}
+
+.cardHeader h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: #ffffff;
     margin: 0;
-  }
-  
-  .tableWrapper {
+    letter-spacing: 0.5px;
+}
+
+.cardHeader a {
+    color: #58a6ff;
+    transition: color 0.2s;
+}
+.cardHeader a:hover {
+    color: #79c0ff;
+}
+
+.tableWrapper {
     overflow-x: auto;
-  }
-  
-  .table {
+}
+
+.table {
     width: 100%;
     border-collapse: collapse;
-  }
-  
-  .table th, .table td {
+}
+
+.table th, .table td {
     text-align: left;
-    padding: 1rem 0.5rem;
-    border-bottom: 1px solid #f0f0f0;
-    font-size: 0.9rem;
-  }
-  
-  .table th {
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.95rem;
+    color: #c9d1d9;
+}
+
+.table th {
     font-weight: 600;
-    color: #95a5a6;
+    color: #8b949e;
     text-transform: uppercase;
     font-size: 0.75rem;
-  }
-  
-  .statusBadge {
-    padding: 4px 10px;
+    letter-spacing: 0.5px;
+}
+
+.statusBadge {
+    padding: 4px 12px;
     border-radius: 20px;
     font-size: 0.75rem;
     display: inline-block;
-    font-weight: 500;
-  }
-  
-  .statusPending { background: #fff3e0; color: #ef6c00; }
-  .statusProcessing { background: #e3f2fd; color: #1565c0; }
-  .statusShipped { background: #e8f5e9; color: #2e7d32; }
-  .statusDelivered { background: #e0f2f1; color: #00695c; }
-  .statusCancelled { background: #ffebee; color: #c62828; }
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.statusPending { background: rgba(251, 146, 60, 0.15); color: #fb923c; border: 1px solid rgba(251, 146, 60, 0.3); box-shadow: 0 0 12px rgba(251, 146, 60, 0.2); }
+.statusProcessing { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); box-shadow: 0 0 12px rgba(56, 189, 248, 0.2); }
+.statusShipped { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); box-shadow: 0 0 12px rgba(52, 211, 153, 0.2); }
+.statusDelivered { background: rgba(45, 212, 191, 0.15); color: #2dd4bf; border: 1px solid rgba(45, 212, 191, 0.3); box-shadow: 0 0 12px rgba(45, 212, 191, 0.2); }
+.statusCancelled { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.3); box-shadow: 0 0 12px rgba(248, 113, 113, 0.2); }
   
   @media (max-width: 900px) {
     .dashboardRow {

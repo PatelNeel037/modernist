@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { formatINR } from '@/lib/currency';
 import {
     Package,
     Clock,
@@ -219,7 +220,7 @@ export default function OrdersPage() {
                                                 </div>
                                                 <div>
                                                     <p className="text-gray-500 mb-1">Total</p>
-                                                    <p className="font-medium text-gray-900">${order.totalAmount}</p>
+                                                    <p className="font-medium text-gray-900">{formatINR(order.totalAmount)}</p>
                                                 </div>
                                                 <div>
                                                     <p className="text-gray-500 mb-1">Order ID</p>
@@ -430,7 +431,7 @@ export default function OrdersPage() {
                                                                         </h5>
                                                                         <p className="text-sm text-gray-500 mt-1">Size: {item.size || 'M'} | Qty: {item.quantity}</p>
                                                                     </div>
-                                                                    <p className="font-medium text-gray-900">${Number(item.price).toFixed(2)}</p>
+                                                                    <p className="font-medium text-gray-900">{formatINR(item.price)}</p>
                                                                 </div>
 
                                                                 {/* Review Button Logic: Only if Delivered */}

@@ -30,9 +30,13 @@ const orderSchema = new mongoose.Schema({
     totalAmount: { type: Number, required: true },
     shippingAddress: addressSchema,
     status: { type: String, default: "Pending", enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"] },
+    paymentStatus: { type: String, default: "Pending", enum: ["Pending", "Paid", "Failed"] },
     carrier: { type: String },
     trackingId: { type: String },
-    refundStatus: { type: String, enum: ["", "Refund Initiated", "Refund Processing", "Refunded"], default: "" }
+    refundStatus: { type: String, enum: ["", "Refund Initiated", "Refund Processing", "Refunded"], default: "" },
+    stripeSessionId: { type: String },
+    razorpayOrderId: { type: String },
+    paymentId: { type: String }
 }, { timestamps: true });
 
 export default mongoose.models.Order || mongoose.model("Order", orderSchema);

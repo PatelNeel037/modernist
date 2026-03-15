@@ -23,6 +23,10 @@ export async function GET(req: any) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
+        if (user.isBlocked) {
+            return NextResponse.json({ error: "Account suspended" }, { status: 403 });
+        }
+
         // Adapt to `id` for consistency in frontend
         return NextResponse.json({ user: { ...user, id: user._id.toString() } });
     } catch (error) {

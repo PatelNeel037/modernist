@@ -21,10 +21,9 @@ export async function GET(req: Request, { params }: { params: any }) {
     }
 }
 
-// POST a new review
 export async function POST(req: Request, { params }: { params: any }) {
     try {
-        const decoded = await verifyAuth();
+        const decoded = await verifyAuth(req);
         if (!decoded) {
             return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
         }

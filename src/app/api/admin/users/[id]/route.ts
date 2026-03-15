@@ -103,14 +103,19 @@ export async function DELETE(request: Request, { params }: { params: any }) {
         await connectDB();
         const { id } = await params;
 
-        const user = await User.findByIdAndUpdate(id, { isBlocked: true, status: 'deleted' });
+        // Perform permanent deletion from database
+        const user = await User.findByIdAndDelete(id);
 
         if (user) {
-            return NextResponse.json({ success: true });
+            return NextResponse.json({ 
+                success: true, 
+                message: 'User permanently deleted from database' 
+            });
         }
         return NextResponse.json({ message: 'User not found' }, { status: 404 });
 
     } catch (e) {
+        console.error('Delete Error:', e);
         return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
     }
 }

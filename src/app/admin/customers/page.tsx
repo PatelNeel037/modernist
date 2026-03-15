@@ -2,10 +2,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './customers.module.css';
-import { Search, User, Filter } from 'lucide-react';
+import { Search, User, Filter, Trash2 } from 'lucide-react';
 
 interface Customer {
-    id: number;
+    id: string; // Changed to string as MongoDB IDs are strings
     name: string;
     email: string;
     role: string;
@@ -36,6 +36,30 @@ export default function AdminCustomersPage() {
         }
     }
 
+    const handleDelete = async (id: string, name: string) => {
+        if (!window.confirm(`Are you absolutely sure you want to PERMANENTLY delete user "${name}"? This action cannot be undone and will remove them from the database.`)) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/admin/users/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (res.ok) {
+                // Remove from local state
+                setCustomers(prev => prev.filter(c => c.id !== id));
+                alert('User deleted successfully.');
+            } else {
+                const data = await res.json();
+                alert(data.message || 'Error deleting user.');
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Failed to delete user.');
+        }
+    };
+
     useEffect(() => {
         loadCustomers();
     }, []);
@@ -63,7 +87,7 @@ export default function AdminCustomersPage() {
 
             <div className={styles.controlsContainer}>
                 <div className={styles.searchBox}>
-                    <Search size={18} className="absolute left-3 text-gray-400" />
+                    <Search size={18} className="absolute left-3 text-slate-500" />
                     <input
                         type="text"
                         placeholder="Search by name or email..."
@@ -109,30 +133,39 @@ export default function AdminCustomersPage() {
                                             <div className={styles.userAvatar}>
                                                 {customer.name.charAt(0).toUpperCase()}
                                             </div>
-                                            <div className="font-medium text-gray-800">{customer.name}</div>
+                                            <div className="font-medium text-slate-200">{customer.name}</div>
                                         </div>
                                     </td>
-                                    <td className="text-gray-600">{customer.email}</td>
+                                    <td className="text-slate-400">{customer.email}</td>
                                     <td>
                                         <span className={`${styles.badge} ${customer.status === 'blocked' ? styles.blockedBadge : styles.activeBadge}`}>
                                             {customer.status || 'active'}
                                         </span>
                                     </td>
-                                    <td className="text-gray-500">{new Date(customer.joined).toLocaleDateString()}</td>
+                                    <td className="text-slate-500">{new Date(customer.joined).toLocaleDateString()}</td>
                                     <td className="text-center">{customer.totalOrders}</td>
-                                    <td className="font-mono">${customer.totalSpent.toFixed(2)}</td>
+                                    <td className="font-mono text-slate-200 font-medium">${customer.totalSpent.toFixed(2)}</td>
                                     <td>
-                                        <Link
-                                            href={`/admin/customers/${customer.id}`}
-                                            className="text-blue-500 hover:underline text-sm font-medium"
-                                        >
-                                            View Profile
-                                        </Link>
+                                        <div className="flex items-center gap-4">
+                                            <Link
+                                                href={`/admin/customers/${customer.id}`}
+                                                className="text-blue-500 hover:text-blue-400 transition-colors text-sm font-bold uppercase tracking-wider"
+                                            >
+                                                View
+                                            </Link>
+                                            <button 
+                                                onClick={() => handleDelete(customer.id, customer.name)}
+                                                className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-all group outline-none focus:ring-1 focus:ring-red-500"
+                                                title="Delete Permanently"
+                                            >
+                                                <Trash2 size={18} className="group-hover:scale-110 transition-transform" />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))
                         ) : (
-                            <tr><td colSpan={7} className="text-center py-8 text-gray-400">No customers found.</td></tr>
+                            <tr><td colSpan={7} className="text-center py-8 text-slate-500 uppercase tracking-widest text-sm font-semibold">No customers found.</td></tr>
                         )}
                     </tbody>
                 </table>

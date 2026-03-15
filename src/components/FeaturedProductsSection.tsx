@@ -33,7 +33,7 @@ export default function FeaturedProductsSection() {
                 <ScrollReveal direction="up">
                     <h2 className="text-3xl font-playfair font-bold mb-12 text-center relative tracking-wide text-content-heading">
                         <span className="bg-bg-soft px-4 relative z-10">Trending Now</span>
-                        <span className="absolute top-1/2 left-0 w-full h-[1px] bg-brand-primary/20 -z-0"></span>
+                        <span className="absolute top-1/2 left-0 w-full h-px bg-brand-primary/20 z-0"></span>
                     </h2>
                 </ScrollReveal>
 
@@ -42,7 +42,7 @@ export default function FeaturedProductsSection() {
                         <ScrollReveal direction="up" delay={0.1 * idx} key={product.id}>
                             <ProductCard product={{
                                 ...product,
-                                price: typeof product.price === 'number' ? product.price.toFixed(2) : product.price,
+                                price: product.price,
                                 image: product.images?.[0] || product.image,
                                 images: product.images
                             }} />

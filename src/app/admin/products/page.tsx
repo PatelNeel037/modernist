@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './products.module.css';
 import { Plus, Edit2, Trash2, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { formatPrice } from '@/lib/currency';
 // import { useAuth } from '@/context/AuthContext'; // Assume admin protection from layout
 
 export default function AdminProductsPage() {
@@ -226,6 +227,8 @@ export default function AdminProductsPage() {
                     <option value="Men">Men</option>
                     <option value="Women">Women</option>
                     <option value="Kids">Kids</option>
+                    <option value="Home Textile">Home Textile</option>
+                    <option value="Wholesale / B2B">Wholesale / B2B</option>
                 </select>
                 <input
                     type="text"
@@ -257,14 +260,14 @@ export default function AdminProductsPage() {
                                 <div className={styles.productCat}>
                                     {product.category}
                                     {product.status !== 'active' && (
-                                        <span className={`${styles.statusBadge} ${product.status === 'deleted' ? styles.statusDeleted : styles.statusHidden}`}>
+                                        <span className={`${styles.statusBadge} ${product.status === 'deleted' ? styles.statusDeleted : product.status === 'new' ? styles.statusNew : product.status === 'featured' ? styles.statusFeatured : styles.statusHidden}`}>
                                             {product.status}
                                         </span>
                                     )}
                                 </div>
                                 <h3 className={styles.productName}>{product.name}</h3>
                                 <div className={styles.productMeta}>
-                                    <span className={styles.productPrice}>${Number(product.price).toFixed(2)}</span>
+                                    <span className={styles.productPrice}>{formatPrice(product.price)}</span>
                                     <span className={`${styles.stockBadge} ${product.stock < 10 ? styles.stockLow : ''}`}>
                                         {product.stock} in stock
                                     </span>
@@ -316,6 +319,8 @@ export default function AdminProductsPage() {
                                         <option value="Men">Men</option>
                                         <option value="Women">Women</option>
                                         <option value="Kids">Kids</option>
+                                        <option value="Home Textile">Home Textile</option>
+                                        <option value="Wholesale / B2B">Wholesale / B2B</option>
                                     </select>
                                 </div>
                                 <div className={styles.formGroup}>
@@ -345,6 +350,8 @@ export default function AdminProductsPage() {
                                 <label>Status</label>
                                 <select name="status" value={formData.status} onChange={handleChange} className={styles.formControl}>
                                     <option value="active">Active</option>
+                                    <option value="new">New Arrival</option>
+                                    <option value="featured">Featured</option>
                                     <option value="hidden">Hidden</option>
                                     <option value="deleted">Deleted</option>
                                 </select>

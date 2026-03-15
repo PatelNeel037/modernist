@@ -12,10 +12,12 @@
 }
 
 .headerTitle {
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: #2c3e50;
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #ffffff;
     margin: 0;
+    letter-spacing: 0.5px;
 }
 
 .btnAdd {
@@ -39,10 +41,12 @@
 
 /* Filters */
 .filtersContainer {
-    background: white;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
     padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     margin-bottom: 2rem;
     display: flex;
     gap: 1rem;
@@ -52,20 +56,22 @@
 
 .filterInput {
     padding: 10px 12px;
-    border: 1px solid #ddd;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 6px;
     min-width: 200px;
     outline: none;
-    transition: border-color 0.2s;
-    color: #2c3e50;
+    transition: all 0.2s;
+    color: #c9d1d9;
 }
 
 .filterInput::placeholder {
-    color: #95a5a6;
+    color: #8b949e;
 }
 
 .filterInput:focus {
-    border-color: #3498db;
+    border-color: #58a6ff;
+    background: rgba(255, 255, 255, 0.08);
 }
 
 /* Grid */
@@ -76,25 +82,26 @@
 }
 
 .productCard {
-    background: white;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s, box-shadow 0.2s;
     position: relative;
-    border: 1px solid #f0f0f0;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .productCard:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
 }
 
 .productImg {
     width: 100%;
     height: 250px;
     object-fit: cover;
-    background-color: #f9f9f9;
+    background-color: #010409;
 }
 
 .productInfo {
@@ -103,20 +110,21 @@
 
 .productCat {
     font-size: 0.75rem;
-    color: #95a5a6;
+    color: #8b949e;
     text-transform: uppercase;
     font-weight: 600;
     margin-bottom: 5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    letter-spacing: 0.5px;
 }
 
 .productName {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     margin: 5px 0 10px 0;
     font-weight: 600;
-    color: #2c3e50;
+    color: #e2e8f0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -131,45 +139,70 @@
 
 .productPrice {
     font-weight: 700;
-    color: #2c3e50;
-    font-size: 1.1rem;
+    color: #ffffff;
+    font-size: 1.2rem;
+    letter-spacing: -0.5px;
 }
 
 .stockBadge {
     font-size: 0.75rem;
-    padding: 4px 8px;
-    border-radius: 4px;
-    background: #e8f5e9;
-    color: #2e7d32;
-    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(46, 160, 67, 0.15);
+    color: #3fb950;
+    font-weight: 600;
+    border: 1px solid rgba(46, 160, 67, 0.3);
 }
 
 .stockLow {
-    background: #ffebee;
-    color: #c62828;
+    background: rgba(248, 81, 73, 0.15);
+    color: #f85149;
+    border: 1px solid rgba(248, 81, 73, 0.3);
 }
 
 .statusBadge {
-    padding: 2px 8px;
-    border-radius: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 .statusActive {
-    background: #e8f5e9;
-    color: #2e7d32;
+    background: rgba(52, 211, 153, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    box-shadow: 0 0 12px rgba(52, 211, 153, 0.2);
+}
+
+.statusNew {
+    background: rgba(56, 189, 248, 0.15);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+}
+
+.statusFeatured {
+    background: rgba(192, 132, 252, 0.15);
+    color: #c084fc;
+    border: 1px solid rgba(192, 132, 252, 0.3);
+    box-shadow: 0 0 12px rgba(192, 132, 252, 0.2);
 }
 
 .statusHidden {
-    background: #fff3e0;
-    color: #ef6c00;
+    background: rgba(251, 146, 60, 0.15);
+    color: #fb923c;
+    border: 1px solid rgba(251, 146, 60, 0.3);
+    box-shadow: 0 0 12px rgba(251, 146, 60, 0.2);
 }
 
 .statusDeleted {
-    background: #ffebee;
-    color: #c62828;
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    box-shadow: 0 0 12px rgba(248, 113, 113, 0.2);
     opacity: 0.7;
 }
 
@@ -177,32 +210,34 @@
     display: flex;
     justify-content: flex-end;
     padding: 0.75rem 1rem;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
     gap: 10px;
-    background-color: #fcfcfc;
+    background-color: rgba(255, 255, 255, 0.01);
 }
 
 .btnIcon {
-    color: #95a5a6;
+    color: #8b949e;
     cursor: pointer;
     transition: all 0.2s;
-    background: white;
-    border: 1px solid #eee;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 6px;
-    border-radius: 4px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .btnIcon:hover {
-    color: #3498db;
-    border-color: #3498db;
+    color: #58a6ff;
+    border-color: #58a6ff;
+    background: rgba(88, 166, 255, 0.1);
 }
 
 .btnIconDelete:hover {
-    color: #e74c3c;
-    border-color: #e74c3c;
+    color: #f85149;
+    border-color: #f85149;
+    background: rgba(248, 81, 73, 0.1);
 }
 
 /* Modal */
@@ -212,7 +247,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -228,7 +264,8 @@
 }
 
 .modalContent {
-    background: white;
+    background: #161b22;
+    border: 1px solid rgba(255,255,255,0.1);
     padding: 2rem;
     border-radius: 12px;
     width: 90%;
@@ -236,7 +273,7 @@
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 .modalHeader {
@@ -244,14 +281,16 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
     padding-bottom: 1rem;
 }
 
 .modalHeader h2 {
-    font-size: 1.5rem;
-    color: #2c3e50;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #ffffff;
     margin: 0;
+    letter-spacing: 0.5px;
 }
 
 .closeModal {
@@ -259,14 +298,14 @@
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #95a5a6;
+    color: #8b949e;
     padding: 0;
     line-height: 1;
     transition: color 0.2s;
 }
 
 .closeModal:hover {
-    color: #e74c3c;
+    color: #f85149;
 }
 
 .formGroup {
@@ -276,28 +315,35 @@
 .formGroup label {
     display: block;
     margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: #555;
+    font-weight: 600;
+    color: #c9d1d9;
     font-size: 0.9rem;
+    letter-spacing: 0.5px;
 }
 
 .formControl {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #ddd;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
     border-radius: 6px;
     font-size: 0.95rem;
-    transition: border-color 0.2s;
-    color: #2c3e50;
+    transition: all 0.2s;
 }
 
 .formControl::placeholder {
-    color: #95a5a6;
+    color: #8b949e;
 }
 
 .formControl:focus {
-    border-color: #3498db;
+    border-color: #58a6ff;
+    background: rgba(255, 255, 255, 0.08);
     outline: none;
+}
+select.formControl option {
+    background-color: #161b22;
+    color: #ffffff;
 }
 
 .formRow {
@@ -310,7 +356,8 @@
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
-    background: #f9f9f9;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     padding: 10px;
     border-radius: 6px;
 }
@@ -322,6 +369,7 @@
     font-weight: normal;
     cursor: pointer;
     user-select: none;
+    color: #c9d1d9;
 }
 
 .modalFooter {
@@ -329,7 +377,7 @@
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-    border-top: 1px solid #eee;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
     padding-top: 1.5rem;
 }
 
@@ -338,20 +386,25 @@
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-weight: 500;
-    transition: filter 0.2s;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
 }
 
 .btn:hover {
-    filter: brightness(0.95);
+    filter: brightness(1.1);
 }
 
 .btnSecondary {
-    background: #ecf0f1;
-    color: #7f8c8d;
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
 }
 
 .btnPrimary {
-    background: #3498db;
-    color: white;
+    background: rgba(46, 160, 67, 0.2);
+    border: 1px solid rgba(46, 160, 67, 0.5);
+    color: #56d364;
+}
+.btnPrimary:hover {
+    background: rgba(46, 160, 67, 0.3);
 }

@@ -5,9 +5,9 @@ import { verifyAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
-        await verifyAdmin();
+        await verifyAdmin(request);
         await connectDB();
         const orders = await Order.find().sort({ createdAt: -1 });
 

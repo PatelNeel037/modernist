@@ -92,16 +92,14 @@ export const DB = {
 
     getToken: function (): string | null {
         if (typeof window === 'undefined') return null;
-        return localStorage.getItem(this.KEYS.TOKEN);
+        // Check both possible keys, just in case
+        return localStorage.getItem(this.KEYS.TOKEN) || localStorage.getItem('modernist_token');
     },
 
     // --- Data Access (Cart) ---
-    // Note: For this migration, we are keeping a "Hybrid" approach.
-    // Guests use LocalStorage. Logged in users use LocalStorage (synced by Auth).
 
     getCart: function (): any[] {
         if (typeof window === 'undefined') return [];
-        // Simple strategy: Always use the localStorage key for the current context
         const userId = this.getCurrentUserId();
         const key = userId ? `modernist_cart_${userId}` : 'modernist_cart_guest';
         const data = localStorage.getItem(key);
@@ -119,14 +117,11 @@ export const DB = {
         const key = userId ? `modernist_cart_${userId}` : 'modernist_cart_guest';
         localStorage.setItem(key, JSON.stringify(cart));
 
-        // Dispatch event for UI updates - IMPORTANT for React Context to sync
         window.dispatchEvent(new StorageEvent('storage', {
             key: key,
             newValue: JSON.stringify(cart)
         }));
     },
-
-    // --- Wishlist (Same Logic) ---
 
     getWishlist: function (): any[] {
         if (typeof window === 'undefined') return [];
@@ -147,7 +142,6 @@ export const DB = {
         const key = userId ? `modernist_wishlist_${userId}` : 'modernist_wishlist_guest';
         localStorage.setItem(key, JSON.stringify(wishlist));
 
-        // Dispatch event for UI updates
         window.dispatchEvent(new StorageEvent('storage', {
             key: key,
             newValue: JSON.stringify(wishlist)
@@ -156,7 +150,7 @@ export const DB = {
 
     // --- API Calls (Auth) ---
 
-    login: async function (email: string, password: string): Promise<{ success: boolean; message?: string }> {
+    login: async function (email: string, password: string): Promise<{ success: boolean; message?: string; requireVerification?: boolean }> {
         try {
             const response = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
@@ -166,20 +160,16 @@ export const DB = {
             const data = await response.json();
 
             if (data.success) {
-                // Save Token & User Info
                 localStorage.setItem(this.KEYS.TOKEN, data.token);
                 localStorage.setItem(this.KEYS.USER, JSON.stringify(data.user));
-
-                // Merge Guest Data logic (simplified version of previous logic)
                 this.mergeGuestData(data.user.id);
                 return { success: true };
             } else {
-                return { success: false, message: data.message };
+                return { success: false, message: data.message, requireVerification: data.requireVerification };
             }
         } catch (error) {
-            // Using warn instead of error to prevent Next.js overlay
-            console.warn("Login Error (Is Backend Running?):", error);
-            return { success: false, message: 'Network Error: Is backend running on port 5000?' };
+            console.warn("Login Error:", error);
+            return { success: false, message: 'Network Error' };
         }
     },
 
@@ -196,7 +186,6 @@ export const DB = {
                 if (data.requireVerification) {
                     return { success: true, message: data.message, requireVerification: true };
                 }
-                // Auto login after signup (Legacy behavior if verification disabled)
                 localStorage.setItem(this.KEYS.TOKEN, data.token);
                 localStorage.setItem(this.KEYS.USER, JSON.stringify(data.user));
                 return { success: true };
@@ -204,8 +193,44 @@ export const DB = {
                 return { success: false, message: data.message };
             }
         } catch (error) {
-            console.warn("Registration failed (Network Error):", error);
-            return { success: false, message: 'Network Error: Is backend running?' };
+            console.warn("Registration failed:", error);
+            return { success: false, message: 'Network Error' };
+        }
+    },
+
+    verifyEmail: async function (email: string, code: string): Promise<{ success: boolean; message?: string; user?: any }> {
+        try {
+            const response = await fetch(`${API_URL}/auth/verify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, code })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                localStorage.setItem(this.KEYS.USER, JSON.stringify(data.user));
+                this.mergeGuestData(data.user.id);
+                return { success: true, user: data.user };
+            } else {
+                return { success: false, message: data.message };
+            }
+        } catch (error) {
+            console.warn("Verification failed:", error);
+            return { success: false, message: 'Network Error' };
+        }
+    },
+
+    resendOTP: async function (email: string): Promise<{ success: boolean; message?: string }> {
+        try {
+            const response = await fetch(`${API_URL}/auth/resend-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            return await response.json();
+        } catch (error) {
+            console.warn("Resend OTP failed:", error);
+            return { success: false, message: 'Network Error' };
         }
     },
 
@@ -218,7 +243,7 @@ export const DB = {
             });
             return await response.json();
         } catch (error) {
-            console.warn("Forgot Password failed (Network Error):", error);
+            console.warn("Forgot Password failed:", error);
             return { success: false, message: 'Network Error' };
         }
     },
@@ -237,7 +262,7 @@ export const DB = {
         }
     },
 
-    updateProfile: async function (user: any): Promise<{ success: boolean; message?: string }> {
+    updateProfile: async function (user: any): Promise<{ success: boolean; message?: string; user?: any }> {
         try {
             const response = await fetch(`${API_URL}/auth/profile`, {
                 method: 'PUT',
@@ -251,12 +276,20 @@ export const DB = {
         }
     },
 
+    deleteProfile: async function (userId: string | number): Promise<{ success: boolean; message?: string }> {
+        try {
+            const response = await fetch(`${API_URL}/auth/profile?id=${userId}`, {
+                method: 'DELETE'
+            });
+            return await response.json();
+        } catch (error) {
+            console.warn("Delete Profile failed:", error);
+            return { success: false, message: 'Network Error' };
+        }
+    },
+
     logout: function () {
         if (typeof window === 'undefined') return;
-
-        // We do NOT delete the user's cart/wishlist here anymore.
-        // This ensures that when they log back in, their data is still there.
-
         sessionStorage.removeItem('modernist_buy_now_item');
         localStorage.removeItem(this.KEYS.TOKEN);
         localStorage.removeItem(this.KEYS.USER);
@@ -267,16 +300,12 @@ export const DB = {
 
     addOrder: async function (order: any): Promise<boolean> {
         const userId = this.getCurrentUserId();
-
         try {
             const response = await fetch(`${API_URL}/orders`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // 'Authorization': `Bearer ${this.getToken()}` // Uncomment if we add middleware later
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    userId: userId, // Send null if guest
+                    userId,
                     guestInfo: order.guestInfo,
                     shippingAddress: order.shippingAddress,
                     items: order.items,
@@ -291,14 +320,13 @@ export const DB = {
             const data = await response.json();
             return data.success;
         } catch (e) {
-            console.warn("Order Failed (Network Error?)", e);
+            console.warn("Order Failed:", e);
             return false;
         }
     },
 
     // --- API Calls (Products) ---
 
-    // This replaces global productsDB access
     fetchProducts: async function () {
         try {
             const response = await fetch(`${API_URL}/products`);
@@ -306,7 +334,7 @@ export const DB = {
             const data = await response.json();
             return Array.isArray(data) ? data : [];
         } catch (e) {
-            console.warn("Failed to fetch products (Is backend running?)", e);
+            console.warn("Failed to fetch products:", e);
             return [];
         }
     },
@@ -317,7 +345,7 @@ export const DB = {
             if (!response.ok) return null;
             return await response.json();
         } catch (e) {
-            console.warn("Failed to fetch product", e);
+            console.warn("Failed to fetch product:", e);
             return null;
         }
     },
@@ -328,16 +356,20 @@ export const DB = {
             if (!response.ok) return [];
             return await response.json();
         } catch (e) {
-            console.warn("Failed to fetch reviews", e);
+            console.warn("Failed to fetch reviews:", e);
             return [];
         }
     },
 
     submitReview: async function (productId: string | number, rating: number, comment: string, reviewerName?: string) {
         try {
+            const token = this.getToken();
             const response = await fetch(`${API_URL}/products/${productId}/reviews`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
                 body: JSON.stringify({ rating, comment, reviewerName })
             });
             const data = await response.json();
@@ -347,8 +379,148 @@ export const DB = {
                 review: data.review
             };
         } catch (e) {
-            console.warn("Failed to submit review", e);
+            console.warn("Failed to submit review:", e);
             return { success: false, message: 'Network error submitting review' };
+        }
+    },
+
+    // --- API Calls (Testimonials) ---
+
+    fetchTestimonials: async function (all: boolean = false) {
+        try {
+            const url = all ? `${API_URL}/testimonials?all=true` : `${API_URL}/testimonials`;
+            const response = await fetch(url);
+            if (!response.ok) return [];
+            return await response.json();
+        } catch (e) {
+            console.warn("Failed to fetch testimonials:", e);
+            return [];
+        }
+    },
+
+    addTestimonial: async function (data: any) {
+        try {
+            const response = await fetch(`${API_URL}/testimonials`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            return await response.json();
+        } catch (e) {
+            return { success: false, message: 'Network error' };
+        }
+    },
+
+    updateTestimonial: async function (id: string, data: any) {
+        try {
+            const response = await fetch(`${API_URL}/testimonials/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            return await response.json();
+        } catch (e) {
+            return { success: false, message: 'Network error' };
+        }
+    },
+
+    deleteTestimonial: async function (id: string) {
+        try {
+            const response = await fetch(`${API_URL}/testimonials/${id}`, {
+                method: 'DELETE'
+            });
+            return await response.json();
+        } catch (e) {
+            return { success: false, message: 'Network error' };
+        }
+    },
+
+    // --- API Calls (Instagram) ---
+
+    fetchInstagramPosts: async function (all: boolean = false) {
+        try {
+            const url = all ? `${API_URL}/instagram?all=true` : `${API_URL}/instagram`;
+            const response = await fetch(url);
+            if (!response.ok) return [];
+            return await response.json();
+        } catch (e) {
+            console.warn("Failed to fetch instagram posts:", e);
+            return [];
+        }
+    },
+
+    addInstagramPost: async function (data: any) {
+        try {
+            const token = localStorage.getItem(this.KEYS.ADMIN_TOKEN);
+            const response = await fetch(`${API_URL}/instagram`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify(data)
+            });
+            return await response.json();
+        } catch (e) {
+            return { success: false, message: 'Network error' };
+        }
+    },
+
+    updateInstagramPost: async function (id: string, data: any) {
+        try {
+            const token = localStorage.getItem(this.KEYS.ADMIN_TOKEN);
+            const response = await fetch(`${API_URL}/instagram/${id}`, {
+                method: 'PATCH',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify(data)
+            });
+            return await response.json();
+        } catch (e) {
+            return { success: false, message: 'Network error' };
+        }
+    },
+
+    deleteInstagramPost: async function (id: string) {
+        try {
+            const token = localStorage.getItem(this.KEYS.ADMIN_TOKEN);
+            const response = await fetch(`${API_URL}/instagram/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                }
+            });
+            return await response.json();
+        } catch (e) {
+            return { success: false, message: 'Network error' };
+        }
+    },
+
+    // --- API Calls (Newsletter) ---
+
+    subscribeNewsletter: async function (email: string) {
+        try {
+            const response = await fetch(`${API_URL}/newsletter`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            return await response.json();
+        } catch (e) {
+            return { success: false, message: 'Network error' };
+        }
+    },
+
+    fetchSubscribers: async function () {
+        try {
+            const response = await fetch(`${API_URL}/newsletter`);
+            if (!response.ok) return [];
+            return await response.json();
+        } catch (e) {
+            console.warn("Failed to fetch subscribers:", e);
+            return [];
         }
     },
 
@@ -370,8 +542,6 @@ export const DB = {
             userCart = JSON.parse(localStorage.getItem(userCartKey) || '[]');
         } catch (e) { }
 
-
-        // Merge logic
         guestCart.forEach((gItem: any) => {
             const existing = userCart.find((u: any) => u.id === gItem.id);
             if (existing) {
@@ -381,11 +551,9 @@ export const DB = {
             }
         });
 
-        // Save & Clear Guest
         localStorage.setItem(userCartKey, JSON.stringify(userCart));
         localStorage.removeItem(guestCartKey);
 
-        // Notify CartContext to reload
         window.dispatchEvent(new StorageEvent('storage', {
             key: userCartKey,
             newValue: JSON.stringify(userCart)

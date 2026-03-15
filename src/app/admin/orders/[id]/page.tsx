@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { formatINR, formatPrice } from '@/lib/currency';
 
 export default function OrderDetailsPage() {
     const params = useParams();
@@ -99,11 +100,7 @@ export default function OrderDetailsPage() {
     if (loading) return <div className="p-12 text-center text-gray-500">Loading Order Details...</div>;
     if (!order) return null;
 
-    // Helper to format currency
-    const formatPrice = (amount: any) => {
-        const num = Number(amount);
-        return isNaN(num) ? '$0.00' : `$${num.toFixed(2)}`;
-    };
+
 
     return (
         <div className={styles.orderDetailsContent}>
@@ -338,20 +335,20 @@ export default function OrderDetailsPage() {
                         <div className="space-y-3">
                             <div className="flex justify-between text-gray-600">
                                 <span>Subtotal</span>
-                                <span>{formatPrice(order.totalAmount)}</span>
+                                <span>{formatINR(order.totalAmount)}</span>
                             </div>
                             <div className="flex justify-between text-gray-600">
                                 <span>Shipping</span>
-                                <span>$0.00</span>
+                                <span>{formatINR(0)}</span>
                             </div>
                             <div className="flex justify-between text-gray-600">
                                 <span>Tax (0%)</span>
-                                <span>$0.00</span>
+                                <span>{formatINR(0)}</span>
                             </div>
                             <hr className="border-gray-100 my-2" />
                             <div className="flex justify-between text-lg font-bold text-gray-900">
                                 <span>Total</span>
-                                <span>{formatPrice(order.totalAmount)}</span>
+                                <span>{formatINR(order.totalAmount)}</span>
                             </div>
                         </div>
                     </div>

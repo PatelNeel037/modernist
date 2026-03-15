@@ -12,7 +12,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const [theme, setTheme] = useState<Theme>('light');
+    const [theme, setTheme] = useState<Theme>('dark');
 
     // Initialize theme
     useEffect(() => {
@@ -21,10 +21,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
             setTheme(storedTheme);
             if (storedTheme === 'dark') {
                 document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
             }
-        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        } else {
+            // Option A: Stealth/Dark mode defaults to dark.
             setTheme('dark');
             document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
         }
     }, []);
 

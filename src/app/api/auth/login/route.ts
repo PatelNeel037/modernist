@@ -12,7 +12,7 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { email, password } = body;
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email }).select('-addresses');
 
         if (user) {
             if (user.isBlocked) {
@@ -23,6 +23,14 @@ export async function POST(request: Request) {
 
             if (!isMatch) {
                 return NextResponse.json({ success: false, message: 'Invalid email or password.' }, { status: 401 });
+            }
+
+            if (user.isVerified === false) {
+                return NextResponse.json({ 
+                    success: false, 
+                    requireVerification: true, 
+                    message: 'Please verify your email to continue.' 
+                }, { status: 401 });
             }
 
             const token = jwt.sign({ id: user._id, role: user.role, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '7d' });

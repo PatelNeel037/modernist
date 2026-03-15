@@ -12,9 +12,10 @@ import {
     Shield, Bell, Lock, Smartphone, Moon, Sun, Monitor
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ProfilePage() {
-    const { user, logout, addAddress, updateAddress, deleteAddress, updateUser, changePassword, isLoading } = useAuth();
+    const { user, logout, addAddress, updateAddress, deleteAddress, updateUser, deleteAccount, changePassword, isLoading } = useAuth();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState('dashboard');
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
@@ -150,10 +151,20 @@ export default function ProfilePage() {
 
     // --- Settings Handlers ---
 
-    const handleProfileUpdate = (e: React.FormEvent) => {
+    const handleProfileUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
-        updateUser({ name: profileForm.name, email: profileForm.email });
-        toast.success('Profile updated successfully!');
+
+        if (profileForm.name.trim() === '') {
+            toast.error('Name cannot be empty.');
+            return;
+        }
+
+        const result = await updateUser({ name: profileForm.name });
+        if (result && result.success === false) {
+            toast.error(result.message);
+        } else {
+            toast.success('Profile updated successfully!');
+        }
     };
 
     const handlePasswordUpdate = async (e: React.FormEvent) => {
@@ -173,18 +184,35 @@ export default function ProfilePage() {
         }
     };
 
-    const handleNotificationToggle = (key: keyof typeof notifications) => {
+    const handleNotificationToggle = async (key: keyof typeof notifications) => {
         const updated = { ...notifications, [key]: !notifications[key] };
         setNotifications(updated);
-        updateUser({ notifications: updated });
+        
+        try {
+            const result = await updateUser({ notifications: updated });
+            if (result && result.success) {
+                toast.success('Notification preference updated');
+            } else {
+                // Rollback local state on failure
+                setNotifications(notifications);
+                toast.error(result?.message || 'Failed to update preference');
+            }
+        } catch (error) {
+            setNotifications(notifications);
+            toast.error('Network error updating preference');
+        }
     };
 
-    const handleDeleteAccount = () => {
+    const handleDeleteAccount = async () => {
         const confirmText = prompt("Type 'DELETE' to confirm account deletion. This cannot be undone.");
         if (confirmText === 'DELETE') {
-            toast.success('Account deleted.');
-            logout();
-            window.location.href = '/';
+            const result = await deleteAccount();
+            if (result.success) {
+                toast.success('Account deleted successfully.');
+                window.location.href = '/';
+            } else {
+                toast.error(result.message || 'Failed to delete account');
+            }
         }
     };
 
@@ -230,347 +258,514 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
 
                     {/* Sidebar */}
-                    <aside className="bg-white p-6 rounded-lg shadow-sm h-fit sticky top-24">
-                        <nav className="space-y-2">
-                            <button
-                                onClick={() => setActiveTab('dashboard')}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded text-sm font-medium transition-colors ${activeTab === 'dashboard' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-50'}`}
-                            >
-                                <User size={18} /> Dashboard
-                            </button>
+                    <motion.aside
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        className="bg-bg-main/80 backdrop-blur-xl p-6 rounded-2xl shadow-xl border border-bg-accent/50 h-fit sticky top-24"
+                    >
+                        <nav className="space-y-2 relative">
+                            {['dashboard', 'addresses', 'settings'].map((tab) => {
+                                const isActive = activeTab === tab;
+                                const icons: Record<string, React.ReactNode> = {
+                                    dashboard: <User size={18} />,
+                                    addresses: <MapPin size={18} />,
+                                    settings: <Settings size={18} />
+                                };
+                                const labels: Record<string, string> = {
+                                    dashboard: 'Dashboard',
+                                    addresses: 'Addresses',
+                                    settings: 'Settings'
+                                };
+                                return (
+                                    <button
+                                        key={tab}
+                                        onClick={() => setActiveTab(tab)}
+                                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors relative z-10 ${isActive ? 'text-bg-main' : 'text-content-body hover:text-brand-primary hover:bg-bg-soft'}`}
+                                    >
+                                        {isActive && (
+                                            <motion.div
+                                                layoutId="activeTabProfile"
+                                                className="absolute inset-0 bg-brand-primary rounded-xl -z-10"
+                                                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                            />
+                                        )}
+                                        {icons[tab]} {labels[tab]}
+                                    </button>
+                                );
+                            })}
                             <Link
                                 href="/orders"
-                                className="w-full flex items-center gap-3 px-4 py-3 rounded text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-content-body hover:text-brand-primary hover:bg-bg-soft transition-colors mt-2"
                             >
                                 <Box size={18} /> My Orders
                             </Link>
-                            <button
-                                onClick={() => setActiveTab('addresses')}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded text-sm font-medium transition-colors ${activeTab === 'addresses' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-50'}`}
-                            >
-                                <MapPin size={18} /> Addresses
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('settings')}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded text-sm font-medium transition-colors ${activeTab === 'settings' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-50'}`}
-                            >
-                                <Settings size={18} /> Settings
-                            </button>
+
                             <button
                                 onClick={handleLogout}
-                                className="w-full flex items-center gap-3 px-4 py-3 rounded text-sm font-medium text-red-600 hover:bg-red-50 transition-colors mt-4 border-t border-gray-100"
+                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:bg-red-500/10 transition-colors mt-4 border-t border-bg-accent/50"
                             >
                                 <LogOut size={18} /> Sign Out
                             </button>
                         </nav>
-                    </aside>
+                    </motion.aside>
 
                     {/* Main Content */}
                     <div className="md:col-span-3">
 
                         {/* Dashboard Tab */}
                         {activeTab === 'dashboard' && (
-                            <div className="animate-fade-in space-y-6">
-                                <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-100">
-                                    <h2 className="text-2xl font-playfair font-bold mb-4">Welcome back, {user.name}</h2>
-                                    <p className="text-gray-600 leading-relaxed">
-                                        From your account dashboard you can view your <Link href="/orders" className="text-black underline">recent orders</Link>, manage your shipping and billing addresses, and edit your password and account details.
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                className="space-y-6"
+                            >
+                                <div className="bg-bg-main p-8 rounded-3xl shadow-lg border border-bg-accent/30 backdrop-blur-sm">
+                                    <h2 className="text-3xl font-playfair font-bold mb-4 text-content-heading">Welcome back, {user.name}</h2>
+                                    <p className="text-content-body leading-relaxed text-lg">
+                                        From your account dashboard you can view your <Link href="/orders" className="text-brand-primary underline font-medium">recent orders</Link>, manage your shipping and billing addresses, and edit your password and account details.
                                     </p>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                                        <div className="bg-gray-50 p-6 rounded border border-gray-100 text-center hover:bg-white hover:shadow-md transition-all">
-                                            <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                                                <Box size={24} />
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+                                        <motion.div
+                                            whileHover={{ scale: 1.05, y: -5 }}
+                                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                                            className="bg-linear-to-br from-bg-soft to-bg-main p-6 rounded-2xl border border-bg-accent/50 text-center shadow-md hover:shadow-xl cursor-pointer"
+                                            onClick={() => router.push('/orders')}
+                                        >
+                                            <div className="w-14 h-14 bg-brand-primary/10 text-brand-primary rounded-2xl flex items-center justify-center mx-auto mb-4 transform rotate-3">
+                                                <Box size={28} />
                                             </div>
-                                            <h3 className="font-bold mb-1">Orders</h3>
-                                            <Link href="/orders" className="text-sm text-gray-500 hover:text-black">View History →</Link>
-                                        </div>
-                                        <div
+                                            <h3 className="font-bold mb-2 text-content-heading text-lg">Orders</h3>
+                                            <span className="text-sm text-content-body font-medium flex justify-center items-center gap-1 group">View History <span className="transform group-hover:translate-x-1 transition-transform">→</span></span>
+                                        </motion.div>
+                                        <motion.div
+                                            whileHover={{ scale: 1.05, y: -5 }}
+                                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
                                             onClick={() => setActiveTab('addresses')}
-                                            className="bg-gray-50 p-6 rounded border border-gray-100 text-center hover:bg-white hover:shadow-md transition-all cursor-pointer"
+                                            className="bg-linear-to-br from-bg-soft to-bg-main p-6 rounded-2xl border border-bg-accent/50 text-center shadow-md hover:shadow-xl cursor-pointer"
                                         >
-                                            <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                                                <MapPin size={24} />
+                                            <div className="w-14 h-14 bg-green-500/10 text-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 transform -rotate-3">
+                                                <MapPin size={28} />
                                             </div>
-                                            <h3 className="font-bold mb-1">Addresses</h3>
-                                            <span className="text-sm text-gray-500">Manage saved →</span>
-                                        </div>
-                                        <div
+                                            <h3 className="font-bold mb-2 text-content-heading text-lg">Addresses</h3>
+                                            <span className="text-sm text-content-body font-medium flex justify-center items-center gap-1 group">Manage saved <span className="transform group-hover:translate-x-1 transition-transform">→</span></span>
+                                        </motion.div>
+                                        <motion.div
+                                            whileHover={{ scale: 1.05, y: -5 }}
+                                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
                                             onClick={() => setActiveTab('settings')}
-                                            className="bg-gray-50 p-6 rounded border border-gray-100 text-center hover:bg-white hover:shadow-md transition-all cursor-pointer"
+                                            className="bg-linear-to-br from-bg-soft to-bg-main p-6 rounded-2xl border border-bg-accent/50 text-center shadow-md hover:shadow-xl cursor-pointer"
                                         >
-                                            <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                                                <Settings size={24} />
+                                            <div className="w-14 h-14 bg-purple-500/10 text-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 transform rotate-3">
+                                                <Settings size={28} />
                                             </div>
-                                            <h3 className="font-bold mb-1">Account Info</h3>
-                                            <span className="text-sm text-gray-500">Edit Details →</span>
-                                        </div>
+                                            <h3 className="font-bold mb-2 text-content-heading text-lg">Account Info</h3>
+                                            <span className="text-sm text-content-body font-medium flex justify-center items-center gap-1 group">Edit Details <span className="transform group-hover:translate-x-1 transition-transform">→</span></span>
+                                        </motion.div>
                                     </div>
                                 </div>
-                            </div>
+                            </motion.div>
                         )}
 
                         {/* Addresses Tab */}
                         {activeTab === 'addresses' && (
-                            <div className="animate-fade-in space-y-6">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                className="space-y-6"
+                            >
                                 <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-2xl font-playfair font-bold">Saved Addresses</h2>
-                                    <button
+                                    <h2 className="text-3xl font-playfair font-bold text-content-heading">Saved Addresses</h2>
+                                    <motion.button
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
                                         onClick={() => openAddressModal()}
-                                        className="bg-black text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-2 hover:bg-gray-800 transition-colors"
+                                        className="bg-brand-primary text-bg-main px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-brand-dark transition-colors shadow-md"
                                     >
                                         <Plus size={16} /> Add New Address
-                                    </button>
+                                    </motion.button>
                                 </div>
-                                <div className="bg-yellow-50 text-yellow-800 px-4 py-3 rounded text-sm flex items-center gap-2 mb-6">
+                                <div className="bg-orange-50 dark:bg-orange-900/20 text-orange-800 dark:text-orange-200 px-4 py-3 rounded-xl text-sm flex items-center gap-2 mb-6 border border-orange-200 dark:border-orange-800/50">
                                     <AlertCircle size={16} />
                                     Addresses cannot be modified for orders already shipped.
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {addresses.length === 0 && (
-                                        <p className="text-gray-500 col-span-2 text-center py-8">No addresses saved yet.</p>
+                                        <p className="text-content-body col-span-2 text-center py-8">No addresses saved yet.</p>
                                     )}
-                                    {addresses.map(addr => (
-                                        <div key={addr.id} className="bg-white border border-gray-200 rounded-lg p-6 relative hover:shadow-md transition-shadow group">
-                                            <div className="absolute top-6 right-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button onClick={() => openAddressModal(addr)} className="text-gray-400 hover:text-black p-1"><Edit2 size={16} /></button>
-                                                <button onClick={() => handleDeleteAddress(addr.id)} className="text-gray-400 hover:text-red-500 p-1"><Trash2 size={16} /></button>
-                                            </div>
-                                            <div className="mb-4">
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    {(addr as any).type && (
-                                                        <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wider ${(addr as any).type === 'Home' ? 'bg-blue-50 text-blue-700' :
-                                                            (addr as any).type === 'Office' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-700'
-                                                            }`}>
-                                                            {(addr as any).type}
-                                                        </span>
-                                                    )}
-                                                    {addr.isDefault && (
-                                                        <span className="bg-gray-900 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
-                                                            <CheckCircle size={12} /> Default
-                                                        </span>
-                                                    )}
+                                    <AnimatePresence>
+                                        {addresses.map((addr, idx) => (
+                                            <motion.div
+                                                key={addr.id}
+                                                initial={{ opacity: 0, scale: 0.9 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.9 }}
+                                                transition={{ delay: idx * 0.1, type: "spring" }}
+                                                className="bg-bg-main border border-bg-accent rounded-2xl p-6 relative hover:shadow-xl transition-shadow group overflow-hidden"
+                                            >
+                                                <div className="absolute top-6 right-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                                                    <motion.button whileHover={{ scale: 1.2, rotate: 10 }} whileTap={{ scale: 0.9 }} onClick={(e) => { e.preventDefault(); e.stopPropagation(); openAddressModal(addr); }} type="button" className="bg-bg-soft text-content-body hover:text-brand-primary p-2 rounded-full shadow-sm"><Edit2 size={16} /></motion.button>
+                                                    <motion.button whileHover={{ scale: 1.2, rotate: -10 }} whileTap={{ scale: 0.9 }} onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeleteAddress(addr.id); }} type="button" className="bg-bg-soft text-content-body hover:text-red-500 p-2 rounded-full shadow-sm"><Trash2 size={16} /></motion.button>
                                                 </div>
-                                                <h4 className="font-bold text-lg">{addr.name}</h4>
-                                            </div>
-                                            <div className="text-sm text-gray-600 space-y-1 mb-4">
-                                                <p>{addr.street}</p>
-                                                <p>{addr.city}, {addr.state} {addr.zip}</p>
-                                                <p className="mt-2 text-gray-900 font-medium">Phone: {addr.phone}</p>
-                                            </div>
-                                            {!addr.isDefault && (
-                                                <button
-                                                    onClick={() => handleSetDefault(addr.id)}
-                                                    className="text-xs font-medium text-gray-500 underline hover:text-black"
-                                                >
-                                                    Set as Default
-                                                </button>
-                                            )}
-                                        </div>
-                                    ))}
+                                                <div className="mb-4 relative z-10">
+                                                    <div className="flex items-center gap-3 mb-2">
+                                                        {(addr as any).type && (
+                                                            <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${(addr as any).type === 'Home' ? 'bg-blue-600 text-white shadow-sm' :
+                                                                (addr as any).type === 'Office' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-gray-600 text-white shadow-sm'
+                                                                }`}>
+                                                                {(addr as any).type}
+                                                            </span>
+                                                        )}
+                                                        {addr.isDefault && (
+                                                            <span className="bg-brand-primary text-bg-main px-2 py-1 rounded-md text-[10px] flex items-center gap-1 font-bold">
+                                                                <CheckCircle size={12} /> Default
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <h4 className="font-bold text-xl text-content-heading">{addr.name}</h4>
+                                                </div>
+                                                <div className="text-sm text-content-body space-y-1 mb-4 relative z-10">
+                                                    <p>{addr.street}</p>
+                                                    <p>{addr.city}, {addr.state} {addr.zip}</p>
+                                                    <p className="mt-2 text-content-heading font-medium">Phone: {addr.phone}</p>
+                                                </div>
+                                                {!addr.isDefault && (
+                                                    <button
+                                                        onClick={() => handleSetDefault(addr.id)}
+                                                        className="text-xs font-bold text-content-body relative z-10 hover:text-brand-primary transition-colors underline decoration-bg-accent hover:decoration-brand-primary underline-offset-4"
+                                                    >
+                                                        Set as Default
+                                                    </button>
+                                                )}
+
+                                                {/* Decorative background shape */}
+                                                <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-bg-soft rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700 ease-out z-0"></div>
+                                            </motion.div>
+                                        ))}
+                                    </AnimatePresence>
                                 </div>
-                            </div>
+                            </motion.div>
                         )}
 
                         {/* Settings Tab */}
                         {activeTab === 'settings' && (
-                            <div className="animate-fade-in space-y-8">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                className="space-y-8"
+                            >
+                                {/* PROFILE INFORMATION SECTION (NEW) */}
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.1, type: "spring" }}
+                                    className="bg-bg-main rounded-2xl shadow-lg border border-bg-accent/50 overflow-hidden"
+                                >
+                                    <div className="p-5 border-b border-bg-accent/50 bg-bg-soft/50 flex items-center gap-3 backdrop-blur-md">
+                                        <User size={20} className="text-brand-primary" />
+                                        <h3 className="font-bold text-content-heading text-lg">Profile Details</h3>
+                                    </div>
+                                    <div className="p-6">
+                                        <form onSubmit={handleProfileUpdate} className="space-y-6">
+                                            <div className="grid grid-cols-1 gap-6">
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-content-body ml-1">Full Name</label>
+                                                    <input
+                                                        type="text"
+                                                        className="w-full px-4 py-3 bg-bg-soft border-transparent border focus:border-brand-primary rounded-xl focus:outline-none transition-colors text-content-heading font-medium"
+                                                        value={profileForm.name}
+                                                        onChange={(e) => setProfileForm(prev => ({ ...prev, name: e.target.value }))}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="flex justify-end pt-2">
+                                                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} type="submit" className="px-5 py-2.5 bg-brand-primary text-bg-main rounded-xl shadow-md font-bold hover:shadow-lg transition-all">Update Profile</motion.button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </motion.div>
 
                                 {/* SECURITY SECTION */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-                                    <div className="p-4 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
-                                        <Lock size={18} className="text-gray-500" />
-                                        <h3 className="font-bold text-gray-900">Security & Login</h3>
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.2, type: "spring" }}
+                                    className="bg-bg-main rounded-2xl shadow-lg border border-bg-accent/50 overflow-hidden"
+                                >
+                                    <div className="p-5 border-b border-bg-accent/50 bg-bg-soft/50 flex items-center gap-3 backdrop-blur-md">
+                                        <Lock size={20} className="text-brand-primary" />
+                                        <h3 className="font-bold text-content-heading text-lg">Security & Login</h3>
                                     </div>
                                     <div className="p-6 space-y-8">
                                         {/* Change Password */}
                                         <form onSubmit={handlePasswordUpdate}>
-                                            <h4 className="font-semibold mb-4 text-sm uppercase tracking-wide text-gray-500">Change Password</h4>
+                                            <h4 className="font-semibold mb-5 text-[11px] uppercase tracking-widest text-content-body ml-1">Change Password</h4>
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-                                                <div className="space-y-1">
-                                                    <label className="text-xs font-medium text-gray-500">Current Password</label>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-content-body ml-1">Current Password</label>
                                                     <input
                                                         type="password"
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded focus:border-black focus:outline-none transition-colors"
+                                                        className="w-full px-4 py-3 bg-bg-soft border-transparent border focus:border-brand-primary rounded-xl focus:outline-none transition-colors text-content-heading font-medium"
                                                         value={passwordForm.current}
                                                         onChange={(e) => setPasswordForm(prev => ({ ...prev, current: e.target.value }))}
                                                     />
                                                 </div>
-                                                <div className="space-y-1">
-                                                    <label className="text-xs font-medium text-gray-500">New Password</label>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-content-body ml-1">New Password</label>
                                                     <input
                                                         type="password"
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded focus:border-black focus:outline-none transition-colors"
+                                                        className="w-full px-4 py-3 bg-bg-soft border-transparent border focus:border-brand-primary rounded-xl focus:outline-none transition-colors text-content-heading font-medium"
                                                         value={passwordForm.new}
                                                         onChange={(e) => setPasswordForm(prev => ({ ...prev, new: e.target.value }))}
                                                     />
                                                 </div>
-                                                <div className="space-y-1">
-                                                    <label className="text-xs font-medium text-gray-500">Confirm Password</label>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-content-body ml-1">Confirm Password</label>
                                                     <input
                                                         type="password"
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded focus:border-black focus:outline-none transition-colors"
+                                                        className="w-full px-4 py-3 bg-bg-soft border-transparent border focus:border-brand-primary rounded-xl focus:outline-none transition-colors text-content-heading font-medium"
                                                         value={passwordForm.confirm}
                                                         onChange={(e) => setPasswordForm(prev => ({ ...prev, confirm: e.target.value }))}
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="mt-4 flex justify-end">
-                                                <button type="submit" className="text-sm bg-black text-white px-5 py-2 rounded hover:bg-gray-800 transition-colors">Update Password</button>
+                                            <div className="mt-5 flex justify-end">
+                                                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} type="submit" className="px-5 py-2.5 bg-brand-primary text-bg-main rounded-xl shadow-md font-bold hover:shadow-lg transition-all">Update Password</motion.button>
                                             </div>
                                         </form>
 
-                                        <div className="border-t border-gray-100 pt-6"></div>
+                                        <div className="border-t border-bg-accent/50 pt-6"></div>
 
                                         {/* Sessions */}
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <h4 className="font-semibold text-gray-900">Active Sessions</h4>
-                                                <p className="text-sm text-gray-500">You are currently logged in on this device.</p>
+                                                <h4 className="font-bold text-content-heading text-lg">Active Sessions</h4>
+                                                <p className="text-sm text-content-body mt-1">You are currently logged in on this device.</p>
                                             </div>
-                                            <button onClick={handleLogout} className="border border-gray-300 text-gray-700 px-4 py-2 rounded text-sm font-medium hover:bg-gray-50 transition-colors">
+                                            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleLogout} className="border border-bg-accent text-content-heading px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-bg-soft transition-colors shadow-sm">
                                                 Logout All Devices
-                                            </button>
+                                            </motion.button>
                                         </div>
                                     </div>
-                                </div>
+                                </motion.div>
 
                                 {/* NOTIFICATIONS SECTION */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-                                    <div className="p-4 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
-                                        <Bell size={18} className="text-gray-500" />
-                                        <h3 className="font-bold text-gray-900">Notifications</h3>
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.3, type: "spring" }}
+                                    className="bg-bg-main rounded-2xl shadow-lg border border-bg-accent/50 overflow-hidden"
+                                >
+                                    <div className="p-5 border-b border-bg-accent/50 bg-bg-soft/50 flex items-center gap-3 backdrop-blur-md">
+                                        <Bell size={20} className="text-brand-primary" />
+                                        <h3 className="font-bold text-content-heading text-lg">Notifications</h3>
                                     </div>
                                     <div className="p-6">
-                                        <div className="space-y-4">
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <p className="font-medium text-gray-900">Order Updates</p>
-                                                    <p className="text-sm text-gray-500 max-w-sm">Receive updates about your order status, shipping, and delivery.</p>
-                                                </div>
-                                                <label className="relative inline-flex items-center cursor-pointer">
-                                                    <input type="checkbox" className="sr-only peer" checked={notifications.orderUpdates} onChange={() => handleNotificationToggle('orderUpdates')} />
-                                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
-                                                </label>
-                                            </div>
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <p className="font-medium text-gray-900">Promotions & Offers</p>
-                                                    <p className="text-sm text-gray-500 max-w-sm">Be the first to know about sales, new arrivals, and exclusive offers.</p>
-                                                </div>
-                                                <label className="relative inline-flex items-center cursor-pointer">
-                                                    <input type="checkbox" className="sr-only peer" checked={notifications.promotions} onChange={() => handleNotificationToggle('promotions')} />
-                                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
-                                                </label>
-                                            </div>
-                                            <hr className="border-gray-100 my-4" />
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <p className="font-medium text-gray-900">Email Notifications</p>
-                                                    <p className="text-sm text-gray-500">Receive emails at {user.email}</p>
-                                                </div>
-                                                <label className="relative inline-flex items-center cursor-pointer">
-                                                    <input type="checkbox" className="sr-only peer" checked={notifications.email} onChange={() => handleNotificationToggle('email')} />
-                                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
-                                                </label>
-                                            </div>
+                                        <div className="space-y-6">
+                                            {[
+                                                { key: 'orderUpdates', label: 'Order Updates', desc: 'Receive updates about your order status, shipping, and delivery.' },
+                                                { key: 'promotions', label: 'Promotions & Offers', desc: 'Be the first to know about sales, new arrivals, and exclusive offers.' },
+                                                { key: 'email', label: 'Email Notifications', desc: `Receive emails at ` },
+                                            ].map((item, i) => (
+                                                <motion.div 
+                                                    key={item.key} 
+                                                    initial={{ opacity: 0, x: -10 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: 0.4 + (i * 0.1) }}
+                                                    className="flex items-center justify-between group/item p-2 rounded-xl hover:bg-bg-soft transition-colors"
+                                                >
+                                                    <div>
+                                                        <p className="font-bold text-content-heading">{item.label}</p>
+                                                        <p className="text-sm text-content-body max-w-sm mt-1">
+                                                            {item.desc}
+                                                            {item.key === 'email' && <span className="font-medium text-brand-primary">{user.email}</span>}
+                                                        </p>
+                                                    </div>
+                                                    <label className="relative inline-flex items-center cursor-pointer">
+                                                        <input 
+                                                            type="checkbox" 
+                                                            className="sr-only peer" 
+                                                            checked={(notifications as any)[item.key]} 
+                                                            onChange={() => handleNotificationToggle(item.key as any)} 
+                                                        />
+                                                        <div className="w-12 h-6 bg-bg-soft border-2 border-bg-accent peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-6 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-primary peer-checked:border-brand-primary shadow-inner"></div>
+                                                    </label>
+                                                </motion.div>
+                                            ))}
                                         </div>
                                     </div>
-                                </div>
+                                </motion.div>
 
                                 {/* ACCOUNT STATUS SECTION */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-                                    <div className="p-4 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
-                                        <Shield size={18} className="text-gray-500" />
-                                        <h3 className="font-bold text-gray-900">Account Status</h3>
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.4, type: "spring" }}
+                                    className="bg-bg-main rounded-2xl shadow-lg border border-bg-accent/50 overflow-hidden"
+                                >
+                                    <div className="p-5 border-b border-bg-accent/50 bg-bg-soft/50 flex items-center gap-3 backdrop-blur-md">
+                                        <Shield size={20} className="text-brand-primary" />
+                                        <h3 className="font-bold text-content-heading text-lg">Account Status</h3>
                                     </div>
-                                    <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
                                         <div>
-                                            <p className="text-sm text-gray-500 mb-1">Account Status</p>
-                                            <p className={`font-bold ${user.isActive !== false ? 'text-green-600' : 'text-red-600'}`}>
-                                                {user.isActive !== false ? 'Active' : 'Blocked'}
+                                            <p className="text-[10px] font-bold tracking-widest uppercase text-content-body mb-2 ml-1">Account Status</p>
+                                            <p className={`text-lg font-bold flex items-center gap-2 ${user.isActive !== false ? 'text-emerald-600' : 'text-red-500'}`}>
+                                                <span className={`w-2 h-2 rounded-full ${user.isActive !== false ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`}></span>
+                                                {user.isActive !== false ? 'Active & Secure' : 'Blocked'}
                                             </p>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-gray-500 mb-1">Email Verification</p>
-                                            <div className="flex items-center gap-2">
-                                                <p className={`font-bold ${user.isVerified ? 'text-green-600' : 'text-orange-500'}`}>
-                                                    {user.isVerified ? 'Verified' : 'Unverified'}
+                                            <p className="text-[10px] font-bold tracking-widest uppercase text-content-body mb-2 ml-1">Email Verification</p>
+                                            <div className="flex items-center gap-3">
+                                                <p className={`text-lg font-bold flex items-center gap-2 ${user.isVerified ? 'text-emerald-600' : 'text-orange-500'}`}>
+                                                    <span className={`w-2 h-2 rounded-full ${user.isVerified ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-orange-500'}`}></span>
+                                                    {user.isVerified ? 'Verified Account' : 'Unverified'}
                                                 </p>
                                                 {!user.isVerified && (
-                                                    <button onClick={() => toast.success('Verification email sent!')} className="text-xs bg-black text-white px-2 py-1 rounded">Verify Now</button>
+                                                    <button 
+                                                        onClick={async () => {
+                                                            const result = await updateUser({ isVerified: true });
+                                                            if (result && result.success) {
+                                                                toast.success('Account verified successfully!');
+                                                            } else {
+                                                                toast.error('Failed to verify account');
+                                                            }
+                                                        }} 
+                                                        className="text-[10px] uppercase font-bold tracking-wider bg-brand-primary text-bg-main px-3 py-1.5 rounded-lg shadow-sm hover:shadow-md transition-all object-cover"
+                                                    >
+                                                        Verify Now
+                                                    </button>
                                                 )}
                                             </div>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-gray-500 mb-1">Two-Factor Authentication</p>
-                                            <div className="flex items-center gap-2">
-                                                <p className="font-bold text-gray-400">Disabled</p>
-                                                <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">Coming Soon</span>
+                                            <p className="text-[10px] font-bold tracking-widest uppercase text-content-body mb-2 ml-1">Two-Factor Authentication</p>
+                                            <div className="flex items-center gap-3">
+                                                <p className="text-lg font-bold text-content-body opacity-50 flex items-center gap-2">
+                                                    <Lock size={16} /> Disabled
+                                                </p>
+                                                <span className="text-[10px] font-bold uppercase tracking-wider bg-bg-soft border border-bg-accent px-2 py-1 rounded-md text-brand-primary shadow-sm">Coming Soon</span>
                                             </div>
                                         </div>
                                         <div>
-                                            <p className="text-sm text-gray-500 mb-1">Member Since</p>
-                                            <p className="font-medium text-gray-900">October 2023</p>
+                                            <p className="text-[10px] font-bold tracking-widest uppercase text-content-body mb-2 ml-1">Member Since</p>
+                                            <p className="text-lg font-bold text-content-heading">October 2023</p>
                                         </div>
                                     </div>
-                                </div>
+                                </motion.div>
 
                                 {/* DANGER ZONE */}
-                                <div className="bg-red-50 rounded-lg border border-red-100 p-6">
-                                    <h3 className="text-lg font-bold text-red-800 mb-2">Danger Zone</h3>
-                                    <p className="text-sm text-red-600 mb-6">Once you delete your account, there is no going back. Please be certain.</p>
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.5, type: "spring" }}
+                                    className="bg-red-500/5 rounded-2xl border border-red-500/20 p-8 shadow-inner overflow-hidden relative group"
+                                >
+                                    <div className="absolute inset-0 bg-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-                                    <div className="flex items-center justify-between bg-white p-4 rounded border border-red-100">
-                                        <div>
-                                            <h4 className="font-bold text-red-700">Delete Account</h4>
-                                            <p className="text-xs text-gray-500 mt-1">Permanently remove your account and all data.</p>
+                                    <h3 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2">Danger Zone</h3>
+                                    <p className="text-sm text-red-600/80 dark:text-red-400/80 mb-8 max-w-lg">Once you delete your account, there is no going back. All of your personal data, order history, and saved addresses will be permanently wiped from our servers.</p>
+
+                                    <div className="flex flex-col md:flex-row items-center justify-between bg-bg-main/50 backdrop-blur-md p-6 rounded-xl border border-red-500/10 shadow-sm relative z-10">
+                                        <div className="mb-4 md:mb-0">
+                                            <h4 className="font-bold text-red-600 dark:text-red-400">Delete Account</h4>
+                                            <p className="text-xs text-content-body mt-1">Permanently remove your account and all data.</p>
                                         </div>
-                                        <button onClick={handleDeleteAccount} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors">
+                                        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleDeleteAccount} className="w-full md:w-auto bg-red-600 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-red-600/20 hover:shadow-red-600/40 hover:bg-red-700 transition-all">
                                             Delete My Account
-                                        </button>
+                                        </motion.button>
                                     </div>
-                                </div>
-                            </div>
+                                </motion.div>
+                            </motion.div>
                         )}
 
                     </div>
                 </div>
             </div>
 
-            {/* Address Modal */}
-            {isAddressModalOpen && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 animate-scale-in">
-                        <h3 className="text-xl font-bold font-playfair mb-6">{editingAddress ? 'Edit Address' : 'Add New Address'}</h3>
-                        <form className="space-y-4" onSubmit={handleAddressSubmit}>
-                            <div className="grid grid-cols-2 gap-4">
-                                <input name="name" value={addressForm.name} onChange={handleInputChange} type="text" placeholder="Full Name" className="w-full px-4 py-2 border border-gray-300 rounded" required />
-                                <input name="mobile" value={addressForm.mobile} onChange={handleInputChange} type="text" placeholder="Mobile Number" className="w-full px-4 py-2 border border-gray-300 rounded" required />
+            {/* Ultra-Premium 3D Address Modal */}
+            <AnimatePresence>
+                {isAddressModalOpen && (
+                    <div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
+                        {/* Glassmorphism Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsAddressModalOpen(false)}
+                            className="absolute inset-0 bg-brand-dark/40 backdrop-blur-md"
+                        />
+
+                        {/* 3D Spring Modal Frame */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 30, rotateX: 15 }}
+                            animate={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 30, rotateX: -15 }}
+                            transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                            style={{ transformPerspective: 1200 }}
+                            className="relative w-full max-w-md bg-bg-main shadow-2xl rounded-2xl overflow-hidden border border-bg-accent z-10"
+                        >
+                            {/* Decorative Top Accent */}
+                            <div className="h-2 w-full bg-linear-to-r from-brand-primary via-brand-secondary to-brand-primary"></div>
+
+                            <div className="p-8">
+                                <h3 className="text-2xl font-bold font-playfair mb-6 text-content-heading">{editingAddress ? 'Edit Address' : 'Add New Address'}</h3>
+                                <form className="space-y-5" onSubmit={handleAddressSubmit}>
+                                    <div className="grid grid-cols-2 gap-5">
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] uppercase font-bold tracking-widest text-content-body ml-1">Full Name</label>
+                                            <input name="name" value={addressForm.name} onChange={handleInputChange} type="text" className="w-full px-4 py-3 bg-bg-soft border-transparent border focus:border-brand-primary rounded-xl focus:outline-none transition-colors text-content-heading font-medium" required />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] uppercase font-bold tracking-widest text-content-body ml-1">Mobile</label>
+                                            <input name="mobile" value={addressForm.mobile} onChange={handleInputChange} type="text" className="w-full px-4 py-3 bg-bg-soft border-transparent border focus:border-brand-primary rounded-xl focus:outline-none transition-colors text-content-heading font-medium" required />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] uppercase font-bold tracking-widest text-content-body ml-1">Street Address</label>
+                                        <input name="street" value={addressForm.street} onChange={handleInputChange} type="text" className="w-full px-4 py-3 bg-bg-soft border-transparent border focus:border-brand-primary rounded-xl focus:outline-none transition-colors text-content-heading font-medium" required />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-5">
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] uppercase font-bold tracking-widest text-content-body ml-1">City</label>
+                                            <input name="city" value={addressForm.city} onChange={handleInputChange} type="text" className="w-full px-4 py-3 bg-bg-soft border-transparent border focus:border-brand-primary rounded-xl focus:outline-none transition-colors text-content-heading font-medium" required />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] uppercase font-bold tracking-widest text-content-body ml-1">State</label>
+                                            <input name="state" value={addressForm.state} onChange={handleInputChange} type="text" className="w-full px-4 py-3 bg-bg-soft border-transparent border focus:border-brand-primary rounded-xl focus:outline-none transition-colors text-content-heading font-medium" required />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-5">
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] uppercase font-bold tracking-widest text-content-body ml-1">Pincode</label>
+                                            <input name="zip" value={addressForm.zip} onChange={handleInputChange} type="text" className="w-full px-4 py-3 bg-bg-soft border-transparent border focus:border-brand-primary rounded-xl focus:outline-none transition-colors text-content-heading font-medium" required />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] uppercase font-bold tracking-widest text-content-body ml-1">Address Type</label>
+                                            <select name="type" value={addressForm.type} onChange={handleInputChange} className="w-full px-4 py-3 bg-bg-soft border-transparent border focus:border-brand-primary rounded-xl focus:outline-none transition-colors text-content-heading font-medium appearance-none">
+                                                <option>Home</option>
+                                                <option>Office</option>
+                                                <option>Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-bg-accent/50">
+                                        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} type="button" onClick={() => setIsAddressModalOpen(false)} className="px-5 py-3 rounded-xl font-bold text-content-body hover:bg-bg-soft transition-colors">Cancel</motion.button>
+                                        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} type="submit" className="px-5 py-3 bg-brand-primary text-bg-main rounded-xl shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/40 focus:outline-none font-bold">
+                                            {editingAddress ? 'Update Details' : 'Save Address'}
+                                        </motion.button>
+                                    </div>
+                                </form>
                             </div>
-                            <input name="street" value={addressForm.street} onChange={handleInputChange} type="text" placeholder="House No, Street" className="w-full px-4 py-2 border border-gray-300 rounded" required />
-                            <div className="grid grid-cols-2 gap-4">
-                                <input name="city" value={addressForm.city} onChange={handleInputChange} type="text" placeholder="City" className="w-full px-4 py-2 border border-gray-300 rounded" required />
-                                <input name="state" value={addressForm.state} onChange={handleInputChange} type="text" placeholder="State" className="w-full px-4 py-2 border border-gray-300 rounded" required />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <input name="zip" value={addressForm.zip} onChange={handleInputChange} type="text" placeholder="Pincode" className="w-full px-4 py-2 border border-gray-300 rounded" required />
-                                <select name="type" value={addressForm.type} onChange={handleInputChange} className="w-full px-4 py-2 border border-gray-300 rounded">
-                                    <option>Home</option>
-                                    <option>Office</option>
-                                    <option>Other</option>
-                                </select>
-                            </div>
-                            <div className="flex justify-end gap-3 mt-6">
-                                <button type="button" onClick={() => setIsAddressModalOpen(false)} className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50">Cancel</button>
-                                <button type="submit" className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800">
-                                    {editingAddress ? 'Update Address' : 'Save Address'}
-                                </button>
-                            </div>
-                        </form>
+                        </motion.div>
                     </div>
-                </div>
-            )}
+                )}
+            </AnimatePresence>
 
             <Footer />
         </main>

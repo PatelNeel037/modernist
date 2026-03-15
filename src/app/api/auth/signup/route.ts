@@ -1,11 +1,9 @@
-import { NextResponse } from 'next/server';
+import { validateEmail } from '@/lib/validation';
+import { sendVerificationEmail } from '@/lib/email';
 import { connectDB } from '@/lib/db';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { sendWelcomeEmail } from '@/lib/email';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_for_development_only';
+import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
     try {
@@ -13,7 +11,12 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { name, email, password } = body;
 
-        if (!email || !password || !name) {
+        const emailValidation = validateEmail(email);
+        if (!emailValidation.isValid) {
+            return NextResponse.json({ success: false, message: emailValidation.message }, { status: 400 });
+        }
+
+        if (!password || !name) {
             return NextResponse.json({ success: false, message: 'All fields are required' }, { status: 400 });
         }
 
@@ -24,36 +27,34 @@ export async function POST(request: Request) {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // Generate 6-digit OTP
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const verificationCodeExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
         const newUser = await User.create({
             name,
             email,
             password: hashedPassword,
             role: 'user',
+            isVerified: false,
+            verificationCode,
+            verificationCodeExpires
         });
-
-        const token = jwt.sign({ id: newUser._id, role: newUser.role, email: newUser.email, name: newUser.name }, JWT_SECRET, { expiresIn: '7d' });
 
         const { password: _, ...safeUser } = newUser.toObject();
         safeUser.id = safeUser._id.toString();
 
-        // Send Welcome Email asynchronously
-        sendWelcomeEmail(safeUser.email, safeUser.name).catch(console.error);
+        // Send Verification Email
+        console.log("SIGNUP DEBUG: About to call sendVerificationEmail for", safeUser.email);
+        await sendVerificationEmail(safeUser.email, safeUser.name, verificationCode);
+        console.log("SIGNUP DEBUG: sendVerificationEmail call finished");
 
-        const response = NextResponse.json({
+        return NextResponse.json({
             success: true,
-            token,
             user: safeUser,
-            message: 'Account created successfully!'
+            requireVerification: true,
+            message: 'Verification code sent to your email.'
         });
-
-        response.cookies.set("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-            path: "/",
-        });
-
-        return response;
 
     } catch (error) {
         console.error("Signup error:", error);

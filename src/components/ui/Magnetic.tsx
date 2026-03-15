@@ -6,11 +6,17 @@ import { motion } from 'framer-motion';
 export default function Magnetic({ children }: { children: React.ReactElement }) {
     const ref = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState({ x: 0, y: 0 });
+    const boundsRef = useRef({ height: 0, width: 0, left: 0, top: 0 });
+
+    const handleMouseEnter = () => {
+        if (ref.current) {
+            boundsRef.current = ref.current.getBoundingClientRect();
+        }
+    };
 
     const handleMouse = (e: React.MouseEvent<HTMLDivElement>) => {
         const { clientX, clientY } = e;
-        if (!ref.current) return;
-        const { height, width, left, top } = ref.current.getBoundingClientRect();
+        const { height, width, left, top } = boundsRef.current;
         const middleX = clientX - (left + width / 2);
         const middleY = clientY - (top + height / 2);
         setPosition({ x: middleX * 0.2, y: middleY * 0.2 });
@@ -25,6 +31,7 @@ export default function Magnetic({ children }: { children: React.ReactElement })
         <motion.div
             style={{ position: 'relative' }}
             ref={ref}
+            onMouseEnter={handleMouseEnter}
             onMouseMove={handleMouse}
             onMouseLeave={reset}
             animate={{ x, y }}

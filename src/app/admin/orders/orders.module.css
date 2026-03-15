@@ -5,16 +5,20 @@
 
 .headerTitle {
     margin-bottom: 2rem;
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: #2c3e50;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 0.5px;
 }
 
 .filtersContainer {
-    background: white;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
     padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     margin-bottom: 2rem;
     display: flex;
     gap: 1rem;
@@ -32,13 +36,15 @@
 
 .filterGroup label {
     font-size: 0.85rem;
-    color: #7f8c8d;
+    color: #8b949e;
     font-weight: 500;
 }
 
 .filterInput {
     padding: 10px 12px;
-    border: 1px solid #ddd;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #c9d1d9;
     border-radius: 6px;
     width: 100%;
     outline: none;
@@ -46,35 +52,38 @@
 }
 
 .filterInput:focus {
-    border-color: #3498db;
+    border-color: #58a6ff;
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .btnFilter {
-    background-color: #3498db;
-    color: white;
-    border: none;
+    background-color: rgba(46, 160, 67, 0.1);
+    color: #3fb950;
+    border: 1px solid rgba(46, 160, 67, 0.3);
     padding: 10px 20px;
     border-radius: 6px;
     cursor: pointer;
     font-weight: 500;
-    transition: background 0.2s;
+    transition: all 0.2s;
     display: flex;
     align-items: center;
     gap: 8px;
     height: 42px;
-    /* Accessibly align with input height */
 }
 
 .btnFilter:hover {
-    background-color: #2980b9;
+    background-color: rgba(46, 160, 67, 0.2);
+    color: #56d364;
 }
 
 /* Table */
 .tableCard {
-    background: white;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
     padding: 0;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     overflow: hidden;
 }
 
@@ -91,24 +100,29 @@
 .adminTable td {
     text-align: left;
     padding: 1rem;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .adminTable td {
-    color: #2c3e50;
+    color: #e2e8f0;
     font-weight: 500;
 }
 
 .adminTable th {
-    background-color: #f8f9fa;
+    background-color: rgba(255, 255, 255, 0.01);
     font-weight: 600;
-    color: #7f8c8d;
+    color: #8b949e;
     font-size: 0.85rem;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.adminTable tbody tr {
+    transition: background-color 0.2s;
 }
 
 .adminTable tbody tr:hover {
-    background-color: #fbfbfb;
+    background-color: rgba(255, 255, 255, 0.03);
 }
 
 /* Status Badges */
@@ -116,49 +130,61 @@
     padding: 4px 12px;
     border-radius: 20px;
     font-size: 0.8rem;
-    font-weight: 500;
+    font-weight: 600;
     text-transform: capitalize;
     display: inline-block;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 .statusPending {
-    background-color: #fff3cd;
-    color: #856404;
+    background-color: rgba(251, 146, 60, 0.15);
+    color: #fb923c;
+    border: 1px solid rgba(251, 146, 60, 0.3);
+    box-shadow: 0 0 12px rgba(251, 146, 60, 0.2);
 }
 
 .statusProcessing {
-    background-color: #cce5ff;
-    color: #004085;
+    background-color: rgba(56, 189, 248, 0.15);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
 }
 
 .statusShipped {
-    background-color: #d1ecf1;
-    color: #0c5460;
+    background-color: rgba(52, 211, 153, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    box-shadow: 0 0 12px rgba(52, 211, 153, 0.2);
 }
 
 .statusDelivered {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: rgba(45, 212, 191, 0.15);
+    color: #2dd4bf;
+    border: 1px solid rgba(45, 212, 191, 0.3);
+    box-shadow: 0 0 12px rgba(45, 212, 191, 0.2);
 }
 
 .statusCancelled {
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    box-shadow: 0 0 12px rgba(248, 113, 113, 0.2);
 }
 
 .btnView {
     padding: 6px 12px;
-    background: white;
-    border: 1px solid #ddd;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #c9d1d9;
     border-radius: 4px;
     cursor: pointer;
-    color: #2c3e50;
     font-size: 0.85rem;
     transition: all 0.2s;
 }
 
 .btnView:hover {
-    background: #3498db;
-    color: white;
-    border-color: #3498db;
+    background: rgba(56, 189, 248, 0.15);
+    color: #58a6ff;
+    border-color: rgba(56, 189, 248, 0.3);
 }

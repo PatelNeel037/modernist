@@ -20,6 +20,16 @@ export default function CategorySection() {
             title: 'Kids',
             img: 'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?q=80&w=1972&auto=format&fit=crop',
             href: '/shop/kids'
+        },
+        {
+            title: 'Home Textile',
+            img: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=2000&auto=format&fit=crop',
+            href: '/shop/home-textile'
+        },
+        {
+            title: 'Wholesale / B2B',
+            img: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=2000&auto=format&fit=crop',
+            href: '/shop/wholesale-b2b'
         }
     ];
 

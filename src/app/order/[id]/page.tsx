@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle, Package, Truck, Home, XCircle, Clock } from 'lucide-react';
+import { formatINR, formatPrice } from '@/lib/currency';
 
 // Order Data
 const mockOrder = {
@@ -157,7 +158,7 @@ export default function OrderDetailsPage() {
                                                     <h3 className="font-medium text-gray-900">{item.name}</h3>
                                                     <p className="text-sm text-gray-500 mt-1">Size: {item.size} | Qty: {item.quantity}</p>
                                                 </div>
-                                                <span className="font-medium">${item.price.toFixed(2)}</span>
+                                                <span className="font-medium">{formatPrice(item.price)}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -174,20 +175,20 @@ export default function OrderDetailsPage() {
                             <div className="space-y-3 border-b border-gray-100 pb-6 mb-6 text-sm">
                                 <div className="flex justify-between text-gray-600">
                                     <span>Subtotal</span>
-                                    <span>${order.subtotal.toFixed(2)}</span>
+                                    <span>{formatINR(order.subtotal)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-600">
                                     <span>Shipping</span>
-                                    {order.shipping === 0 ? <span className="text-green-600">Free</span> : <span>${order.shipping.toFixed(2)}</span>}
+                                    {order.shipping === 0 ? <span className="text-green-600">Free</span> : <span>{formatINR(order.shipping)}</span>}
                                 </div>
                                 <div className="flex justify-between text-gray-600">
                                     <span>Estimated Tax</span>
-                                    <span>${order.tax.toFixed(2)}</span>
+                                    <span>{formatINR(order.tax)}</span>
                                 </div>
                             </div>
                             <div className="flex justify-between font-bold text-lg text-gray-900">
                                 <span>Total</span>
-                                <span>${order.total.toFixed(2)}</span>
+                                <span>{formatINR(order.total)}</span>
                             </div>
                         </div>
 

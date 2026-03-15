@@ -1,18 +1,21 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Hero3D from './Hero3D';
 import Magnetic from './ui/Magnetic';
 
 export default function Hero() {
     return (
         <section className="relative h-screen flex items-center justify-center bg-gray-900 overflow-hidden">
-            {/* Background Image / Placeholder */}
-            <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
-
+            {/* Background Image */}
             <div className="absolute inset-0 z-0">
-                <Hero3D />
+                <img 
+                    src="https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2000&auto=format&fit=crop" 
+                    alt="Modernist Fashion Hero Background" 
+                    className="w-full h-full object-cover opacity-80"
+                />
             </div>
+
+            <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
 
             {/* Content */}
             <div className="relative z-20 text-center text-white px-4 max-w-4xl mx-auto pointer-events-none">

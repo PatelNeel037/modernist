@@ -12,6 +12,7 @@ import ProductCard from '@/components/ProductCard';
 import { useToast } from '@/context/ToastContext';
 import { Star, Truck, RefreshCw, ShieldCheck, Heart, ShoppingBag, Zap, X } from 'lucide-react';
 import { DB } from '@/services/db';
+import { formatPrice } from '@/lib/currency';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { createPortal } from 'react-dom';
 
@@ -348,7 +349,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         </div>
 
                         <h1 className="text-4xl font-playfair font-bold text-gray-900 mb-4">{product.name}</h1>
-                        <p className="text-2xl font-medium text-gray-900 mb-6">${typeof product.price === 'number' ? product.price.toFixed(2) : product.price}</p>
+                        <p className="text-2xl font-medium text-gray-900 mb-6">{formatPrice(product.price)}</p>
 
                         <p className="text-gray-600 leading-relaxed mb-8">
                             {product.description}
@@ -435,7 +436,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                 <Truck className="text-gray-400 w-5 h-5 mt-1" />
                                 <div className="text-sm">
                                     <h5 className="font-medium text-gray-900">Free Shipping & Returns</h5>
-                                    <p className="text-gray-500 mt-1">Free standard shipping on orders over $100.</p>
+                                    <p className="text-gray-500 mt-1">Free standard shipping on orders over {formatPrice(100)}.</p>
                                 </div>
                             </div>
                             <div className="flex items-start gap-3">
@@ -593,7 +594,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                         ...prod,
                                         image: prod.images?.[0] || prod.image,
                                         images: prod.images,
-                                        price: typeof prod.price === 'number' ? prod.price.toFixed(2) : prod.price
+                                        price: prod.price
                                     }}
                                 />
                             ))}
@@ -615,7 +616,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                         ...prod,
                                         image: prod.images?.[0] || prod.image,
                                         images: prod.images,
-                                        price: typeof prod.price === 'number' ? prod.price.toFixed(2) : prod.price
+                                        price: prod.price
                                     }}
                                 />
                             ))}

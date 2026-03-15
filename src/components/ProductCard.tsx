@@ -7,11 +7,12 @@ import { Heart, Plus } from 'lucide-react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { formatPrice } from '@/lib/currency';
 
 interface ProductProps {
     id: number;
     name: string;
-    price: string;
+    price: string | number;
     image: string;
     sale?: boolean;
     hoverImage?: string;
@@ -45,8 +46,6 @@ export default function ProductCard({ product }: { product: ProductProps }) {
         y.set(0.5);
     };
 
-    // ... (toggleWishlist logic remains same)
-
     const toggleWishlist = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -56,7 +55,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
             addToWishlist({
                 id: product.id,
                 name: product.name,
-                price: parseFloat(product.price), // ensure float
+                price: typeof product.price === 'string' ? parseFloat(product.price) : product.price, // ensure float
                 image: product.image,
                 images: product.images
             });
@@ -77,7 +76,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
         addToCart({
             id: product.id,
             name: product.name,
-            price: parseFloat(product.price),
+            price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
             image: product.image,
             quantity: 1,
             size: 'M' // Default size for quick add
@@ -177,7 +176,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                 <Link href={`/product/${product.id}`}>
                     <h3 className="font-medium text-content-heading text-lg mb-1 hover:text-brand-primary transition-colors">{product.name}</h3>
                 </Link>
-                <p className="text-brand-primary font-medium">${product.price}</p>
+                <p className="text-brand-primary font-medium">{formatPrice(product.price)}</p>
             </div>
 
             {/* Fly to Cart Animation Overlay */}

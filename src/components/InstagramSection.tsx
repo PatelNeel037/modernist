@@ -2,40 +2,70 @@
 
 import { Instagram } from 'lucide-react';
 import ScrollReveal from './ui/ScrollReveal';
+import { useState, useEffect } from 'react';
+import { DB } from '@/services/db';
 
 export default function InstagramSection() {
-    const images = [
-        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1000&auto=format&fit=crop', // Fashion model
-        'https://images.unsplash.com/photo-1529139574466-a302c2751994?q=80&w=1000&auto=format&fit=crop', // Aesthetic detail
-        'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1000&auto=format&fit=crop', // Shopping / Street
-        'https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=1000&auto=format&fit=crop', // Minimalist outfit
+    const [images, setImages] = useState<any[]>([]);
+    
+    const defaultImages = [
+        { imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1000&auto=format&fit=crop', link: '#' },
+        { imageUrl: 'https://images.unsplash.com/photo-1529139574466-a302c2751994?q=80&w=1000&auto=format&fit=crop', link: '#' },
+        { imageUrl: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1000&auto=format&fit=crop', link: '#' },
+        { imageUrl: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=1000&auto=format&fit=crop', link: '#' },
     ];
 
+    useEffect(() => {
+        const loadPosts = async () => {
+            const data = await DB.fetchInstagramPosts();
+            if (data && data.length > 0) {
+                setImages(data);
+            } else {
+                setImages(defaultImages);
+            }
+        };
+        loadPosts();
+    }, []);
+
     return (
-        <section className="py-20 bg-bg-main">
+        <section className="py-20 bg-bg-main relative">
             <div className="container mx-auto px-6">
                 <ScrollReveal direction="up" className="flex flex-col items-center mb-12">
-                    <Instagram className="w-8 h-8 text-brand-primary mb-4" />
-                    <h2 className="text-2xl md:text-3xl font-playfair font-bold text-content-heading text-center">
-                        Follow us on Instagram
+                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-6 shadow-xl border border-bg-accent/20 transition-transform hover:rotate-12 duration-500">
+                        <Instagram className="w-8 h-8 text-brand-primary" />
+                    </div>
+                    <h2 className="text-3xl md:text-5xl font-playfair font-bold text-content-heading text-center tracking-tight mb-4">
+                        Follow our Journey
                     </h2>
-                    <a href="#" className="text-brand-primary font-medium mt-2 hover:underline">@modernist.official</a>
+                    <a href="https://instagram.com/modernist.official" target="_blank" rel="noopener noreferrer" className="text-brand-primary font-bold text-lg tracking-widest uppercase flex items-center gap-2 hover:opacity-70 transition-all group">
+                        @modernist.official
+                        <div className="h-px bg-brand-primary w-0 group-hover:w-8 transition-all duration-500" />
+                    </a>
                 </ScrollReveal>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {images.map((img, idx) => (
-                        <ScrollReveal direction="up" delay={0.1 * idx} key={idx} className="group relative aspect-square overflow-hidden rounded-lg cursor-pointer">
-                            <img
-                                src={img}
-                                alt={`Instagram post ${idx + 1}`}
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                <Instagram className="w-8 h-8 text-white" />
-                            </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+                    {images.map((post, idx) => (
+                        <ScrollReveal direction="up" delay={0.1 * idx} key={post._id || idx} className="group relative aspect-square overflow-hidden rounded-4xl cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                            <a href={post.link || '#'} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                                <img
+                                    src={post.imageUrl}
+                                    alt={`Instagram post ${idx + 1}`}
+                                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-brand-dark/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                                    <div className="bg-white/90 p-4 rounded-full scale-50 group-hover:scale-100 transition-transform duration-500 shadow-2xl">
+                                        <Instagram className="w-6 h-6 text-brand-dark" />
+                                    </div>
+                                </div>
+                            </a>
                         </ScrollReveal>
                     ))}
                 </div>
+            </div>
+            
+            {/* Background Decorative Text */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 text-[20vw] font-playfair font-black text-bg-accent/5 pointer-events-none select-none">
+                MODERNIST
             </div>
         </section>
     );

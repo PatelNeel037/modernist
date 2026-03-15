@@ -9,7 +9,11 @@ import {
     Shirt,
     Users,
     LogOut,
-    Menu
+    Menu,
+    Star,
+    MessageSquare,
+    Instagram,
+    Mail
 } from 'lucide-react';
 import { DB } from '@/services/db'; // Direct DB access for Admin
 
@@ -68,6 +72,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { label: 'Orders', href: '/admin/orders', icon: Package },
         { label: 'Products', href: '/admin/products', icon: Shirt },
         { label: 'Customers', href: '/admin/customers', icon: Users },
+        { label: 'Reviews', href: '/admin/reviews', icon: Star },
+        { label: 'Testimonials', href: '/admin/testimonials', icon: MessageSquare },
+        { label: 'Instagram', href: '/admin/instagram', icon: Instagram },
+        { label: 'Subscribers', href: '/admin/subscribers', icon: Mail },
     ];
 
     return (

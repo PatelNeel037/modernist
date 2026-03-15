@@ -1,19 +1,23 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { Filter, ChevronDown } from 'lucide-react';
 import { DB } from '@/services/db';
-
-const subCategories = ['All', 'Boy', 'Girl', 'T-Shirt', 'Jeans', 'Outerwear', 'Shoes', 'Pants'];
+import { formatPrice } from '@/lib/currency';
 
 export default function KidsPage() {
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+
+    const subCategories = useMemo(() => {
+        const types = new Set(products.map(p => p.type).filter(type => typeof type === 'string' && type.trim() !== ''));
+        return ['All', ...Array.from(types)];
+    }, [products]);
 
     useEffect(() => {
         const load = async () => {
@@ -52,13 +56,13 @@ export default function KidsPage() {
                             <h3 className="text-lg font-semibold border-b border-gray-200 pb-2 mb-4">Price</h3>
                             <div className="space-y-2">
                                 <label className="flex items-center gap-2 cursor-pointer text-gray-600 hover:text-gray-900">
-                                    <input type="checkbox" className="rounded border-gray-300 text-black focus:ring-black" /> Under $50
+                                    <input type="checkbox" className="rounded border-gray-300 text-black focus:ring-black" /> Under {formatPrice(50)}
                                 </label>
                                 <label className="flex items-center gap-2 cursor-pointer text-gray-600 hover:text-gray-900">
-                                    <input type="checkbox" className="rounded border-gray-300 text-black focus:ring-black" /> $50 - $100
+                                    <input type="checkbox" className="rounded border-gray-300 text-black focus:ring-black" /> {formatPrice(50)} - {formatPrice(100)}
                                 </label>
                                 <label className="flex items-center gap-2 cursor-pointer text-gray-600 hover:text-gray-900">
-                                    <input type="checkbox" className="rounded border-gray-300 text-black focus:ring-black" /> $100+
+                                    <input type="checkbox" className="rounded border-gray-300 text-black focus:ring-black" /> {formatPrice(100)}+
                                 </label>
                             </div>
                         </div>
@@ -126,9 +130,9 @@ export default function KidsPage() {
                                     <div>
                                         <h4 className="font-semibold mb-2">Price</h4>
                                         <div className="space-y-2 text-sm">
-                                            <label className="block"><input type="checkbox" /> Under $50</label>
-                                            <label className="block"><input type="checkbox" /> $50 - $100</label>
-                                            <label className="block"><input type="checkbox" /> $100+</label>
+                                            <label className="block"><input type="checkbox" /> Under {formatPrice(50)}</label>
+                                            <label className="block"><input type="checkbox" /> {formatPrice(50)} - {formatPrice(100)}</label>
+                                            <label className="block"><input type="checkbox" /> {formatPrice(100)}+</label>
                                         </div>
                                     </div>
                                     <div>
@@ -153,7 +157,7 @@ export default function KidsPage() {
                                         ...product,
                                         image: product.images?.[0] || product.image,
                                         images: product.images,
-                                        price: typeof product.price === 'number' ? product.price.toFixed(2) : product.price
+                                        price: product.price
                                     }} />
                                 ))}
                             </div>

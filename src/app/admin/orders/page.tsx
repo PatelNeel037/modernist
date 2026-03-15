@@ -4,6 +4,7 @@ import Link from 'next/link';
 import styles from './orders.module.css';
 import { RefreshCw, Search, Eye } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { formatINR } from '@/lib/currency';
 
 interface Order {
     id: string; // The full "ORD-..." ID
@@ -31,7 +32,12 @@ export default function AdminOrdersPage() {
     async function loadOrders() {
         setLoading(true);
         try {
-            const response = await fetch('/api/orders/all');
+            const token = localStorage.getItem('modernist_admin_token');
+            const response = await fetch('/api/orders/all', {
+                headers: {
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                }
+            });
             if (response.ok) {
                 const data = await response.json();
                 setAllOrders(data);
@@ -99,11 +105,12 @@ export default function AdminOrdersPage() {
                         onChange={(e) => setStatusFilter(e.target.value)}
                     >
                         <option value="">All Statuses</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Processing">Processing</option>
-                        <option value="Shipped">Shipped</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Cancelled">Cancelled</option>
+                        <option className="bg-[#161b22] text-white" value="">All Statuses</option>
+                        <option className="bg-[#161b22] text-white" value="Pending">Pending</option>
+                        <option className="bg-[#161b22] text-white" value="Processing">Processing</option>
+                        <option className="bg-[#161b22] text-white" value="Shipped">Shipped</option>
+                        <option className="bg-[#161b22] text-white" value="Delivered">Delivered</option>
+                        <option className="bg-[#161b22] text-white" value="Cancelled">Cancelled</option>
                     </select>
                 </div>
 
@@ -161,13 +168,13 @@ export default function AdminOrdersPage() {
                             ) : filteredOrders.length > 0 ? (
                                 filteredOrders.map(order => (
                                     <tr key={order.id}>
-                                        <td className="font-mono text-gray-600">
+                                        <td className="font-mono text-slate-400 font-medium">
                                             #{order.id.length > 10 ? order.id.substring(4, 10) + '...' : order.id}
                                         </td>
-                                        <td>
+                                        <td className="text-slate-200">
                                             {order.shippingAddress?.name || order.guestInfo?.name || 'Guest'}
                                         </td>
-                                        <td>
+                                        <td className="text-slate-300">
                                             {new Date(order.createdAt).toLocaleDateString()}
                                         </td>
                                         <td>
@@ -175,7 +182,7 @@ export default function AdminOrdersPage() {
                                                 {order.status}
                                             </span>
                                         </td>
-                                        <td>${Number(order.totalAmount).toFixed(2)}</td>
+                                        <td className="text-slate-100 font-medium">{formatINR(order.totalAmount)}</td>
                                         <td>
                                             <Link
                                                 href={`/admin/orders/${order.id}`}
@@ -195,7 +202,7 @@ export default function AdminOrdersPage() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={6} className="text-center py-8 text-gray-400">
+                                    <td colSpan={6} className="text-center py-8 text-slate-500 uppercase tracking-widest text-sm font-semibold">
                                         No orders found matching criteria.
                                     </td>
                                 </tr>

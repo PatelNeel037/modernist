@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Order from '@/models/Order';
 import User from '@/models/User';
-import { verifyAuth } from '@/lib/auth';
-import { sendOrderConfirmationEmail } from '@/lib/email';
 
 export async function POST(request: Request) {
     try {
@@ -11,18 +9,11 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { userId, items, totalAmount, shippingAddress, guestInfo } = body;
 
-        let customerEmail = guestInfo?.email;
-        let customerName = guestInfo?.name || shippingAddress?.name || 'Customer';
-
-        // We will verify block status if the user is in the database.
+        // Verify block status if authenticated
         if (userId && userId !== 'GUEST') {
             const user = await User.findById(userId);
-            if (user) {
-                if (user.isBlocked) {
-                    return NextResponse.json({ success: false, message: 'Account is blocked' }, { status: 403 });
-                }
-                customerEmail = user.email;
-                customerName = user.name;
+            if (user && user.isBlocked) {
+                return NextResponse.json({ success: false, message: 'Account is blocked' }, { status: 403 });
             }
         }
 
@@ -31,33 +22,31 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, message: 'Cart is empty' }, { status: 400 });
         }
 
+        // Create Order with initial 'Pending' status
         const newOrder = await Order.create({
             userId: userId || 'GUEST',
-            userEmail: userId ? null : guestInfo?.email, // If guest, store email
+            userEmail: userId ? null : guestInfo?.email,
             guestInfo,
             items,
             totalAmount,
             shippingAddress,
             status: 'Pending',
+            paymentStatus: 'Pending'
         });
 
-        // Convert _id to string ID so UI works gracefully
-        const safeOrder = newOrder.toObject();
-        safeOrder.id = safeOrder._id.toString();
+        const orderId = newOrder._id.toString();
 
-        // Dispatch Confirmation Email Async
-        if (customerEmail) {
-            sendOrderConfirmationEmail(customerEmail, customerName, safeOrder.id, items, totalAmount).catch(console.error);
-        }
-
-        return NextResponse.json({ success: true, orderId: safeOrder.id, message: 'Order placed successfully!' });
+        return NextResponse.json({ 
+            success: true, 
+            orderId, 
+            message: 'Order recorded. Proceeding to payment.' 
+        });
 
     } catch (error) {
         console.error("Order API Error:", error);
         return NextResponse.json({
             success: false,
             message: 'Failed to process order',
-            error: String(error)
         }, { status: 500 });
     }
 }

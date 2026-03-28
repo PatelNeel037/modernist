@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { DB } from '@/services/db';
 
 function TestimonialCard({ test, idx }: { test: any, idx: number }) {
-// ... existing TestimonialCard code ...
+    // ... existing TestimonialCard code ...
     const x = useMotionValue(0.5);
     const y = useMotionValue(0.5);
 
@@ -59,11 +59,11 @@ function TestimonialCard({ test, idx }: { test: any, idx: number }) {
                         </motion.div>
                     ))}
                 </div>
-                
+
                 <p className="text-content-body italic text-lg leading-relaxed mb-8 flex-1 relative z-10" style={{ transform: "translateZ(20px)" }}>
                     "{test.text}"
                 </p>
-                
+
                 <div className="flex items-center justify-center gap-3 relative z-10" style={{ transform: "translateZ(40px)" }}>
                     <div className="h-px bg-brand-primary/20 w-4" />
                     <h4 className="font-bold text-content-heading tracking-tight">
@@ -85,7 +85,7 @@ export default function TestimonialSection() {
         { name: 'James D.', text: 'Absolutely love the linen shirts. Perfect for summer!' },
         { name: 'Emily R.', text: 'Customer service was amazing when I needed an exchange.' },
     ];
-    
+
     const [testimonials, setTestimonials] = useState<any[]>(defaultTestimonials);
 
     useEffect(() => {
@@ -103,27 +103,28 @@ export default function TestimonialSection() {
             <div className="container mx-auto px-6 text-center">
                 <ScrollReveal direction="up">
                     <div className="flex items-center justify-center gap-8 mb-16">
-                        <motion.div 
+                        <motion.div
                             initial={{ width: 0 }}
                             whileInView={{ width: 80 }}
                             transition={{ duration: 1, ease: "circOut" }}
-                            className="h-px bg-bg-accent" 
+                            className="h-px bg-bg-accent"
                         />
                         <h2 className="text-4xl font-playfair font-bold text-content-heading tracking-tight">
                             Happy Customers
                         </h2>
-                        <motion.div 
+                        <motion.div
                             initial={{ width: 0 }}
                             whileInView={{ width: 80 }}
                             transition={{ duration: 1, ease: "circOut" }}
-                            className="h-px bg-bg-accent" 
+                            className="h-px bg-bg-accent"
                         />
                     </div>
                 </ScrollReveal>
 
                 <div className="relative mt-20 overflow-hidden py-10">
                     {/* Style tag for custom marquee animation */}
-                    <style dangerouslySetInnerHTML={{ __html: `
+                    <style dangerouslySetInnerHTML={{
+                        __html: `
                         @keyframes marquee {
                             0% { transform: translateX(0); }
                             100% { transform: translateX(calc(-50% - 20px)); }
@@ -135,9 +136,9 @@ export default function TestimonialSection() {
 
                     {testimonials.length > 1 ? (
                         <div className="marquee-container overflow-hidden">
-                            <div 
+                            <div
                                 className="marquee-content flex gap-10 w-max"
-                                style={{ 
+                                style={{
                                     animation: `marquee ${testimonials.length * 8}s linear infinite`
                                 }}
                             >

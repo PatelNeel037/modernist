@@ -15,7 +15,7 @@ export default function NewsletterSection() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         // Frontend Validation
         const emailValidation = validateEmail(email);
         if (!emailValidation.isValid) {
@@ -49,7 +49,7 @@ export default function NewsletterSection() {
             <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.05] pointer-events-none"></div>
             <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-brand-dark/10 to-transparent" />
             <div className="absolute bottom-0 left-0 w-full h-px bg-linear-to-r from-transparent via-brand-dark/10 to-transparent" />
-            
+
             <div className="container mx-auto px-6 text-center relative z-10 max-w-2xl">
                 <ScrollReveal direction="up" className="inline-block p-1 px-3 bg-brand-dark/5 rounded-full border border-brand-dark/10 mb-6">
                     <span className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-dark/60">Exclusive Access</span>
@@ -57,20 +57,20 @@ export default function NewsletterSection() {
 
                 <ScrollReveal direction="up" delay={0.1}>
                     <div className="flex items-center justify-center gap-4 md:gap-8 mb-10">
-                        <motion.div 
+                        <motion.div
                             initial={{ width: 0, opacity: 0 }}
                             whileInView={{ width: "100%", opacity: 1 }}
                             transition={{ duration: 1.5, ease: "circOut" }}
-                            className="h-px bg-brand-dark/20 flex-1" 
+                            className="h-px bg-brand-dark/20 flex-1"
                         />
                         <h2 className="text-4xl md:text-6xl font-playfair font-bold text-brand-dark tracking-tight leading-tight whitespace-nowrap">
                             Newsletter
                         </h2>
-                        <motion.div 
+                        <motion.div
                             initial={{ width: 0, opacity: 0 }}
                             whileInView={{ width: "100%", opacity: 1 }}
                             transition={{ duration: 1.5, ease: "circOut" }}
-                            className="h-px bg-brand-dark/20 flex-1" 
+                            className="h-px bg-brand-dark/20 flex-1"
                         />
                     </div>
                 </ScrollReveal>
@@ -84,7 +84,7 @@ export default function NewsletterSection() {
                 <ScrollReveal direction="up" delay={0.3}>
                     <AnimatePresence mode="wait">
                         {status === 'success' ? (
-                            <motion.div 
+                            <motion.div
                                 initial={{ opacity: 0, scale: 0.9, y: 10 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.9, y: -10 }}
@@ -95,28 +95,28 @@ export default function NewsletterSection() {
                                 <p className="text-emerald-700/70 font-medium">Check your inbox for your exclusive code.</p>
                             </motion.div>
                         ) : (
-                            <motion.form 
+                            <motion.form
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
-                                onSubmit={handleSubmit} 
+                                onSubmit={handleSubmit}
                                 className="relative flex flex-col md:flex-row gap-4 max-w-xl mx-auto items-center"
                             >
                                 <div className="relative w-full group">
                                     <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-dark/30 group-focus-within:text-brand-dark transition-colors" />
-                                    <input 
-                                        type="email" 
-                                        placeholder="Your email address" 
+                                    <input
+                                        type="email"
+                                        placeholder="Your email address"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full pl-16 pr-8 py-5 rounded-full bg-white/60 backdrop-blur-md border border-brand-dark/10 text-brand-dark placeholder-brand-dark/40 focus:outline-none focus:bg-white/90 focus:border-brand-dark focus:shadow-2xl transition-all duration-500 font-bold" 
-                                        required 
+                                        className="w-full pl-16 pr-8 py-5 rounded-full bg-white/60 backdrop-blur-md border border-brand-dark/10 text-brand-dark placeholder-brand-dark/40 focus:outline-none focus:bg-white/90 focus:border-brand-dark focus:shadow-2xl transition-all duration-500 font-bold"
+                                        required
                                         disabled={status === 'loading'}
                                         suppressHydrationWarning
                                     />
                                 </div>
-                                <button 
-                                    type="submit" 
+                                <button
+                                    type="submit"
                                     disabled={status === 'loading'}
                                     className="w-full md:w-auto bg-brand-dark text-white pl-8 pr-12 py-5 rounded-full font-black hover:bg-brand-primary transition-all duration-500 uppercase tracking-[0.2em] text-xs shadow-xl hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 group flex items-center justify-center relative overflow-hidden"
                                     suppressHydrationWarning
@@ -135,23 +135,23 @@ export default function NewsletterSection() {
                     </AnimatePresence>
                 </ScrollReveal>
             </div>
-            
+
             {/* Background floating decor */}
-            <motion.div 
-                animate={{ 
+            <motion.div
+                animate={{
                     y: [0, -20, 0],
                     rotate: [0, 4, 0]
                 }}
                 transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute top-20 right-[15%] w-32 h-32 border border-brand-dark/5 rounded-full -z-10" 
+                className="absolute top-20 right-[15%] w-32 h-32 border border-brand-dark/5 rounded-full -z-10"
             />
-            <motion.div 
-                animate={{ 
+            <motion.div
+                animate={{
                     y: [0, 20, 0],
                     rotate: [0, -4, 0]
                 }}
                 transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute bottom-20 left-[10%] w-48 h-48 bg-brand-dark/2 rounded-full -z-10" 
+                className="absolute bottom-20 left-[10%] w-48 h-48 bg-brand-dark/2 rounded-full -z-10"
             />
         </section>
     );

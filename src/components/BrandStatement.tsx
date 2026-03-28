@@ -4,16 +4,14 @@ import ScrollReveal from './ui/ScrollReveal';
 
 export default function BrandStatement() {
     return (
-        <section className="py-24 bg-bg-main text-center px-6">
-            <div className="container mx-auto max-w-4xl">
-                <ScrollReveal direction="up" duration={0.8}>
-                    <div className="flex items-center justify-center gap-6 md:gap-12">
-                        <div className="h-px bg-brand-primary/30 flex-1 hidden sm:block" />
-                        <h2 className="text-3xl md:text-5xl font-playfair leading-tight text-content-heading italic">
-                            "Redefining Modern Elegance"
-                        </h2>
-                        <div className="h-px bg-brand-primary/30 flex-1 hidden sm:block" />
-                    </div>
+        <section className="py-24 md:py-40 bg-gray-50 text-center px-4 md:px-8 border-b border-gray-200">
+            <div className="container mx-auto max-w-[1200px] flex flex-col items-center">
+                <ScrollReveal direction="up" duration={1.2}>
+                    <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-8 font-semibold">The Philosophy</p>
+                    <h2 className="text-3xl md:text-5xl lg:text-7xl font-playfair font-medium leading-[1.2] text-black italic">
+                        "Crafting pieces that outlive trends.<br className="hidden md:block" /> Simplicity is the ultimate sophistication."
+                    </h2>
+                    <div className="w-px h-16 bg-black mx-auto mt-12 md:mt-16 block" />
                 </ScrollReveal>
             </div>
         </section>

@@ -5,49 +5,86 @@ import Magnetic from './ui/Magnetic';
 
 export default function Hero() {
     return (
-        <section className="relative h-screen flex items-center justify-center bg-gray-900 overflow-hidden">
-            {/* Background Image */}
-            <div className="absolute inset-0 z-0">
-                <img 
-                    src="https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2000&auto=format&fit=crop" 
-                    alt="Modernist Fashion Hero Background" 
-                    className="w-full h-full object-cover opacity-80"
+        <section className="relative h-screen flex items-center justify-center bg-black overflow-hidden">
+            {/* Background Image with Parallax-like scale */}
+            <motion.div
+                className="absolute inset-0 z-0"
+                initial={{ scale: 1.1 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+            >
+                <img
+                    src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop"
+                    alt="Modernist Fashion Hero Background"
+                    className="w-full h-full object-cover opacity-70"
                 />
-            </div>
+            </motion.div>
 
-            <div className="absolute inset-0 bg-black/40 z-10 pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-b from-black/60 via-black/20 to-black/80 z-10 pointer-events-none" />
 
             {/* Content */}
-            <div className="relative z-20 text-center text-white px-4 max-w-4xl mx-auto pointer-events-none">
-                <h1 className="flex flex-col items-center justify-center font-serif leading-tight animate-fade-in-up">
-                    <span className="text-2xl md:text-3xl font-light tracking-widest text-gray-200 uppercase mb-4 block">Modern</span>
-                    <span className="text-6xl md:text-8xl font-black tracking-tight text-white drop-shadow-md">Everyday Wear</span>
-                </h1>
-                <p className="text-lg md:text-xl font-light mb-10 max-w-2xl mx-auto text-gray-100 animate-fade-in-up delay-100 mt-6 leading-relaxed opacity-90">
-                    Premium fabrics for modern lifestyle. Redefining your wardrobe with essentials that matter.
-                </p>
-                <div className="flex justify-center w-full">
+            <div className="relative z-20 text-center text-white px-6 w-full max-w-5xl mx-auto pointer-events-none flex flex-col items-center">
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+                >
+                    <span className="text-sm md:text-base font-semibold tracking-[0.3em] text-gray-300 uppercase mb-6 block border-b border-white/20 pb-4 inline-block px-8">
+                        The New Standard
+                    </span>
+                </motion.div>
+
+                <motion.h1
+                    className="font-playfair leading-[1.1] mb-6 drop-shadow-2xl"
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
+                >
+                    <span className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight text-white block">
+                        ELEVATED
+                    </span>
+                    <span className="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tight text-gray-200 block italic mt-2">
+                        Everyday Wear
+                    </span>
+                </motion.h1>
+
+                <motion.p
+                    className="text-lg md:text-xl font-light mb-12 max-w-2xl mx-auto text-gray-200 leading-relaxed opacity-90"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 1, delay: 0.8, ease: "easeOut" }}
+                >
+                    Premium fabrics. Uncompromising design. Redefining your wardrobe with essentials built for the modern lifestyle.
+                </motion.p>
+
+                <motion.div
+                    className="flex justify-center w-full"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
+                >
                     <Magnetic>
                         <motion.a
                             href="/shop"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                            className="inline-block bg-brand-primary text-bg-main hover:bg-brand-dark hover:text-white px-10 py-4 rounded-full text-base font-bold transition-colors shadow-xl border border-transparent hover:shadow-2xl tracking-wide uppercase pointer-events-auto cursor-pointer"
+                            className="inline-flex items-center justify-center bg-white text-black hover:bg-gray-200 px-12 py-5 text-sm font-bold transition-all shadow-2xl tracking-[0.2em] uppercase pointer-events-auto cursor-pointer"
                         >
-                            SHOP NOW
+                            Explore Collection
                         </motion.a>
                     </Magnetic>
-                </div>
+                </motion.div>
             </div>
+
             {/* Scroll Indicator */}
             <motion.div
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-20"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, y: [0, 10, 0] }}
+                transition={{ opacity: { delay: 1.5, duration: 1 }, y: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' } }}
+                className="absolute bottom-12 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center"
             >
-                <span className="text-white text-xs font-light tracking-widest block mb-2 cursor-pointer">SCROLL</span>
-                <div className="w-px h-12 bg-white/50 mx-auto" />
+                <div className="w-[1px] h-16 bg-linear-to-b from-white/80 to-transparent mx-auto origin-top" />
             </motion.div>
         </section>
     );

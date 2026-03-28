@@ -28,16 +28,16 @@ export default function FeaturedProductsSection() {
     }
 
     return (
-        <section id="new-arrivals" className="py-24 bg-bg-soft">
-            <div className="container mx-auto px-6">
-                <ScrollReveal direction="up">
-                    <h2 className="text-3xl font-playfair font-bold mb-12 text-center relative tracking-wide text-content-heading">
-                        <span className="bg-bg-soft px-4 relative z-10">Trending Now</span>
-                        <span className="absolute top-1/2 left-0 w-full h-px bg-brand-primary/20 z-0"></span>
+        <section id="new-arrivals" className="py-24 md:py-32 bg-white">
+            <div className="container mx-auto px-4 md:px-8 max-w-[1600px]">
+                <ScrollReveal direction="up" className="flex flex-col items-center mb-16 md:mb-20">
+                    <span className="text-gray-500 font-semibold uppercase tracking-[0.3em] text-[10px] md:text-xs mb-4 block">The Editor's Edit</span>
+                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-playfair font-medium text-center text-black tracking-tight">
+                        Trending Now
                     </h2>
                 </ScrollReveal>
 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                     {featuredProducts.map((product, idx) => (
                         <ScrollReveal direction="up" delay={0.1 * idx} key={product.id}>
                             <ProductCard product={{
@@ -50,9 +50,9 @@ export default function FeaturedProductsSection() {
                     ))}
                 </div>
 
-                <ScrollReveal direction="up" delay={0.4} className="text-center mt-12">
-                    <Link href="/shop" className="inline-block px-10 py-4 bg-brand-primary text-bg-main font-semibold text-sm hover:bg-brand-dark hover:text-white transition-all rounded-full uppercase tracking-wider hover:shadow-xl shadow-lg transform hover:-translate-y-1">
-                        View All Products
+                <ScrollReveal direction="up" delay={0.4} className="flex justify-center mt-16 md:mt-24">
+                    <Link href="/shop" className="group inline-flex items-center justify-center border border-black text-black px-12 py-4 text-sm font-bold tracking-[0.2em] uppercase transition-all hover:bg-black hover:text-white">
+                        <span>View the full collection</span>
                     </Link>
                 </ScrollReveal>
             </div>

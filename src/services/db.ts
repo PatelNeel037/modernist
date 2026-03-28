@@ -498,6 +498,68 @@ export const DB = {
         }
     },
 
+    // --- API Calls (Collections) ---
+
+    fetchCollections: async function () {
+        try {
+            const response = await fetch(`${API_URL}/admin/collections`);
+            if (!response.ok) return [];
+            return await response.json();
+        } catch (e) {
+            console.warn("Failed to fetch collections:", e);
+            return [];
+        }
+    },
+
+    addCollection: async function (data: any) {
+        try {
+            const token = localStorage.getItem(this.KEYS.ADMIN_TOKEN);
+            const response = await fetch(`${API_URL}/admin/collections`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify(data)
+            });
+            return await response.json();
+        } catch (e) {
+            return { success: false, message: 'Network error' };
+        }
+    },
+
+    updateCollection: async function (id: string, data: any) {
+        try {
+            const token = localStorage.getItem(this.KEYS.ADMIN_TOKEN);
+            const response = await fetch(`${API_URL}/admin/collections/${id}`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify(data)
+            });
+            return await response.json();
+        } catch (e) {
+            return { success: false, message: 'Network error' };
+        }
+    },
+
+    deleteCollection: async function (id: string) {
+        try {
+            const token = localStorage.getItem(this.KEYS.ADMIN_TOKEN);
+            const response = await fetch(`${API_URL}/admin/collections/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                }
+            });
+            return await response.json();
+        } catch (e) {
+            return { success: false, message: 'Network error' };
+        }
+    },
+
     // --- API Calls (Newsletter) ---
 
     subscribeNewsletter: async function (email: string) {

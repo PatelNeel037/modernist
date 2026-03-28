@@ -39,7 +39,7 @@ export default function Footer() {
 
             <div className="container mx-auto px-6 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 mb-20">
-                    
+
                     {/* Brand Column */}
                     <div className="lg:col-span-4 space-y-8">
                         <div>
@@ -50,7 +50,7 @@ export default function Footer() {
                                 Crafting a new standard for modern tailoring. We redefine everyday fashion with timeless, ethically sourced essentials designed for the sophisticated individual.
                             </p>
                         </div>
-                        
+
                         <div className="flex items-center space-x-5">
                             <SocialIcon icon={<Instagram className="w-5 h-5" />} href="https://instagram.com" />
                             <SocialIcon icon={<Facebook className="w-5 h-5" />} href="https://facebook.com" />
@@ -105,7 +105,7 @@ export default function Footer() {
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div className="pt-6 border-t border-white/5">
                             <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-white/50 mb-6">Payment Excellence</h4>
                             <div className="flex flex-wrap items-center gap-5">
@@ -128,12 +128,12 @@ export default function Footer() {
                         <Link href="/terms-of-service" className="hover:text-white transition-colors">Terms</Link>
                         <Link href="/cookies" className="hover:text-white transition-colors">Cookies</Link>
                     </div>
-                    
+
                     <div className="flex items-center gap-3 text-white/40">
-                        <motion.div 
+                        <motion.div
                             animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
                             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                            className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" 
+                            className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]"
                         />
                         <span className="text-[11px] uppercase tracking-widest font-medium">Global Dispatch Operating</span>
                     </div>
@@ -160,8 +160,8 @@ function SocialIcon({ icon, href }: { icon: React.ReactNode; href: string }) {
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            whileHover={{ 
-                y: -5, 
+            whileHover={{
+                y: -5,
                 backgroundColor: 'rgba(255,255,255,0.1)',
                 borderColor: 'rgba(255,255,255,0.2)',
                 boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)'
@@ -178,9 +178,9 @@ function SocialIcon({ icon, href }: { icon: React.ReactNode; href: string }) {
 function PaymentIcon({ src, alt, h }: { src: string; alt: string; h: string }) {
     return (
         <motion.div
-            whileHover={{ 
-                y: -8, 
-                opacity: 1, 
+            whileHover={{
+                y: -8,
+                opacity: 1,
                 scale: 1.05,
                 borderColor: 'rgba(255,255,255,0.3)',
                 backgroundColor: 'rgba(255,255,255,0.08)'
@@ -196,8 +196,8 @@ function PaymentIcon({ src, alt, h }: { src: string; alt: string; h: string }) {
 
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
     return (
-        <Link 
-            href={href} 
+        <Link
+            href={href}
             className="group relative text-white/50 hover:text-white text-sm font-light transition-colors duration-300 flex items-center"
         >
             <span className="w-0 group-hover:w-2 h-px bg-brand-primary mr-0 group-hover:mr-2 transition-all duration-300" />

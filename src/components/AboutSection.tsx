@@ -3,37 +3,59 @@ import ScrollReveal from './ui/ScrollReveal';
 
 export default function AboutSection() {
     const features = [
-        { icon: <Truck size={32} className="text-brand-primary mx-auto mb-4" />, title: 'Free Shipping', text: 'On all orders nicely over $50' },
-        { icon: <RotateCcw size={32} className="text-brand-primary mx-auto mb-4" />, title: 'Easy Returns', text: '30 days money back guarantee' },
-        { icon: <Lock size={32} className="text-brand-primary mx-auto mb-4" />, title: 'Secure Payment', text: 'Checkout with SSL encryption' },
-        { icon: <Award size={32} className="text-brand-primary mx-auto mb-4" />, title: 'Premium Quality', text: 'Certified top materials' },
+        { icon: <Truck size={24} className="text-black mb-0" />, title: 'Complimentary Delivery', text: 'On all domestic orders over $150.' },
+        { icon: <RotateCcw size={24} className="text-black mb-0" />, title: 'Effortless Returns', text: '30-day money-back guarantee, no questions asked.' },
+        { icon: <Lock size={24} className="text-black mb-0" />, title: 'Secure Checkout', text: 'Encrypted transactions for your peace of mind.' },
+        { icon: <Award size={24} className="text-black mb-0" />, title: 'Exceptional Quality', text: 'Crafted from the finest sustainable materials.' },
     ];
 
     return (
-        <section id="about" className="py-24 bg-bg-main relative overflow-hidden">
-            <div className="absolute inset-0 bg-linear-to-br from-bg-soft to-bg-main -z-10" />
-            <div className="container mx-auto px-6 text-center max-w-4xl">
-                <ScrollReveal direction="up">
-                    <h2 className="text-3xl md:text-5xl font-playfair font-bold text-content-heading mb-6">
-                        Designed for Comfort. <br /> Made to Last.
-                    </h2>
-                </ScrollReveal>
-                <ScrollReveal direction="up" delay={0.1}>
-                    <p className="text-content-body mb-16 text-lg max-w-2xl mx-auto leading-relaxed">
-                        We believe fashion should be effortless. Our collections are crafted from sustainable, premium materials that feel as good as they look.
-                    </p>
-                </ScrollReveal>
+        <section id="about" className="py-24 md:py-32 bg-white relative overflow-hidden text-black">
+            <div className="container mx-auto px-4 md:px-8 max-w-[1600px]">
+                <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                    {features.map((feature, idx) => (
-                        <ScrollReveal direction="up" delay={0.1 + (idx * 0.1)} key={idx}>
-                            <div className="p-6 bg-bg-main rounded-xl shadow-sm hover:-translate-y-2 hover:shadow-xl transition-all duration-300 border border-bg-accent/50 h-full">
-                                {feature.icon}
-                                <h4 className="font-semibold text-content-heading mb-2">{feature.title}</h4>
-                                <p className="text-sm text-content-body">{feature.text}</p>
-                            </div>
+                    {/* Image Side */}
+                    <div className="w-full lg:w-1/2 relative h-[500px] md:h-[700px] overflow-hidden">
+                        <ScrollReveal direction="left" className="h-full w-full">
+                            <img
+                                src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2070&auto=format&fit=crop"
+                                alt="Modernist Craftsmanship"
+                                className="w-full h-full object-cover grayscale-20 transition-transform duration-[2s] hover:scale-105"
+                            />
                         </ScrollReveal>
-                    ))}
+                        <div className="absolute inset-0 border border-black/10 m-6 pointer-events-none hidden md:block" />
+                    </div>
+
+                    {/* Content Side */}
+                    <div className="w-full lg:w-1/2 max-w-2xl">
+                        <ScrollReveal direction="up">
+                            <span className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-6 block font-semibold">The Modernist Way</span>
+                            <h2 className="text-4xl md:text-5xl lg:text-6xl font-playfair font-medium text-black mb-8 leading-[1.1] tracking-tight">
+                                Designed for Life.<br /> Made to Endure.
+                            </h2>
+                        </ScrollReveal>
+
+                        <ScrollReveal direction="up" delay={0.1}>
+                            <p className="text-gray-600 mb-16 text-lg tracking-wide leading-relaxed font-light">
+                                We believe in fashion that doesn't compromise. Our collections are ethically crafted from sustainable, premium materials, ensuring every piece feels as remarkable as it looks. Discover the intersection of comfort and luxury.
+                            </p>
+                        </ScrollReveal>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+                            {features.map((feature, idx) => (
+                                <ScrollReveal direction="up" delay={0.2 + (idx * 0.1)} key={idx}>
+                                    <div className="group flex flex-col items-start">
+                                        <div className="mb-4 p-3 bg-gray-50 rounded-full group-hover:bg-gray-100 transition-colors">
+                                            {feature.icon}
+                                        </div>
+                                        <h4 className="font-semibold text-black tracking-widest text-xs uppercase mb-2">{feature.title}</h4>
+                                        <p className="text-sm text-gray-500 font-light leading-relaxed">{feature.text}</p>
+                                    </div>
+                                </ScrollReveal>
+                            ))}
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </section>

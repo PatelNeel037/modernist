@@ -3,7 +3,39 @@
 import { motion } from 'framer-motion';
 import Magnetic from './ui/Magnetic';
 
+import { useState, useEffect } from 'react';
+import { DB } from '@/services/db';
+
 export default function Hero() {
+    const [heroData, setHeroData] = useState({
+        tagline: 'The New Standard',
+        mainTitle: 'ELEVATED',
+        subTitle: 'Everyday Wear',
+        description: 'Premium fabrics. Uncompromising design. Redefining your wardrobe with essentials built for the modern lifestyle.',
+        bgImg: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop',
+        buttonText: 'Explore Collection',
+        buttonHref: '/shop'
+    });
+
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const loadHeroData = async () => {
+            const data = await DB.fetchHomepage();
+            if (data && data.hero) {
+                setHeroData(data.hero);
+            }
+            setIsLoading(false);
+        };
+        loadHeroData();
+    }, []);
+
+    if (isLoading) {
+        return <div className="h-screen bg-black flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+        </div>;
+    }
+
     return (
         <section className="relative h-screen flex items-center justify-center bg-black overflow-hidden">
             {/* Background Image with Parallax-like scale */}
@@ -14,8 +46,8 @@ export default function Hero() {
                 transition={{ duration: 1.5, ease: "easeOut" }}
             >
                 <img
-                    src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop"
-                    alt="Modernist Fashion Hero Background"
+                    src={heroData.bgImg}
+                    alt="Hero Background"
                     className="w-full h-full object-cover opacity-70"
                 />
             </motion.div>
@@ -30,7 +62,7 @@ export default function Hero() {
                     transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
                 >
                     <span className="text-sm md:text-base font-semibold tracking-[0.3em] text-gray-300 uppercase mb-6 block border-b border-white/20 pb-4 inline-block px-8">
-                        The New Standard
+                        {heroData.tagline}
                     </span>
                 </motion.div>
 
@@ -41,10 +73,10 @@ export default function Hero() {
                     transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
                 >
                     <span className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight text-white block">
-                        ELEVATED
+                        {heroData.mainTitle}
                     </span>
                     <span className="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tight text-gray-200 block italic mt-2">
-                        Everyday Wear
+                        {heroData.subTitle}
                     </span>
                 </motion.h1>
 
@@ -54,7 +86,7 @@ export default function Hero() {
                     animate={{ opacity: 1 }}
                     transition={{ duration: 1, delay: 0.8, ease: "easeOut" }}
                 >
-                    Premium fabrics. Uncompromising design. Redefining your wardrobe with essentials built for the modern lifestyle.
+                    {heroData.description}
                 </motion.p>
 
                 <motion.div
@@ -65,13 +97,13 @@ export default function Hero() {
                 >
                     <Magnetic>
                         <motion.a
-                            href="/shop"
+                            href={heroData.buttonHref}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             transition={{ type: "spring", stiffness: 400, damping: 17 }}
                             className="inline-flex items-center justify-center bg-white text-black hover:bg-gray-200 px-12 py-5 text-sm font-bold transition-all shadow-2xl tracking-[0.2em] uppercase pointer-events-auto cursor-pointer"
                         >
-                            Explore Collection
+                            {heroData.buttonText}
                         </motion.a>
                     </Magnetic>
                 </motion.div>

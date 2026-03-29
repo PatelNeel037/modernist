@@ -158,15 +158,7 @@ export default function Navbar() {
                     </div>
 
                     <div className="hidden md:flex items-center space-x-6">
-                        <motion.button
-                            suppressHydrationWarning
-                            whileHover={{ scale: 1.15 }}
-                            whileTap={{ scale: 0.85 }}
-                            onClick={toggleTheme}
-                            className="relative text-bg-main group cursor-pointer focus:outline-none"
-                        >
-                            {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-                        </motion.button>
+
 
                         <div className="relative" ref={searchRef}>
                             <motion.div

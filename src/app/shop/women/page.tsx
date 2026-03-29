@@ -40,10 +40,16 @@ export default function WomenPage() {
             <Navbar />
 
             {/* Header */}
-            <div className="pt-32 pb-12 text-center bg-gray-50">
-                <div className="container mx-auto px-6">
-                    <h1 className="text-4xl md:text-5xl font-playfair font-bold text-gray-900 mb-4">Women's Collection</h1>
-                    <p className="text-gray-500 max-w-2xl mx-auto">Elegant and timeless pieces for every occasion. Discover our latest styles.</p>
+            <div className="relative pt-40 pb-20 text-center overflow-hidden mb-12 flex items-center justify-center min-h-[45vh]">
+                <div className="absolute inset-0 z-0">
+                    <img src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=2000&auto=format&fit=crop" alt="Women's Collection" className="w-full h-full object-cover scale-105" />
+                    <div className="absolute inset-0 bg-black/40"></div>
+                </div>
+                <div className="relative z-10 container mx-auto px-6 inline-block mt-10">
+                    <div className="backdrop-blur-xl bg-white/10 border border-white/20 p-12 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] max-w-3xl mx-auto">
+                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-playfair font-bold text-white mb-6 drop-shadow-lg">Women's Collection</h1>
+                        <p className="text-gray-100 max-w-2xl mx-auto text-lg md:text-xl drop-shadow font-medium tracking-wide leading-relaxed">Elegant and timeless pieces for every occasion. Discover our latest styles.</p>
+                    </div>
                 </div>
             </div>
 

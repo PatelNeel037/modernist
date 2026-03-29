@@ -7,15 +7,22 @@ import { useEffect, useState } from 'react';
 export default function Template({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const [isMounted, setIsMounted] = useState(false);
+    const [shouldAnimate, setShouldAnimate] = useState(false);
 
     useEffect(() => {
         setIsMounted(true);
-    }, []);
+        // Only run the entry animation on the very first visit to the site
+        const hasAnimated = sessionStorage.getItem('hasAnimated');
+        if (!hasAnimated) {
+            setShouldAnimate(true);
+            sessionStorage.setItem('hasAnimated', 'true');
+        }
+    }, [pathname]);
 
     // Don't show confusing animations for admin paths (it breaks their UX forms)
     const isAdmin = pathname.startsWith('/admin');
 
-    if (isAdmin || !isMounted) {
+    if (isAdmin || !isMounted || !shouldAnimate) {
         return <div className="w-full h-full">{children}</div>;
     }
 

@@ -8,55 +8,67 @@ import { useState, useEffect } from 'react';
 import { DB } from '@/services/db';
 
 export default function CategorySection() {
-    const defaultCategories = [
-        {
-            title: 'Men',
-            subtitle: 'Elevated essentials',
-            img: 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=1740&auto=format&fit=crop',
-            href: '/shop/men',
-            className: 'md:col-span-2 md:row-span-2 h-[600px]'
-        },
-        {
-            title: 'Women',
-            subtitle: 'Modern silhouettes',
-            img: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=1778&auto=format&fit=crop',
-            href: '/shop/women',
-            className: 'md:col-span-1 md:row-span-1 h-[300px] md:h-auto'
-        },
-        {
-            title: 'Kids',
-            subtitle: 'Playful comfort',
-            img: 'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?q=80&w=1972&auto=format&fit=crop',
-            href: '/shop/kids',
-            className: 'md:col-span-1 md:row-span-1 h-[300px] md:h-auto'
-        },
-        {
-            title: 'Home Textile',
-            subtitle: 'Living refined',
-            img: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=2000&auto=format&fit=crop',
-            href: '/shop/home-textile',
-            className: 'md:col-span-2 h-[350px]'
-        },
-        {
-            title: 'Wholesale / B2B',
-            subtitle: 'Partner with us',
-            img: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=2000&auto=format&fit=crop',
-            href: '/shop/wholesale-b2b',
-            className: 'md:col-span-1 h-[350px]'
-        }
-    ];
-
-    const [categories, setCategories] = useState<any[]>(defaultCategories);
+    const [categories, setCategories] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const fetchCategories = async () => {
+        const loadCategories = async () => {
             const data = await DB.fetchCollections();
             if (data && data.length > 0) {
                 setCategories(data);
+            } else {
+                // If nothing in DB, we can optionally use the defaults
+                const defaultCategories = [
+                    {
+                        title: 'Men',
+                        subtitle: 'Elevated essentials',
+                        img: 'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?q=80&w=1740&auto=format&fit=crop',
+                        href: '/shop/men',
+                        className: 'md:col-span-2 md:row-span-2 h-[600px]'
+                    },
+                    {
+                        title: 'Women',
+                        subtitle: 'Modern silhouettes',
+                        img: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=1778&auto=format&fit=crop',
+                        href: '/shop/women',
+                        className: 'md:col-span-1 md:row-span-1 h-[300px] md:h-auto'
+                    },
+                    {
+                        title: 'Kids',
+                        subtitle: 'Playful comfort',
+                        img: 'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?q=80&w=1972&auto=format&fit=crop',
+                        href: '/shop/kids',
+                        className: 'md:col-span-1 md:row-span-1 h-[300px] md:h-auto'
+                    },
+                    {
+                        title: 'Home Textile',
+                        subtitle: 'Living refined',
+                        img: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=2000&auto=format&fit=crop',
+                        href: '/shop/home-textile',
+                        className: 'md:col-span-2 h-[350px]'
+                    },
+                    {
+                        title: 'Wholesale / B2B',
+                        subtitle: 'Partner with us',
+                        img: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=2000&auto=format&fit=crop',
+                        href: '/shop/wholesale-b2b',
+                        className: 'md:col-span-1 h-[350px]'
+                    }
+                ];
+                setCategories(defaultCategories);
             }
+            setIsLoading(false);
         };
-        fetchCategories();
+        loadCategories();
     }, []);
+
+    if (isLoading) {
+        return (
+            <div className="py-24 bg-bg-soft flex items-center justify-center min-h-[400px]">
+                <div className="w-8 h-8 border-2 border-brand-primary/20 border-t-brand-primary rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
     return (
         <section id="categories" className="py-24 px-4 md:px-8 max-w-[1600px] mx-auto">
@@ -80,17 +92,19 @@ export default function CategorySection() {
                         className={cat.className}
                     >
                         <Link href={cat.href} className="group relative block w-full h-full overflow-hidden bg-gray-100">
-                            {/* Image */}
-                            <div className="absolute inset-0">
-                                <img
-                                    src={cat.img}
-                                    alt={cat.title}
-                                    className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105"
-                                    onError={(e) => {
-                                        e.currentTarget.src = `https://placehold.co/600x800/EEE/31343C?text=${cat.title}`;
-                                    }}
-                                />
-                                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-black/10 opacity-70 transition-opacity duration-700 group-hover:opacity-40"></div>
+                            <div className="absolute inset-0 overflow-hidden">
+                                <div className="w-full h-full transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-110">
+                                    <img
+                                        src={cat.img}
+                                        alt={cat.title}
+                                        className={`w-full h-full ${cat.imgClass || 'object-cover'} ${cat.imgPosition || 'object-center'}`}
+                                        style={{ transform: `scale(${(cat.imgScale || 100) / 100})` }}
+                                        onError={(e) => {
+                                            e.currentTarget.src = `https://placehold.co/600x800/EEE/31343C?text=${cat.title}`;
+                                        }}
+                                    />
+                                </div>
+                                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-black/10 opacity-70 transition-opacity duration-700 group-hover:opacity-40 pointer-events-none"></div>
                             </div>
 
                             {/* Content */}

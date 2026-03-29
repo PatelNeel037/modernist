@@ -502,7 +502,7 @@ export const DB = {
 
     fetchCollections: async function () {
         try {
-            const response = await fetch(`${API_URL}/admin/collections`);
+            const response = await fetch(`${API_URL}/admin/collections?t=${Date.now()}`, { cache: 'no-store' });
             if (!response.ok) return [];
             return await response.json();
         } catch (e) {
@@ -557,6 +557,35 @@ export const DB = {
             return await response.json();
         } catch (e) {
             return { success: false, message: 'Network error' };
+        }
+    },
+    
+    // --- API Calls (Homepage/Hero) ---
+    fetchHomepage: async function () {
+        try {
+            const response = await fetch(`${API_URL}/admin/homepage?t=${Date.now()}`, { cache: 'no-store' });
+            if (!response.ok) return null;
+            return await response.json();
+        } catch (e) {
+            console.warn("Failed to fetch homepage settings:", e);
+            return null;
+        }
+    },
+
+    updateHomepage: async function (data: any) {
+        try {
+            const token = localStorage.getItem(this.KEYS.ADMIN_TOKEN);
+            const response = await fetch(`${API_URL}/admin/homepage`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify(data)
+            });
+            return await response.json();
+        } catch (e) {
+            return { success: false, message: 'Network error updating homepage' };
         }
     },
 

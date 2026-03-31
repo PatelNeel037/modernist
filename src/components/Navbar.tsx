@@ -241,8 +241,8 @@ export default function Navbar() {
                         <div className="relative" ref={userRef}>
                             {user ? (
                                 <>
-                                    <button 
-                                        onClick={() => setIsUserOpen(!isUserOpen)} 
+                                    <button
+                                        onClick={() => setIsUserOpen(!isUserOpen)}
                                         className="relative group focus:outline-none flex items-center"
                                     >
                                         <div className={`p-2 rounded-full transition-all duration-300 ${isUserOpen ? 'bg-brand-primary/20' : 'hover:bg-white/10'}`}>
@@ -277,17 +277,17 @@ export default function Navbar() {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                
+
                                                 {/* Links Section */}
                                                 <div className="p-3">
                                                     {[
                                                         { href: '/profile', icon: IdCard, label: 'Profile Settings', desc: 'Manage your personal details' },
                                                         { href: '/orders', icon: Package, label: 'Order History', desc: 'Track and view your purchases' }
                                                     ].map((item) => (
-                                                        <Link 
+                                                        <Link
                                                             key={item.href}
-                                                            href={item.href} 
-                                                            className="flex items-center gap-4 px-4 py-3 text-sm font-semibold rounded-2xl transition-all duration-300 group hover:bg-white/5 text-gray-300 hover:text-white" 
+                                                            href={item.href}
+                                                            className="flex items-center gap-4 px-4 py-3 text-sm font-semibold rounded-2xl transition-all duration-300 group hover:bg-white/5 text-gray-300 hover:text-white"
                                                             onClick={() => setIsUserOpen(false)}
                                                         >
                                                             <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center transition-all duration-300 group-hover:bg-brand-primary/20 group-hover:scale-110">
@@ -303,8 +303,8 @@ export default function Navbar() {
 
                                                 {/* Logout Section */}
                                                 <div className="p-3 border-t border-white/5 mt-1 bg-white/[0.02]">
-                                                    <button 
-                                                        onClick={() => { logout(); setIsUserOpen(false); }} 
+                                                    <button
+                                                        onClick={() => { logout(); setIsUserOpen(false); }}
                                                         className="flex items-center justify-between w-full px-4 py-3 text-sm font-bold text-red-400 hover:bg-red-500/10 rounded-2xl transition-all duration-300 group"
                                                     >
                                                         <div className="flex items-center gap-4">
@@ -369,8 +369,8 @@ export default function Navbar() {
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: i * 0.05 }}
                                 >
-                                    <Link 
-                                        href={link.href} 
+                                    <Link
+                                        href={link.href}
                                         onClick={() => setIsOpen(false)}
                                         className="flex items-center justify-between py-4 text-2xl font-playfair font-bold border-b border-gray-100 dark:border-white/5 group"
                                     >
@@ -379,14 +379,14 @@ export default function Navbar() {
                                     </Link>
                                 </motion.div>
                             ))}
-                            
+
                             <div className="pt-8">
                                 {user ? (
-                                    <motion.button 
+                                    <motion.button
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         transition={{ delay: 0.5 }}
-                                        onClick={() => { logout(); setIsOpen(false); }} 
+                                        onClick={() => { logout(); setIsOpen(false); }}
                                         className="flex items-center gap-3 w-full p-4 rounded-2xl bg-red-50 dark:bg-red-500/10 text-red-500 font-bold"
                                     >
                                         <LogOut className="w-5 h-5" />
@@ -398,8 +398,8 @@ export default function Navbar() {
                                         animate={{ opacity: 1 }}
                                         transition={{ delay: 0.5 }}
                                     >
-                                        <Link 
-                                            href="/login" 
+                                        <Link
+                                            href="/login"
                                             onClick={() => setIsOpen(false)}
                                             className="flex items-center justify-center gap-3 w-full p-4 rounded-2xl bg-brand-primary text-white font-bold"
                                         >

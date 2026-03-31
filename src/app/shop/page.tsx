@@ -2,12 +2,13 @@
 import { useState, useMemo, useEffect, Suspense } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import ValuePropSection from '@/components/ValuePropSection';
 import { useSearchParams } from 'next/navigation';
 import { DB } from '@/services/db';
 import ProductCard from '@/components/ProductCard';
-import { 
-    Filter, X, ChevronDown, ChevronRight, Search, 
-    Trash2, LayoutGrid, User, UserCheck, Baby, 
+import {
+    Filter, X, ChevronDown, ChevronRight, Search,
+    Trash2, LayoutGrid, User, UserCheck, Baby,
     Home, Briefcase, RefreshCcw, Check
 } from 'lucide-react';
 import { formatPrice } from '@/lib/currency';
@@ -151,12 +152,12 @@ function ShopContent() {
         return result;
     }, [products, searchQuery, activeCategory, activeType, priceFilters, materialFilters, sizeFilters, sortOption]);
 
-    const activeFilterCount = (activeCategory !== 'All' ? 1 : 0) + 
-                             (activeType !== 'All' ? 1 : 0) + 
-                             priceFilters.length + 
-                             materialFilters.length + 
-                             sizeFilters.length + 
-                             (searchQuery ? 1 : 0);
+    const activeFilterCount = (activeCategory !== 'All' ? 1 : 0) +
+        (activeType !== 'All' ? 1 : 0) +
+        priceFilters.length +
+        materialFilters.length +
+        sizeFilters.length +
+        (searchQuery ? 1 : 0);
 
     const clearAll = () => {
         setActiveCategory('All');
@@ -169,7 +170,7 @@ function ShopContent() {
     };
 
     const getCategoryIcon = (cat: string) => {
-        switch(cat) {
+        switch (cat) {
             case 'All': return <LayoutGrid size={16} />;
             case 'Men': return <User size={16} />;
             case 'Women': return <UserCheck size={16} />;
@@ -185,7 +186,7 @@ function ShopContent() {
         const [isOpen, setIsOpen] = useState(isOpenDefault);
         return (
             <div className="border-b border-bg-accent pb-4 mb-4 last:border-0 last:mb-0">
-                <button 
+                <button
                     onClick={() => setIsOpen(!isOpen)}
                     className="flex items-center justify-between w-full font-bold text-content-heading mb-4 hover:opacity-70 transition-opacity"
                 >
@@ -215,11 +216,10 @@ function ShopContent() {
                 <button
                     key={cat}
                     onClick={() => { setActiveCategory(cat); setActiveType('All'); setShowMobileFilters(false); }}
-                    className={`group flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-sm transition-all duration-300 ${
-                        activeCategory === cat 
-                        ? 'bg-brand-primary text-white shadow-md shadow-brand-primary/20 translate-x-1' 
+                    className={`group flex items-center justify-between w-full px-3 py-2.5 rounded-lg text-sm transition-all duration-300 ${activeCategory === cat
+                        ? 'bg-brand-primary text-white shadow-md shadow-brand-primary/20 translate-x-1'
                         : 'text-content-body hover:bg-bg-soft hover:text-content-heading'
-                    }`}
+                        }`}
                 >
                     <div className="flex items-center gap-3">
                         <span className={`${activeCategory === cat ? 'text-white' : 'text-brand-primary/60 group-hover:text-brand-primary'} transition-colors`}>
@@ -227,9 +227,8 @@ function ShopContent() {
                         </span>
                         <span className="font-medium">{cat}</span>
                     </div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full border ${
-                        activeCategory === cat ? 'border-white/30 text-white' : 'border-bg-accent text-content-body/60'
-                    }`}>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full border ${activeCategory === cat ? 'border-white/30 text-white' : 'border-bg-accent text-content-body/60'
+                        }`}>
                         {categoryCounts[cat] || 0}
                     </span>
                 </button>
@@ -242,8 +241,8 @@ function ShopContent() {
             {/* Search */}
             <div className="relative group">
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-content-body/40 group-focus-within:text-brand-primary transition-colors" />
-                <input 
-                    type="text" 
+                <input
+                    type="text"
                     placeholder="Search in shop..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -313,8 +312,8 @@ function ShopContent() {
             )}
 
             {activeFilterCount > 0 && (
-                <button 
-                    onClick={clearAll} 
+                <button
+                    onClick={clearAll}
                     className="flex items-center justify-center gap-2 w-full py-3 mt-4 text-xs font-bold text-red-500 bg-red-50 border border-red-100 rounded-xl hover:bg-red-100 transition-colors"
                 >
                     <RefreshCcw size={12} /> Reset All ({activeFilterCount})
@@ -325,7 +324,7 @@ function ShopContent() {
 
     const SortDropdown = ({ mobile = false }: { mobile?: boolean }) => {
         const selectedLabel = SORT_OPTIONS.find(o => o.value === sortOption)?.label || 'Featured';
-        
+
         return (
             <div className="relative">
                 <button
@@ -356,11 +355,10 @@ function ShopContent() {
                                             setSortOption(option.value);
                                             setIsSortOpen(false);
                                         }}
-                                        className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all ${
-                                            sortOption === option.value
+                                        className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all ${sortOption === option.value
                                             ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20'
                                             : 'text-content-body hover:bg-bg-soft hover:text-content-heading'
-                                        }`}
+                                            }`}
                                     >
                                         <span>{option.label}</span>
                                         {sortOption === option.value && <Check size={14} className="text-white" />}
@@ -396,7 +394,7 @@ function ShopContent() {
 
             <main className="container mx-auto px-6 py-12">
                 <div className="flex flex-col lg:flex-row gap-12 items-start">
-                    
+
                     {/* Desktop Sidebar */}
                     <div className="hidden lg:block w-72 sticky top-32">
                         <FiltersSidebar />
@@ -421,14 +419,14 @@ function ShopContent() {
 
                     <AnimatePresence>
                         {showMobileFilters && (
-                            <motion.div 
+                            <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                                 className="fixed inset-0 z-100 bg-black/40 backdrop-blur-sm lg:hidden"
                                 onClick={() => setShowMobileFilters(false)}
                             >
-                                <motion.div 
+                                <motion.div
                                     initial={{ x: '100%' }}
                                     animate={{ x: 0 }}
                                     exit={{ x: '100%' }}
@@ -438,7 +436,7 @@ function ShopContent() {
                                 >
                                     <div className="flex items-center justify-between mb-8">
                                         <h2 className="text-2xl font-playfair font-bold">Filters</h2>
-                                        <button 
+                                        <button
                                             onClick={() => setShowMobileFilters(false)}
                                             className="p-2 rounded-full bg-bg-soft text-content-heading hover:bg-bg-accent transition-colors"
                                         >
@@ -475,11 +473,10 @@ function ShopContent() {
                                 <button
                                     key={type}
                                     onClick={() => setActiveType(type)}
-                                    className={`whitespace-nowrap px-5 py-2 rounded-full text-xs font-bold border-2 transition-all ${
-                                        activeType === type
+                                    className={`whitespace-nowrap px-5 py-2 rounded-full text-xs font-bold border-2 transition-all ${activeType === type
                                         ? 'border-brand-primary bg-brand-primary text-white shadow-lg shadow-brand-primary/20'
                                         : 'border-bg-accent text-content-body bg-bg-soft hover:border-content-heading'
-                                    }`}
+                                        }`}
                                 >
                                     {type}
                                 </button>
@@ -487,7 +484,7 @@ function ShopContent() {
                         </div>
 
                         {/* Product Grid */}
-                        <motion.div 
+                        <motion.div
                             layout
                             className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-12"
                         >
@@ -520,7 +517,7 @@ function ShopContent() {
                                     </motion.div>
                                 ))
                             ) : (
-                                <motion.div 
+                                <motion.div
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     className="col-span-full py-32 flex flex-col items-center text-center space-y-6 bg-bg-soft/50 border border-dashed border-bg-accent rounded-3xl"
@@ -532,8 +529,8 @@ function ShopContent() {
                                         <h3 className="text-2xl font-playfair font-bold text-content-heading">Nothing fits those filters</h3>
                                         <p className="text-content-body mt-2">Try adjusting your filters or search terms.</p>
                                     </div>
-                                    <button 
-                                        onClick={clearAll} 
+                                    <button
+                                        onClick={clearAll}
                                         className="px-8 py-3 bg-brand-primary text-white rounded-xl font-bold shadow-lg shadow-brand-primary/20 hover:scale-105 transition-all text-sm uppercase tracking-widest"
                                     >
                                         Clear All Filters
@@ -555,6 +552,7 @@ export function ShopPage() {
             <Suspense fallback={<div className="container mx-auto px-6 pt-32 text-center text-content-heading py-20 animate-pulse">Initializing Boutique...</div>}>
                 <ShopContent />
             </Suspense>
+            <ValuePropSection />
             <Footer />
         </main>
     );

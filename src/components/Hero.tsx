@@ -98,12 +98,24 @@ export default function Hero() {
                     <Magnetic>
                         <motion.a
                             href={heroData.buttonHref}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                            className="inline-flex items-center justify-center bg-white text-black hover:bg-gray-200 px-12 py-5 text-sm font-bold transition-all shadow-2xl tracking-[0.2em] uppercase pointer-events-auto cursor-pointer"
+                            whileHover={{ scale: 1.08, rotate: 1.5 }}
+                            whileTap={{ scale: 0.92, rotate: -0.5 }}
+                            transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                            className="group relative inline-flex items-center justify-center pointer-events-auto cursor-pointer"
                         >
-                            {heroData.buttonText}
+                            {/* Clay Button Body */}
+                            <div className="px-16 py-6 bg-[#F0F2F5] rounded-full text-black font-black text-xs uppercase tracking-[0.3em] transition-all duration-300
+                                shadow-[15px_15px_30px_rgba(0,0,0,0.6),inset_8px_8px_16px_rgba(255,255,255,1),inset_-8px_-8px_16px_rgba(163,177,198,0.5)]
+                                group-hover:shadow-[20px_20px_40px_rgba(0,0,0,0.8),inset_4px_4px_8px_rgba(255,255,255,1),inset_-4px_-4px_8px_rgba(163,177,198,0.4)]
+                                flex items-center gap-4 border border-white/50"
+                            >
+                                <span className="drop-shadow-sm">{heroData.buttonText}</span>
+                                <div className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1)] group-hover:bg-white/20 transition-all">
+                                    <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 stroke-current stroke-3">
+                                        <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                </div>
+                            </div>
                         </motion.a>
                     </Magnetic>
                 </motion.div>
@@ -116,7 +128,7 @@ export default function Hero() {
                 transition={{ opacity: { delay: 1.5, duration: 1 }, y: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' } }}
                 className="absolute bottom-12 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center"
             >
-                <div className="w-[1px] h-16 bg-linear-to-b from-white/80 to-transparent mx-auto origin-top" />
+                <div className="w-px h-16 bg-linear-to-b from-white/80 to-transparent mx-auto origin-top" />
             </motion.div>
         </section>
     );

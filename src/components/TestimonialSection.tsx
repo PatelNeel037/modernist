@@ -40,14 +40,14 @@ function TestimonialCard({ test, idx }: { test: any, idx: number }) {
                     rotateY: rotateY,
                     transformStyle: "preserve-3d",
                 }}
-                className="bg-bg-main relative p-10 rounded-3xl shadow-xs hover:shadow-2xl border border-bg-accent/30 transition-shadow duration-500 h-full flex flex-col group overflow-hidden"
+                className="bg-[#F1E4D4] relative p-10 rounded-3xl shadow-xs hover:shadow-2xl border border-[#8F4E34]/30 transition-shadow duration-500 h-full flex flex-col group overflow-hidden"
             >
                 {/* Decorative Quote Icon */}
                 <div className="absolute top-4 right-6 opacity-5 group-hover:opacity-10 transition-opacity transform rotate-12">
                     <Quote size={80} />
                 </div>
 
-                <div className="flex justify-center gap-1 mb-6 text-emerald-500 relative z-10" style={{ transform: "translateZ(30px)" }}>
+                <div className="flex justify-center gap-1 mb-6 text-[#8F4E34] relative z-10" style={{ transform: "translateZ(30px)" }}>
                     {[...Array(test.rating || 5)].map((_, i) => (
                         <motion.div
                             key={i}
@@ -60,16 +60,16 @@ function TestimonialCard({ test, idx }: { test: any, idx: number }) {
                     ))}
                 </div>
 
-                <p className="text-content-body italic text-lg leading-relaxed mb-8 flex-1 relative z-10" style={{ transform: "translateZ(20px)" }}>
+                <p className="text-[#1E1713] italic text-lg leading-relaxed mb-8 flex-1 relative z-10" style={{ transform: "translateZ(20px)" }}>
                     "{test.text}"
                 </p>
 
                 <div className="flex items-center justify-center gap-3 relative z-10" style={{ transform: "translateZ(40px)" }}>
-                    <div className="h-px bg-brand-primary/20 w-4" />
-                    <h4 className="font-bold text-content-heading tracking-tight">
+                    <div className="h-px bg-[#8F4E34]/20 w-4" />
+                    <h4 className="font-bold text-[#1E1713] tracking-tight">
                         {test.name}
                     </h4>
-                    <div className="h-px bg-brand-primary/20 w-4" />
+                    <div className="h-px bg-[#8F4E34]/20 w-4" />
                 </div>
 
                 {/* Glassy reflection effect on hover */}
@@ -99,7 +99,7 @@ export default function TestimonialSection() {
     }, []);
 
     return (
-        <section className="py-24 bg-linear-to-b from-bg-main to-bg-soft/30 border-t border-bg-accent/20">
+        <section className="py-24 bg-linear-to-b from-[#EAD8C3] to-[#E0C9B0] border-t border-[#8F4E34]/20">
             <div className="container mx-auto px-6 text-center">
                 <ScrollReveal direction="up">
                     <div className="flex items-center justify-center gap-8 mb-16">
@@ -107,22 +107,21 @@ export default function TestimonialSection() {
                             initial={{ width: 0 }}
                             whileInView={{ width: 80 }}
                             transition={{ duration: 1, ease: "circOut" }}
-                            className="h-px bg-bg-accent"
+                            className="h-px bg-[#8F4E34]"
                         />
-                        <h2 className="text-4xl font-playfair font-bold text-content-heading tracking-tight">
+                        <h2 className="text-4xl font-playfair font-bold text-[#1E1713] tracking-tight">
                             Happy Customers
                         </h2>
                         <motion.div
                             initial={{ width: 0 }}
                             whileInView={{ width: 80 }}
                             transition={{ duration: 1, ease: "circOut" }}
-                            className="h-px bg-bg-accent"
+                            className="h-px bg-[#8F4E34]"
                         />
                     </div>
                 </ScrollReveal>
 
                 <div className="relative mt-20 overflow-hidden py-10">
-                    {/* Style tag for custom marquee animation */}
                     <style dangerouslySetInnerHTML={{
                         __html: `
                         @keyframes marquee {
@@ -144,13 +143,13 @@ export default function TestimonialSection() {
                             >
                                 {/* First set */}
                                 {testimonials.map((test, idx) => (
-                                    <div key={`orig-${test._id || idx}`} className="w-[400px] md:w-[500px] shrink-0">
+                                    <div key={`orig-${test._id || idx}`} className="w-100 md:w-125 shrink-0">
                                         <TestimonialCard test={test} idx={idx} />
                                     </div>
                                 ))}
                                 {/* Second set for seamless loop */}
                                 {testimonials.map((test, idx) => (
-                                    <div key={`dup-${test._id || idx}`} className="w-[400px] md:w-[500px] shrink-0">
+                                    <div key={`dup-${test._id || idx}`} className="w-100 md:w-125 shrink-0">
                                         <TestimonialCard test={test} idx={idx} />
                                     </div>
                                 ))}
@@ -159,7 +158,7 @@ export default function TestimonialSection() {
                     ) : (
                         <div className="flex justify-center px-6">
                             {testimonials.map((test, idx) => (
-                                <div key={test._id || idx} className="w-full max-w-[600px]">
+                                <div key={test._id || idx} className="w-full max-w-150">
                                     <TestimonialCard test={test} idx={idx} />
                                 </div>
                             ))}

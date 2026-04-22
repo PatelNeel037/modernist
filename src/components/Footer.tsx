@@ -31,7 +31,7 @@ export default function Footer() {
     };
 
     return (
-        <footer className="relative bg-brand-dark overflow-hidden pt-24 pb-12 border-t border-white/5">
+        <footer className="relative bg-brand-primary overflow-hidden pt-24 pb-12 border-t border-white/5">
             {/* Background elements */}
             <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-brand-primary/30 to-transparent" />
             <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-brand-primary/5 blur-[120px] rounded-full" />
@@ -43,7 +43,7 @@ export default function Footer() {
                     {/* Brand Column */}
                     <div className="lg:col-span-4 space-y-8">
                         <div>
-                            <Link href="/" className="text-3xl font-playfair font-bold tracking-tighter text-white hover:text-brand-primary transition-colors inline-block">
+                            <Link href="/" className="text-3xl font-playfair font-bold tracking-tighter text-white hover:opacity-80 transition-opacity inline-block">
                                 MODERNIST
                             </Link>
                             <p className="mt-6 text-white/70 text-base leading-relaxed max-w-sm font-light">
@@ -96,7 +96,7 @@ export default function Footer() {
                                 </div>
                             </div>
                             <div className="flex items-start group cursor-default">
-                                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mr-4 group-hover:bg-brand-primary group-hover:border-brand-primary transition-all duration-500">
+                                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mr-4 group-hover:bg-brand-dark group-hover:border-brand-dark transition-all duration-500">
                                     <Mail className="w-4 h-4 text-white" />
                                 </div>
                                 <div>

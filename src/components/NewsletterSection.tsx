@@ -44,15 +44,15 @@ export default function NewsletterSection() {
     };
 
     return (
-        <section className="py-32 bg-brand-secondary/40 text-brand-dark relative overflow-hidden">
+        <section className="py-32 bg-[#E3CFB8] text-brand-dark relative overflow-hidden">
             {/* Artistic background elements */}
             <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.05] pointer-events-none"></div>
             <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-brand-dark/10 to-transparent" />
             <div className="absolute bottom-0 left-0 w-full h-px bg-linear-to-r from-transparent via-brand-dark/10 to-transparent" />
 
             <div className="container mx-auto px-6 text-center relative z-10 max-w-2xl">
-                <ScrollReveal direction="up" className="inline-block p-1 px-3 bg-brand-dark/5 rounded-full border border-brand-dark/10 mb-6">
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-dark/60">Exclusive Access</span>
+                <ScrollReveal direction="up" className="inline-block p-1 px-3 bg-[#F1E4D4] rounded-full border border-white/50 mb-6 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.05),inset_-2px_-2px_5px_#ffffff]">
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8F4E34]/60">Exclusive Access</span>
                 </ScrollReveal>
 
                 <ScrollReveal direction="up" delay={0.1}>
@@ -61,23 +61,23 @@ export default function NewsletterSection() {
                             initial={{ width: 0, opacity: 0 }}
                             whileInView={{ width: "100%", opacity: 1 }}
                             transition={{ duration: 1.5, ease: "circOut" }}
-                            className="h-px bg-brand-dark/20 flex-1"
+                            className="h-px bg-[#8F4E34]/20 flex-1"
                         />
-                        <h2 className="text-4xl md:text-6xl font-playfair font-bold text-brand-dark tracking-tight leading-tight whitespace-nowrap">
+                        <h2 className="text-4xl md:text-6xl font-playfair font-black text-[#1E1713] tracking-tight leading-tight whitespace-nowrap drop-shadow-md">
                             Newsletter
                         </h2>
                         <motion.div
                             initial={{ width: 0, opacity: 0 }}
                             whileInView={{ width: "100%", opacity: 1 }}
                             transition={{ duration: 1.5, ease: "circOut" }}
-                            className="h-px bg-brand-dark/20 flex-1"
+                            className="h-px bg-[#8F4E34]/20 flex-1"
                         />
                     </div>
                 </ScrollReveal>
 
                 <ScrollReveal direction="up" delay={0.2}>
-                    <p className="text-brand-dark/70 mb-12 text-xl max-w-lg mx-auto font-medium leading-relaxed italic">
-                        Sign up & receive a <span className="text-brand-dark font-black not-italic border-b-2 border-brand-dark/20">15% discount</span> on your premier order.
+                    <p className="text-[#68584D] mb-12 text-xl max-w-lg mx-auto font-medium leading-relaxed italic">
+                        Sign up & receive a <span className="text-[#1E1713] font-black not-italic border-b-2 border-[#8F4E34]/20">15% discount</span> on your premier order.
                     </p>
                 </ScrollReveal>
 
@@ -88,11 +88,11 @@ export default function NewsletterSection() {
                                 initial={{ opacity: 0, scale: 0.9, y: 10 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.9, y: -10 }}
-                                className="bg-white/80 backdrop-blur-xl border border-emerald-500/20 py-8 px-12 rounded-[2.5rem] shadow-2xl inline-flex flex-col items-center"
+                                className="bg-white p-12 rounded-[3rem] shadow-[20px_20px_40px_rgba(107,79,79,0.1),-20px_-20px_40px_#ffffff] border border-white/50 inline-flex flex-col items-center"
                             >
-                                <CheckCircle className="w-16 h-16 text-emerald-500 mb-4 animate-bounce" />
-                                <h3 className="text-2xl font-bold text-emerald-800">Welcome Aboard</h3>
-                                <p className="text-emerald-700/70 font-medium">Check your inbox for your exclusive code.</p>
+                                <CheckCircle className="w-16 h-16 text-[#8F4E34] mb-4 animate-bounce" />
+                                <h3 className="text-2xl font-bold text-[#1E1713]">Welcome Aboard</h3>
+                                <p className="text-[#68584D] font-medium">Check your inbox for your exclusive code.</p>
                             </motion.div>
                         ) : (
                             <motion.form
@@ -100,16 +100,16 @@ export default function NewsletterSection() {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
                                 onSubmit={handleSubmit}
-                                className="relative flex flex-col md:flex-row gap-4 max-w-xl mx-auto items-center"
+                                className="relative flex flex-col md:flex-row gap-6 max-w-xl mx-auto items-center"
                             >
                                 <div className="relative w-full group">
-                                    <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-dark/30 group-focus-within:text-brand-dark transition-colors" />
+                                    <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8F4E34]/30 group-focus-within:text-[#8F4E34] transition-colors z-20" />
                                     <input
                                         type="email"
                                         placeholder="Your email address"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full pl-16 pr-8 py-5 rounded-full bg-white/60 backdrop-blur-md border border-brand-dark/10 text-brand-dark placeholder-brand-dark/40 focus:outline-none focus:bg-white/90 focus:border-brand-dark focus:shadow-2xl transition-all duration-500 font-bold"
+                                        className="w-full pl-16 pr-8 py-5 rounded-full bg-[#fcfbf9] border border-white text-[#1E1713] placeholder-[#8F4E34]/40 focus:outline-none focus:shadow-[inset_2px_2px_5px_rgba(0,0,0,0.05),6px_6px_15px_rgba(107,79,79,0.1)] shadow-[inset_6px_6px_12px_rgba(0,0,0,0.05),inset_-6px_-6px_12px_#ffffff] transition-all duration-500 font-bold"
                                         required
                                         disabled={status === 'loading'}
                                         suppressHydrationWarning
@@ -118,7 +118,7 @@ export default function NewsletterSection() {
                                 <button
                                     type="submit"
                                     disabled={status === 'loading'}
-                                    className="w-full md:w-auto bg-brand-dark text-white pl-8 pr-12 py-5 rounded-full font-black hover:bg-brand-primary transition-all duration-500 uppercase tracking-[0.2em] text-xs shadow-xl hover:shadow-2xl hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 group flex items-center justify-center relative overflow-hidden"
+                                    className="w-full md:w-auto bg-[#8F4E34] text-white pl-8 pr-12 py-5 rounded-full font-black hover:bg-[#1E1713] transition-all duration-500 uppercase tracking-[0.2em] text-xs shadow-[8px_8px_16px_rgba(107,79,79,0.2),-8px_-8px_16px_#ffffff] hover:shadow-[4px_4px_8px_rgba(107,79,79,0.1),-4px_-4px_8px_#ffffff] hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 group flex items-center justify-center relative overflow-hidden"
                                     suppressHydrationWarning
                                 >
                                     {status === 'loading' ? (

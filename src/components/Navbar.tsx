@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Search, ShoppingBag, Menu, X, User, Heart, ChevronRight, LogOut, Package, IdCard, Sun, Moon } from 'lucide-react';
-import { motion, useScroll, useVelocity, useTransform, useSpring, AnimatePresence, useMotionValueEvent } from 'framer-motion';
+import { motion, useScroll, AnimatePresence, useMotionValueEvent } from 'framer-motion';
 
 import { useTheme } from '@/context/ThemeContext';
 import { useCart } from '@/context/CartContext';
@@ -29,7 +29,7 @@ export default function Navbar() {
     const NavLink = ({ href, children }: { href: string, children: React.ReactNode }) => (
         <Link href={href} className={`relative group text-sm font-medium transition-colors ${isActive(href) ? 'text-brand-primary' : 'text-bg-main/80 hover:text-bg-main'}`}>
             {children}
-            <span className={`absolute left-0 -bottom-1 h-[2px] bg-brand-primary transition-all duration-300 ${isActive(href) ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
+            <span className={`absolute left-0 -bottom-1 h-0.5 bg-brand-primary transition-all duration-300 ${isActive(href) ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
         </Link>
     );
 
@@ -86,6 +86,7 @@ export default function Navbar() {
     const isHome = pathname === '/';
     const [yOffset, setYOffset] = useState(0);
     const lastScrollY = useRef(0);
+    const ticking = useRef(false);
     const { scrollY } = useScroll();
 
     useEffect(() => {
@@ -94,17 +95,25 @@ export default function Navbar() {
     }, [pathname, isHome]);
 
     useMotionValueEvent(scrollY, "change", (latest) => {
+        if (ticking.current) return;
+        ticking.current = true;
+
+        requestAnimationFrame(() => {
         const diff = latest - lastScrollY.current;
-        setIsScrolled(!isHome || latest > 50);
-        if (latest < 50) {
+
+        setIsScrolled(!isHome || latest > 24);
+
+        if (latest < 80) {
             setYOffset(0);
-        } else {
-            setYOffset((prev) => {
-                const newOffset = prev - diff;
-                return Math.max(-100, Math.min(0, newOffset));
-            });
+        } else if (diff > 4) {
+            setYOffset(-100);
+        } else if (diff < -4) {
+            setYOffset(0);
         }
+
         lastScrollY.current = latest;
+        ticking.current = false;
+        });
     });
 
     useEffect(() => {
@@ -140,8 +149,8 @@ export default function Navbar() {
             <motion.nav
                 initial={false}
                 animate={{ y: (isOpen || isSearchOpen || isUserOpen) ? 0 : `${yOffset}%` }}
-                transition={{ duration: 0.1 }}
-                className={`fixed top-0 left-0 w-full z-50 transition-[background-color,padding,box-shadow,backdrop-filter] duration-500 ${isScrolled ? 'bg-brand-dark shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] py-3 backdrop-blur-xl' : 'bg-transparent py-8'}`}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+                className={`fixed top-0 left-0 w-full z-50 transition-[background-color,padding,box-shadow,backdrop-filter] duration-500 ${isScrolled || isSearchOpen || isUserOpen || isOpen ? 'bg-brand-primary shadow-[0_10px_40px_rgba(0,0,0,0.15)] py-3 backdrop-blur-xl' : 'bg-transparent py-8'}`}
             >
                 <div className="container mx-auto px-6 flex justify-between items-center">
                     <Link href="/" className="text-2xl font-playfair font-bold tracking-wider text-bg-main">
@@ -218,15 +227,15 @@ export default function Navbar() {
                                                                 onClick={() => handleProductClick(item.id)}
                                                                 className="group flex items-center gap-4 p-3 hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer rounded-2xl transition-all duration-300 border border-transparent hover:border-gray-100 dark:hover:border-white/10"
                                                             >
-                                                                <div className="w-20 h-24 bg-gray-100 dark:bg-white/10 rounded-xl overflow-hidden shrink-0 relative">
+                                                                <div className="w-20 h-24 bg-[#F5F1E9] rounded-xl overflow-hidden shrink-0 relative">
                                                                     <img src={item.images?.[0] || item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                                                 </div>
                                                                 <div className="flex-1 min-w-0">
-                                                                    <h4 className="text-sm font-bold truncate group-hover:text-brand-primary transition-colors text-gray-900 dark:text-white">{item.name}</h4>
-                                                                    <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-1">{item.category}</p>
-                                                                    <p className="text-sm font-extrabold mt-2 text-brand-primary">{formatPrice(item.price)}</p>
+                                                                    <h4 className="text-sm font-bold truncate group-hover:text-[#6B4F4F] transition-colors text-[#6B4F4F]">{item.name}</h4>
+                                                                    <p className="text-[10px] font-bold text-[#6B4F4F]/40 uppercase tracking-widest mt-1">{item.category}</p>
+                                                                    <p className="text-sm font-extrabold mt-2 text-[#6B4F4F]">{formatPrice(item.price)}</p>
                                                                 </div>
-                                                                <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-brand-primary group-hover:translate-x-1 transition-all" />
+                                                                <ChevronRight className="w-4 h-4 text-[#6B4F4F]/30 group-hover:text-[#6B4F4F] group-hover:translate-x-1 transition-all" />
                                                             </div>
                                                         ))}
                                                     </div>
@@ -245,8 +254,8 @@ export default function Navbar() {
                                         onClick={() => setIsUserOpen(!isUserOpen)}
                                         className="relative group focus:outline-none flex items-center"
                                     >
-                                        <div className={`p-2 rounded-full transition-all duration-300 ${isUserOpen ? 'bg-brand-primary/20' : 'hover:bg-white/10'}`}>
-                                            <User className={`w-5 h-5 transition-colors duration-300 ${isUserOpen ? 'text-brand-primary' : 'text-bg-main'}`} />
+                                        <div className={`p-2 rounded-full transition-all duration-300 ${isUserOpen ? 'bg-[#6B4F4F]/20' : 'hover:bg-[#6B4F4F]/10'}`}>
+                                            <User className={`w-5 h-5 transition-colors duration-300 ${isUserOpen ? 'text-[#6B4F4F]' : 'text-[#6B4F4F]'}`} />
                                         </div>
                                     </button>
                                     <AnimatePresence>
@@ -256,21 +265,21 @@ export default function Navbar() {
                                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                                 exit={{ opacity: 0, scale: 0.95, y: 15 }}
                                                 transition={{ type: "spring", duration: 0.4, bounce: 0.2 }}
-                                                className="absolute right-0 mt-4 w-72 bg-[#0c0a09]/95 backdrop-blur-2xl shadow-[0_30px_100px_rgba(0,0,0,0.8)] rounded-3xl border border-white/10 overflow-hidden z-50 transform-gpu origin-top-right"
+                                                className="absolute right-0 mt-4 w-72 bg-[#6B4F4F] backdrop-blur-2xl shadow-[0_30px_100px_rgba(107,79,79,0.8)] rounded-3xl border border-[#6B4F4F]/10 overflow-hidden z-50 transform-gpu origin-top-right"
                                             >
                                                 {/* Header Section */}
                                                 <div className="px-6 py-5 border-b border-white/5 bg-white/5">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="w-12 h-12 rounded-2xl bg-brand-primary/10 flex items-center justify-center border border-brand-primary/20 shrink-0">
-                                                            <User className="w-6 h-6 text-brand-primary" />
+                                                        <div className="w-12 h-12 rounded-2xl bg-[#F5F1E9]/10 flex items-center justify-center border border-[#F5F1E9]/20 shrink-0">
+                                                            <User className="w-6 h-6 text-[#F5F1E9]" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <p className="text-base font-black truncate text-white tracking-tight">
                                                                 {user.name}
                                                             </p>
                                                             <div className="flex items-center gap-1.5 mt-0.5">
-                                                                <div className="w-1.5 h-1.5 rounded-full bg-brand-primary animate-pulse" />
-                                                                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-brand-primary/80">
+                                                                <div className="w-1.5 h-1.5 rounded-full bg-[#F5F1E9] animate-pulse" />
+                                                                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#F5F1E9]/80">
                                                                     Premium Member
                                                                 </p>
                                                             </div>
@@ -290,8 +299,8 @@ export default function Navbar() {
                                                             className="flex items-center gap-4 px-4 py-3 text-sm font-semibold rounded-2xl transition-all duration-300 group hover:bg-white/5 text-gray-300 hover:text-white"
                                                             onClick={() => setIsUserOpen(false)}
                                                         >
-                                                            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center transition-all duration-300 group-hover:bg-brand-primary/20 group-hover:scale-110">
-                                                                <item.icon className="w-5 h-5 text-gray-400 group-hover:text-brand-primary" />
+                                                            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center transition-all duration-300 group-hover:bg-[#F5F1E9]/20 group-hover:scale-110">
+                                                                <item.icon className="w-5 h-5 text-gray-400 group-hover:text-[#F5F1E9]" />
                                                             </div>
                                                             <div>
                                                                 <span className="block">{item.label}</span>
@@ -302,7 +311,7 @@ export default function Navbar() {
                                                 </div>
 
                                                 {/* Logout Section */}
-                                                <div className="p-3 border-t border-white/5 mt-1 bg-white/[0.02]">
+                                                <div className="p-3 border-t border-white/5 mt-1 bg-white/2">
                                                     <button
                                                         onClick={() => { logout(); setIsUserOpen(false); }}
                                                         className="flex items-center justify-between w-full px-4 py-3 text-sm font-bold text-red-400 hover:bg-red-500/10 rounded-2xl transition-all duration-300 group"
@@ -348,7 +357,7 @@ export default function Navbar() {
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
                             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="md:hidden fixed inset-0 top-0 bg-white dark:bg-bg-main z-[60] p-6 pt-24 flex flex-col space-y-2 overflow-y-auto"
+                            className="md:hidden fixed inset-0 top-0 bg-white dark:bg-bg-main z-60 p-6 pt-24 flex flex-col space-y-2 overflow-y-auto"
                         >
                             <button className="absolute top-8 right-6 p-2 rounded-full bg-gray-100 dark:bg-white/5" onClick={() => setIsOpen(false)}>
                                 <X className="w-6 h-6" />

@@ -65,26 +65,26 @@ export default function CategorySection() {
 
     if (isLoading) {
         return (
-            <div className="py-24 bg-bg-soft flex items-center justify-center min-h-[400px]">
-                <div className="w-8 h-8 border-2 border-brand-primary/20 border-t-brand-primary rounded-full animate-spin"></div>
+            <div className="py-24 bg-[#EADBC8] flex items-center justify-center min-h-100">
+                <div className="w-8 h-8 border-2 border-[#8F4E34]/20 border-t-[#8F4E34] rounded-full animate-spin"></div>
             </div>
         );
     }
 
     return (
-        <section id="categories" className="py-24 px-6 md:px-12 max-w-[1400px] mx-auto bg-[#F0F2F5]/40 rounded-[80px] my-16 border border-white/40">
+        <section id="categories" className="py-24 px-6 md:px-12 max-w-350 mx-auto bg-[#EADBC8] rounded-[80px] my-16 border border-white/40">
             <ScrollReveal direction="up" className="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-10 px-8">
                 <div className="space-y-6">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-[3px] bg-blue-600/40 rounded-full" />
-                        <span className="text-blue-600/70 font-black uppercase tracking-[0.4em] text-[11px]">Curated Selections</span>
+                        <div className="w-12 h-0.75 bg-[#8F4E34]/40 rounded-full" />
+                        <span className="text-[#8F4E34]/70 font-black uppercase tracking-[0.4em] text-[11px]">Curated Selections</span>
                     </div>
-                    <h2 className="text-6xl md:text-8xl font-playfair font-black text-gray-900 tracking-[-0.05em] leading-[0.9] drop-shadow-sm">
+                    <h2 className="text-6xl md:text-8xl font-playfair font-black text-[#1E1713] tracking-[-0.05em] leading-[0.9] drop-shadow-sm">
                         Discover <br />
-                        <span className="text-blue-600/90 italic font-serif opacity-95">Collections</span>
+                        <span className="text-[#8F4E34] italic font-serif opacity-95">Collections</span>
                     </h2>
                 </div>
-                <Link href="/shop" className="group relative px-10 py-5 bg-[#F0F2F5] shadow-[10px_10px_20px_#d1d9e6,-10px_-10px_20px_#ffffff] rounded-[32px] flex items-center gap-5 text-sm font-black uppercase tracking-[0.3em] text-gray-800 hover:text-blue-600 transition-all duration-300 hover:shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] hover:scale-[0.98]">
+                <Link href="/shop" className="group relative px-10 py-5 bg-white shadow-[10px_10px_20px_rgba(107,79,79,0.1),-10px_-10px_20px_#ffffff] rounded-4xl flex items-center gap-5 text-sm font-black uppercase tracking-[0.3em] text-[#1E1713] hover:text-[#8F4E34] transition-all duration-300 hover:shadow-[inset_6px_6px_12px_rgba(107,79,79,0.1),inset_-6px_-6px_12px_#ffffff] hover:scale-[0.98]">
                     <span>View All</span>
                     <ArrowRight size={20} className="transform group-hover:translate-x-2 transition-transform" />
                 </Link>
@@ -100,7 +100,7 @@ export default function CategorySection() {
                         "md:col-span-7 md:row-span-1 h-full", // Home Textile
                         "md:col-span-5 md:row-span-1 h-full", // Wholesale
                     ];
-                    
+
                     const gridClass = gridConfig[idx] || "md:col-span-4 h-full";
 
                     return (
@@ -110,10 +110,10 @@ export default function CategorySection() {
                             key={idx}
                             className={gridClass}
                         >
-                            <Link href={cat.href} className="group relative block w-full h-full rounded-[56px] bg-[#F0F2F5] shadow-[24px_24px_70px_#d1d9e6,-24px_-24px_70px_#ffffff] overflow-hidden transition-all duration-700 hover:shadow-[12px_12px_40px_#d1d9e6,-12px_-12px_40px_#ffffff] hover:-translate-y-4">
+                            <Link href={cat.href} className="group relative block w-full h-full rounded-[56px] bg-white shadow-[24px_24px_70px_rgba(107,79,79,0.1),-24px_-24px_70px_#ffffff] overflow-hidden transition-all duration-700 hover:shadow-[12px_12px_40px_rgba(107,79,79,0.15),-12px_-12px_40px_#ffffff] hover:-translate-y-4">
                                 {/* Characteristically Clay: Deep Inner Gloam */}
-                                <div className="absolute inset-0 rounded-[56px] shadow-[inset_12px_12px_24px_rgba(255,255,255,0.8),inset_-12px_-12px_24px_rgba(163,177,198,0.5)] pointer-events-none z-30" />
-                                
+                                <div className="absolute inset-0 rounded-[56px] shadow-[inset_12px_12px_24px_rgba(255,255,255,0.8),inset_-12px_-12px_24px_rgba(107,79,79,0.1)] pointer-events-none z-30" />
+
                                 {/* Image Surface: Recessed Inset Effect */}
                                 <div className="absolute inset-5 overflow-hidden rounded-[44px] bg-white/40 shadow-[inset_6px_6px_15px_rgba(0,0,0,0.15)]">
                                     <div className="w-full h-full transition-transform duration-[2.5s] cubic-bezier(0.16, 1, 0.3, 1) group-hover:scale-110">
@@ -131,7 +131,7 @@ export default function CategorySection() {
 
                                 {/* Floating Master Content */}
                                 <div className="absolute inset-0 p-14 flex flex-col justify-end z-40 text-white">
-                                    <motion.div 
+                                    <motion.div
                                         initial={false}
                                         className="transform transition-all duration-1000 cubic-bezier(0.16, 1, 0.3, 1) translate-y-4 group-hover:translate-y-0"
                                     >
@@ -147,7 +147,7 @@ export default function CategorySection() {
                                     <div className="mt-12 flex items-center justify-between opacity-0 translate-y-6 transition-all duration-700 cubic-bezier(0.16, 1, 0.3, 1) group-hover:opacity-100 group-hover:translate-y-0 delay-200">
                                         <div className="flex items-center gap-3 group/btn">
                                             <span className="text-[11px] font-black uppercase tracking-[0.3em] border-b-2 border-white/50 pb-1 group-hover/btn:border-white transition-all">Curated View</span>
-                                            <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-3xl flex items-center justify-center border border-white/40 shadow-2xl group-hover/btn:bg-white group-hover/btn:text-blue-700 group-hover/btn:scale-110 transition-all duration-500">
+                                            <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-3xl flex items-center justify-center border border-white/40 shadow-2xl group-hover/btn:bg-white group-hover/btn:text-[#8F4E34] group-hover/btn:scale-110 transition-all duration-500">
                                                 <ArrowRight size={24} />
                                             </div>
                                         </div>

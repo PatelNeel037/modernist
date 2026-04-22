@@ -1,25 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --color-brand-primary: #664c36;
-  --color-brand-secondary: #ffd3ac;
-  --color-brand-dark: #331c08;
-  --color-content-heading: #331c08;
-  --color-content-body: #5c4a3d;
-  --color-bg-soft: #f9f7f5;
-  --color-bg-accent: #ccbeb1;
-  --color-bg-main: #ffffff;
+  --color-brand-primary: #8F4E34;
+  --color-brand-secondary: #F4EFE8;
+  --color-brand-dark: #1E1713;
+  --color-content-heading: #1E1713;
+  --color-content-body: #68584D;
+  --color-bg-soft: #F7F2EC;
+  --color-bg-accent: #D9C0A9;
+  --color-bg-main: #FBF5EE;
 }
 
 .dark {
-  --color-brand-primary: #ffd3ac;
-  --color-brand-secondary: #664c36;
-  --color-brand-dark: #f9f7f5;
-  --color-content-heading: #f9f7f5;
-  --color-content-body: #ccbeb1;
-  --color-bg-soft: #181512;
-  --color-bg-accent: #2a241f;
-  --color-bg-main: #0c0a09;
+  --color-brand-primary: #e2b295;
+  --color-brand-secondary: #3d2a21;
+  --color-brand-dark: #f8f5f1;
+  --color-content-heading: #f8f5f1;
+  --color-content-body: #d8c1af;
+  --color-bg-soft: #17120f;
+  --color-bg-accent: #33251e;
+  --color-bg-main: #0d0a08;
 }
 
 @theme {
@@ -54,6 +54,10 @@
   body {
     background-color: var(--color-bg-main);
     color: var(--color-content-heading);
+    background-image:
+      radial-gradient(circle at top left, rgba(143, 78, 52, 0.08), transparent 36%),
+      radial-gradient(circle at bottom right, rgba(73, 44, 29, 0.05), transparent 32%);
+    background-attachment: scroll;
   }
 
   h1,
